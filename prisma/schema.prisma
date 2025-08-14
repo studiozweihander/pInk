@@ -1,0 +1,69 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Idiom {
+  id      Int     @id @default(autoincrement())
+  name    String
+  comics  Comic[]
+  issues  Issue[]
+}
+
+model Publisher {
+  id     Int    @id @default(autoincrement())
+  name   String
+  comics Comic[]
+}
+
+model Author {
+  id           Int             @id @default(autoincrement())
+  name         String
+  comicAuthors ComicAuthor[]
+}
+
+model Comic {
+  id          Int             @id @default(autoincrement())
+  title       String
+  year        Int
+  link        String
+  cover       String
+  idiomId     Int
+  publisherId Int
+  idiom       Idiom           @relation(fields: [idiomId], references: [id])
+  publisher   Publisher       @relation(fields: [publisherId], references: [id])
+  authors     ComicAuthor[]
+  issues      Issue[]
+}
+
+model Issue {
+  id          Int      @id @default(autoincrement())
+  title       String
+  issueNumber Int
+  year        Int
+  size        String
+  series      String
+  genres      String[]
+  link        String
+  cover       String
+  synopsis    String
+  comicId     Int
+  idiomId     Int
+  comic       Comic    @relation(fields: [comicId], references: [id])
+  idiom       Idiom    @relation(fields: [idiomId], references: [id])
+
+  @@unique([comicId, issueNumber])
+}
+
+model ComicAuthor {
+  comicId  Int
+  authorId Int
+  comic    Comic  @relation(fields: [comicId], references: [id])
+  author   Author @relation(fields: [authorId], references: [id])
+
+  @@id([comicId, authorId])
+}
