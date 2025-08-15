@@ -29,6 +29,7 @@ model Author {
 model Comic {
   id          Int             @id @default(autoincrement())
   title       String
+  issues      Int
   year        Int
   link        String
   cover       String
