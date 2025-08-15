@@ -8,26 +8,26 @@ datasource db {
 }
 
 model Idiom {
-  id      Int     @id @default(autoincrement())
-  name    String
-  comics  Comic[]
-  issues  Issue[]
+  id     Int     @id @default(autoincrement())
+  name   String
+  comics Comic[]
+  issues Issue[]
 }
 
 model Publisher {
-  id     Int    @id @default(autoincrement())
+  id     Int     @id @default(autoincrement())
   name   String
   comics Comic[]
 }
 
 model Author {
-  id           Int             @id @default(autoincrement())
+  id           Int           @id @default(autoincrement())
   name         String
   comicAuthors ComicAuthor[]
 }
 
 model Comic {
-  id          Int             @id @default(autoincrement())
+  id          Int           @id @default(autoincrement())
   title       String
   issues      Int
   year        Int
@@ -35,10 +35,10 @@ model Comic {
   cover       String
   idiomId     Int
   publisherId Int
-  idiom       Idiom           @relation(fields: [idiomId], references: [id])
-  publisher   Publisher       @relation(fields: [publisherId], references: [id])
+  idiom       Idiom         @relation(fields: [idiomId], references: [id])
+  publisher   Publisher     @relation(fields: [publisherId], references: [id])
   authors     ComicAuthor[]
-  issues      Issue[]
+  issuesList  Issue[]
 }
 
 model Issue {
