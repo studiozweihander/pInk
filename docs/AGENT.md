@@ -4,7 +4,7 @@
 
 **Projeto Original**: pInk - Catálogo de quadrinhos  
 **Localização**: `c:/Users/Zweihander/pInk/`  
-**Repositório**: https://github.com/zwei-han-der/pInk  
+**Repositório**: https://github.com/studio-zweihander/pInk  
 
 **Objetivo**: Refatorar completamente a estrutura do projeto mantendo o design existente, mas usando tecnologias mais simples e acessíveis para o desenvolvedor.
 
@@ -210,5 +210,5 @@ git push -u origin feature/nome-da-feature
 ---
 **Última atualização**: 19/08/2025  
 **Status**: Projeto estruturado, Git configurado, pronto para desenvolvimento das funcionalidades  
-**Repositório**: https://github.com/zwei-han-der/pInk  
+**Repositório**: https://github.com/studio-zweihander/pInk  
 **Desenvolvido por**: Zweihander
