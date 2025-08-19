@@ -25,11 +25,6 @@ async function testConnection() {
   console.log('🔍 Testing Supabase connection...');
   
   try {
-    // Verifica se as variáveis de ambiente estão definidas
-    if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-      throw new Error('Missing environment variables: SUPABASE_URL or SUPABASE_ANON_KEY');
-    }
-    
     console.log(`🔗 Connecting to: ${SUPABASE_URL}`);
     
     // Testa conexão fazendo uma query simples na tabela Idiom
