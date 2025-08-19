@@ -35,7 +35,7 @@ npm start      # Produção (Express)
 ## 📖 Documentação
 
 - [Git Flow Strategy](./docs/Git%20Flow.md)
-- [Contexto do Projeto](../PROJETO_PINK_REFACTOR.md)
+- [Contexto do Projeto](./docs/AGENT.md)
 
 ---
 Desenvolvido por Zweihander
