@@ -27,6 +27,7 @@
 - **Backend**: Express.js + pg (PostgreSQL client)
 - **Database**: Supabase PostgreSQL (reutilizar dados existentes)
 - **Estrutura**: Monorepo unificado na pasta raiz
+- **Deploy**: Configurado para produção (plataforma a definir)
 
 ## 📊 Estrutura do Banco de Dados
 
@@ -89,7 +90,7 @@ pInk/
 
 ## ✅ Progresso das Tarefas
 
-### Concluído
+### ✅ Concluído (Backend)
 - [x] Análise da estrutura atual do projeto
 - [x] Definição das tecnologias para nova versão
 - [x] Verificação do schema do banco de dados
@@ -101,15 +102,42 @@ pInk/
 - [x] Organização da estrutura de pastas
 - [x] Configuração inicial do Git
 - [x] Documentação completa do projeto
+- [x] Instalação e configuração do Express
+- [x] Configuração específica para Supabase
+- [x] **Server.js refatorado completamente** (rotas organizadas integradas)
+- [x] **Controllers implementados** (comics + issues com tratamento completo)
+- [x] **Rotas REST organizadas** (4 endpoints funcionais)
+- [x] **Conflitos de porta corrigidos** (padronizado 3000)
+- [x] **Schema database validado** (queries Supabase funcionais)
+- [x] **Error handling implementado** (global + específico)
+- [x] **Estrutura de startup robusta** (test connection + logs)
 
-### Pendente
-- [ ] Instalação e configuração do Express
-- [ ] Configuração da conexão com Supabase
-- [ ] Implementação das APIs REST básicas
-- [ ] Desenvolvimento dos componentes frontend
-- [ ] Replicação do design existente
-- [ ] Implementação das funcionalidades
-- [ ] Testes e validação
+### ✅ Concluído (Frontend Base)
+- [x] **API Client implementado** (fetch com timeout + error handling)
+- [x] **Estrutura HTML completa** (header + search + cards container)
+- [x] **JavaScript funcional** (loading states + error handling + busca)
+- [x] **Main.js com todas as funções** (loadComics + filter + card creation)
+
+### ⚠️ Pendente (Crítico)
+- [ ] **Configuração das credenciais Supabase (.env)** - BLOQUEANTE
+- [ ] **Teste do servidor completo** - Validar APIs funcionando
+- [ ] **CSS responsivo implementado** - Design system aplicado
+
+### 📝 Pendente (Funcionalidades)
+- [ ] **Página de edições** - Navegação para lista de issues
+- [ ] **Modal de detalhes** - Popup com informações + download
+- [ ] **Assets preparados** - Logo SVG + capas default
+- [ ] **Tratamento de imagens** - Fallback para capas inexistentes
+- [ ] **Busca avançada** - Filtros por idioma/publisher
+- [ ] **Loading states visuais** - Spinners + skeletons
+- [ ] **Responsividade completa** - Mobile-first testado
+
+### 🚀 Pendente (Deploy)
+- [ ] **Build de produção** - Vite build + otimizações
+- [ ] **Configuração de deploy** - Escolha de plataforma
+- [ ] **Environment variables** - Produção vs desenvolvimento
+- [ ] **Testes e validação** - QA completo
+- [ ] **Documentação de deploy** - Instruções para futuro
 
 ## 🎨 Design System - Backup Completo
 
@@ -184,17 +212,24 @@ pInk/
 1. ✅ Estrutura Vite criada e funcionando
 2. ✅ Git inicializado com branches (main/develop)
 3. ✅ Documentação completa
-4. Configurar Express + conexão Supabase
-5. Implementar APIs REST básicas
-6. Desenvolver componentes frontend
-7. Implementar funcionalidades completas
+4. ✅ Express configurado específico para Supabase
+5. ✅ **Server.js refatorado com rotas organizadas**
+6. ✅ **Controllers implementados (4 endpoints funcionais)**
+7. ✅ **Conflitos de porta e schema corrigidos** (padronizado 3000)
+8. **Configurar credenciais Supabase (.env)** - BLOQUEANTE ATUAL
+9. **Testar servidor completo** - Validar APIs funcionando
+10. **Implementar CSS responsivo** - Aplicar design system
+11. **Desenvolver funcionalidades restantes** (modal, navegação)
+12. **Preparar assets** (logo, capas default)
+13. **Deploy em produção** (plataforma a definir)
 
 ## 💡 Comandos Importantes
 
 ### Desenvolvimento
 ```bash
-npm run dev    # Servidor de desenvolvimento (Vite)
-npm start      # Servidor de produção (quando Express estiver pronto)
+npm run dev    # Frontend: Servidor de desenvolvimento (Vite)
+npm run server # Backend: Servidor Express com auto-reload (nodemon)
+npm start      # Backend: Servidor Express produção
 ```
 
 ### Git Flow
@@ -207,8 +242,33 @@ git push -u origin feature/nome-da-feature
 # Criar PR para develop
 ```
 
+## 🚨 Pontos Críticos Identificados
+
+### Backend Funcional ✅
+- **Server Express**: Completamente refatorado e organizado
+- **4 APIs REST**: Todas implementadas com error handling robusto
+- **Database queries**: Validadas e funcionais (aguarda credenciais)
+- **Error handling**: Global e específico implementado
+- **Startup robusta**: Testa conexão antes de aceitar requests
+
+### Frontend Base Completo ✅  
+- **HTML estrutura**: Header + search + cards container
+- **JavaScript funcional**: API client + loading states + busca
+- **CSS básico**: Presente mas precisa ser expandido
+
+### Bloqueadores Atuais ⚠️
+1. **Credenciais Supabase**: `.env` existe mas conteúdo não verificável
+2. **CSS responsivo**: Design system documentado mas não aplicado
+3. **Assets faltando**: Logo SVG + capas default não encontrados
+
+### Missing Components 📋
+- **Modal sistema**: Para detalhes das edições
+- **Navegação**: Entre páginas inicial ↔ edições  
+- **Loading spinners**: Apenas texto atualmente
+- **Error states**: Visuais básicos implementados
+
 ---
 **Última atualização**: 19/08/2025  
-**Status**: Projeto estruturado, Git configurado, pronto para desenvolvimento das funcionalidades  
+**Status**: Backend funcional, Frontend estruturado, bloqueado por credenciais Supabase  
 **Repositório**: https://github.com/studio-zweihander/pInk  
 **Desenvolvido por**: Zweihander
