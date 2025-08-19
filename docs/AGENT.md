@@ -112,16 +112,19 @@ pInk/
 - [x] **Error handling implementado** (global + específico)
 - [x] **Estrutura de startup robusta** (test connection + logs)
 
-### ✅ Concluído (Frontend Base)
+### ✅ Concluído (Frontend Completo)
 - [x] **API Client implementado** (fetch com timeout + error handling)
 - [x] **Estrutura HTML completa** (header + search + cards container)
 - [x] **JavaScript funcional** (loading states + error handling + busca)
 - [x] **Main.js com todas as funções** (loadComics + filter + card creation)
+- [x] **CSS responsivo implementado** (design system completo + breakpoints)
+- [x] **Cards finalizados** (design conforme mockup + metadados formatados)
+- [x] **Limpeza de código** (redundâncias removidas + pastas vazias eliminadas)
 
-### ⚠️ Pendente (Crítico)
-- [ ] **Configuração das credenciais Supabase (.env)** - BLOQUEANTE
-- [ ] **Teste do servidor completo** - Validar APIs funcionando
-- [ ] **CSS responsivo implementado** - Design system aplicado
+### ✅ Concluído (Sistema Base)
+- [x] **Configuração das credenciais Supabase (.env)** - Funcionando
+- [x] **Teste do servidor completo** - APIs todas funcionais
+- [x] **Integração frontend-backend** - Comunicação estabelecida
 
 ### 📝 Pendente (Funcionalidades)
 - [ ] **Página de edições** - Navegação para lista de issues
@@ -216,12 +219,14 @@ pInk/
 5. ✅ **Server.js refatorado com rotas organizadas**
 6. ✅ **Controllers implementados (4 endpoints funcionais)**
 7. ✅ **Conflitos de porta e schema corrigidos** (padronizado 3000)
-8. **Configurar credenciais Supabase (.env)** - BLOQUEANTE ATUAL
-9. **Testar servidor completo** - Validar APIs funcionando
-10. **Implementar CSS responsivo** - Aplicar design system
-11. **Desenvolver funcionalidades restantes** (modal, navegação)
-12. **Preparar assets** (logo, capas default)
-13. **Deploy em produção** (plataforma a definir)
+8. ✅ **Configurar credenciais Supabase (.env)** - Funcionando
+9. ✅ **Testar servidor completo** - APIs todas funcionais
+10. ✅ **Implementar CSS responsivo** - Design system aplicado
+11. ✅ **Cards finalizados** - Design conforme mockup
+12. ✅ **Limpeza de código** - Redundâncias removidas
+13. **Desenvolver funcionalidades restantes** (modal, navegação) - PRÓXIMO
+14. **Preparar assets** (logo, capas default)
+15. **Deploy em produção** (plataforma a definir)
 
 ## 💡 Comandos Importantes
 
@@ -251,24 +256,25 @@ git push -u origin feature/nome-da-feature
 - **Error handling**: Global e específico implementado
 - **Startup robusta**: Testa conexão antes de aceitar requests
 
-### Frontend Base Completo ✅  
+### Frontend Completo ✅  
 - **HTML estrutura**: Header + search + cards container
 - **JavaScript funcional**: API client + loading states + busca
-- **CSS básico**: Presente mas precisa ser expandido
+- **CSS responsivo**: Design system aplicado conforme mockup
+- **Cards finalizados**: Layout + metadados + responsividade implementados
 
 ### Bloqueadores Atuais ⚠️
-1. **Credenciais Supabase**: `.env` existe mas conteúdo não verificável
-2. **CSS responsivo**: Design system documentado mas não aplicado
-3. **Assets faltando**: Logo SVG + capas default não encontrados
+1. **Assets faltando**: Logo SVG + capas default não encontrados
+2. **Modal sistema**: Ainda não implementado para detalhes
+3. **Navegação**: Transição entre páginas não implementada
 
 ### Missing Components 📋
 - **Modal sistema**: Para detalhes das edições
 - **Navegação**: Entre páginas inicial ↔ edições  
-- **Loading spinners**: Apenas texto atualmente
-- **Error states**: Visuais básicos implementados
+- **Assets de imagem**: Logo + fallback covers
+- **Estados de carregamento**: Melhorias visuais
 
 ---
 **Última atualização**: 19/08/2025  
-**Status**: Backend funcional, Frontend estruturado, bloqueado por credenciais Supabase  
+**Status**: Sistema base funcional completo - Backend + Frontend + Database integrados  
 **Repositório**: https://github.com/studio-zweihander/pInk  
 **Desenvolvido por**: Zweihander
