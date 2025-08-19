@@ -34,8 +34,11 @@ function showError(message) {
   `;
 }
 
-// Função para criar card de quadrinho
 function createComicCard(comic) {
+  const year = comic.year || '';
+  const issues = comic.total_issues || 0;
+  const metaText = `Lançamento: ${year} | Edições: ${issues} | Idioma: ${comic.language} | Editora: ${comic.publisher}`;
+  
   return `
     <div class="card" data-id="${comic.id}" onclick="viewComicDetails(${comic.id})">
       <div class="card-image">
@@ -44,14 +47,7 @@ function createComicCard(comic) {
       </div>
       <div class="card-info">
         <h3 class="card-title">${comic.title}</h3>
-        <div class="card-meta">
-          <span class="card-year">${comic.year || 'N/A'}</span>
-          <span class="card-issues">${comic.total_issues || 0} edições</span>
-        </div>
-        <div class="card-details">
-          ${comic.language ? `<span class="card-language">${comic.language}</span>` : ''}
-          ${comic.publisher ? `<span class="card-publisher">${comic.publisher}</span>` : ''}
-        </div>
+        <div class="card-meta">${metaText}</div>
       </div>
     </div>
   `;
