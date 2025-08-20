@@ -1,4 +1,8 @@
-const API_BASE_URL = 'http://localhost:3000/api';
+// URL base da API - adaptada para desenvolvimento e produção
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:3000/api'  // Express local
+  : '/api';  // Vercel functions
+  
 const REQUEST_TIMEOUT = 10000;
 
 class ApiClient {
@@ -79,7 +83,10 @@ class ApiClient {
 
   async healthCheck() {
     try {
-      const response = await fetch(`http://localhost:3000/health`);
+      const healthUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:3000/health'  // Express local
+        : '/api/health';  // Vercel function
+      const response = await fetch(healthUrl);
       return response.ok;
     } catch {
       return false;
