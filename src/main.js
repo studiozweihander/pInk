@@ -223,14 +223,126 @@ window.backToHome = function() {
   console.log('🏠 Voltou para página inicial');
 };
 
-window.viewIssueDetails = function(issueId) {
-  console.log(`📄 Clicou na edição ID: ${issueId}`);
-  alert(`Modal de detalhes em desenvolvimento!\nEdição ID: ${issueId}`);
+let currentIssueData = null;
+
+window.viewIssueDetails = async function(issueId) {
+  console.log(`📄 Abrindo detalhes da edição ID: ${issueId}`);
+  await openModal(issueId);
+};
+
+async function openModal(issueId) {
+  const modal = document.getElementById('modal');
+  const modalTitle = document.getElementById('modal-title');
+  const modalCover = document.getElementById('modal-cover');
+  const modalSynopsis = document.getElementById('modal-synopsis');
+  const modalSeries = document.getElementById('modal-series');
+  const modalGenres = document.getElementById('modal-genres');
+  const modalYear = document.getElementById('modal-year');
+  const modalSize = document.getElementById('modal-size');
+  const modalLanguage = document.getElementById('modal-language');
+  const downloadSize = document.getElementById('download-size');
+  
+  // Mostrar modal com loading
+  modal.classList.add('open');
+  modalTitle.textContent = 'Carregando...';
+  modalSynopsis.textContent = 'Carregando informações...';
+  
+  // Reset outros campos
+  modalSeries.textContent = '-';
+  modalGenres.textContent = '-';
+  modalYear.textContent = '-';
+  modalSize.textContent = '-';
+  modalLanguage.textContent = '-';
+  downloadSize.textContent = '';
+  modalCover.src = '';
+  
+  try {
+    // Buscar dados da edição
+    console.log(`🔍 Buscando dados da edição ID: ${issueId}`);
+    const response = await api.getIssueById(issueId);
+    currentIssueData = response.data;
+    
+    console.log('✅ Dados da edição carregados:', currentIssueData);
+    
+    // Preencher modal com dados
+    modalTitle.textContent = currentIssueData.title || 'Título não disponível';
+    modalCover.src = currentIssueData.cover || '/assets/covers/default.jpg';
+    modalCover.alt = currentIssueData.title || 'Capa da edição';
+    
+    modalSynopsis.textContent = currentIssueData.synopsis || 'Sinopse não disponível para esta edição.';
+    
+    modalSeries.textContent = currentIssueData.series || 'N/A';
+    
+    // Formatar gêneros
+    let genres = currentIssueData.genres;
+    if (genres) {
+      genres = Array.isArray(genres) ? genres.join(', ') : genres.replace(/,/g, ', ');
+    }
+    modalGenres.textContent = genres || 'N/A';
+    
+    modalYear.textContent = currentIssueData.year || 'N/A';
+    modalSize.textContent = currentIssueData.size || 'N/A';
+    modalLanguage.textContent = currentIssueData.language || 'N/A';
+    
+    // Formatar tamanho do download
+    if (currentIssueData.size) {
+      downloadSize.textContent = `(${currentIssueData.size})`;
+    }
+    
+  } catch (error) {
+    console.error('❌ Erro ao carregar dados da edição:', error);
+    modalTitle.textContent = 'Erro ao carregar';
+    modalSynopsis.textContent = 'Não foi possível carregar os detalhes desta edição. Tente novamente mais tarde.';
+  }
+}
+
+window.closeModal = function() {
+  const modal = document.getElementById('modal');
+  modal.classList.remove('open');
+  
+  // Aguardar animação antes de limpar dados
+  setTimeout(() => {
+    currentIssueData = null;
+    
+    // Reset campos
+    document.getElementById('modal-title').textContent = 'Carregando...';
+    document.getElementById('modal-cover').src = '';
+    document.getElementById('modal-synopsis').textContent = 'Carregando sinopse...';
+    document.getElementById('modal-series').textContent = '-';
+    document.getElementById('modal-genres').textContent = '-';
+    document.getElementById('modal-year').textContent = '-';
+    document.getElementById('modal-size').textContent = '-';
+    document.getElementById('modal-language').textContent = '-';
+    document.getElementById('download-size').textContent = '';
+  }, 300);
+  
+  console.log('❌ Modal fechado');
+};
+
+window.downloadIssue = function() {
+  if (!currentIssueData) {
+    console.warn('⚠️ Nenhuma edição carregada para download');
+    return;
+  }
+  
+  if (!currentIssueData.link) {
+    alert('❌ Link de download não disponível para esta edição.');
+    return;
+  }
+  
+  console.log(`📥 Iniciando download da edição: ${currentIssueData.title}`);
+  
+  // Abrir link em nova aba
+  window.open(currentIssueData.link, '_blank');
+  
+  // Log para tracking
+  console.log(`✅ Download iniciado: ${currentIssueData.title} (${currentIssueData.size || 'Tamanho desconhecido'})`);
 };
 
 document.addEventListener('DOMContentLoaded', () => {
   console.log('✅ DOM carregado, iniciando aplicação...');
   
+  // Event listener para busca
   searchInput.addEventListener('input', (e) => {
     if (currentView === 'home') {
       filterComics(e.target.value);
@@ -239,6 +351,20 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
   
+  // Event listeners do modal
+  // Fechar modal ao pressionar ESC
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && document.getElementById('modal').classList.contains('open')) {
+      closeModal();
+    }
+  });
+  
+  // Impedir erro na imagem do modal
+  document.getElementById('modal-cover').addEventListener('error', function() {
+    this.src = '/assets/covers/default.jpg';
+  });
+  
+  // Carregar dados iniciais
   loadAllComics();
 });
 window.api = api;
