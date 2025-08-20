@@ -126,14 +126,18 @@ pInk/
 - [x] **Teste do servidor completo** - APIs todas funcionais
 - [x] **Integração frontend-backend** - Comunicação estabelecida
 
-### 📝 Pendente (Funcionalidades)
-- [ ] **Página de edições** - Navegação para lista de issues
-- [ ] **Modal de detalhes** - Popup com informações + download
+### ✅ Concluído (Funcionalidades Principais)
+- [x] **Página de edições** - Navegação para lista de issues implementada
+- [x] **Modal de detalhes** - Popup com informações + download totalmente funcional
+- [x] **Responsividade completa** - Mobile-first implementado e testado
+
+### 📝 Pendente (Melhorias e Assets)
 - [ ] **Assets preparados** - Logo SVG + capas default
-- [ ] **Tratamento de imagens** - Fallback para capas inexistentes
+- [ ] **Tratamento de imagens** - Fallback para capas inexistentes melhorado
 - [ ] **Busca avançada** - Filtros por idioma/publisher
-- [ ] **Loading states visuais** - Spinners + skeletons
-- [ ] **Responsividade completa** - Mobile-first testado
+- [ ] **Loading states visuais** - Spinners + skeletons melhorados
+- [ ] **Página 404** - Tratamento para IDs inexistentes
+- [ ] **Breadcrumbs clicáveis** - Navegação mais intuitiva
 
 ### 🚀 Pendente (Deploy)
 - [ ] **Build de produção** - Vite build + otimizações
@@ -224,8 +228,8 @@ pInk/
 10. ✅ **Implementar CSS responsivo** - Design system aplicado
 11. ✅ **Cards finalizados** - Design conforme mockup
 12. ✅ **Limpeza de código** - Redundâncias removidas
-13. **Desenvolver funcionalidades restantes** (modal, navegação) - PRÓXIMO
-14. **Preparar assets** (logo, capas default)
+13. ✅ **Desenvolver funcionalidades restantes** - Modal + navegação implementados
+14. **Preparar assets** (logo, capas default) - PRÓXIMO
 15. **Deploy em produção** (plataforma a definir)
 
 ## 💡 Comandos Importantes
@@ -264,17 +268,17 @@ git push -u origin feature/nome-da-feature
 
 ### Bloqueadores Atuais ⚠️
 1. **Assets faltando**: Logo SVG + capas default não encontrados
-2. **Modal sistema**: Ainda não implementado para detalhes
-3. **Navegação**: Transição entre páginas não implementada
+2. **Fallback de imagens**: Melhorias no tratamento de capas inexistentes
+3. **Funcionalidades extras**: Busca avançada + filtros
 
 ### Missing Components 📋
-- **Modal sistema**: Para detalhes das edições
-- **Navegação**: Entre páginas inicial ↔ edições  
 - **Assets de imagem**: Logo + fallback covers
-- **Estados de carregamento**: Melhorias visuais
+- **Estados de carregamento**: Melhorias visuais  
+- **Busca avançada**: Filtros por idioma/editora
+- **Breadcrumbs**: Navegação clicável melhorada
 
 ---
-**Última atualização**: 19/08/2025  
+**Última atualização**: 20/08/2025  
 **Status**: Sistema base funcional completo - Backend + Frontend + Database integrados  
 **Repositório**: https://github.com/studio-zweihander/pInk  
 **Desenvolvido por**: Zweihander
