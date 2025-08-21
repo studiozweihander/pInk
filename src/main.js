@@ -44,6 +44,10 @@ function handleImageError(imgElement, fallbackSrc = '/assets/covers/default.jpg'
   }
   
   imgElement.dataset.errorHandled = 'true';
+  
+  console.log('❌ Erro ao carregar imagem:', imgElement.src);
+  console.log('🔄 Tentando fallback:', fallbackSrc);
+  
   imgElement.src = fallbackSrc;
   
   setTimeout(() => {
@@ -167,29 +171,68 @@ function filterComics(searchTerm) {
 }
 
 function filterIssues(searchTerm) {
-  if (!currentIssues || currentIssues.length === 0 || !currentComic) {
-    console.warn('⚠️ Dados de edições não disponíveis para filtro');
+  console.log('🔍 Filtrando edições. Termo:', searchTerm);
+  console.log('📚 Current Issues:', currentIssues);
+  console.log('🎯 Current Comic:', currentComic);
+  
+  if (!currentIssues || currentIssues.length === 0) {
+    console.warn('⚠️ Nenhuma edição carregada para filtrar');
+    return;
+  }
+  
+  if (!currentComic) {
+    console.warn('⚠️ Quadrinho atual não definido');
     return;
   }
   
   if (!searchTerm.trim()) {
+    console.log('✅ Mostrando todas as edições');
     renderIssues(currentIssues, currentComic);
     return;
   }
   
-  const filtered = currentIssues.filter(issue => 
-    issue.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    (issue.series && issue.series.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (issue.genres && issue.genres.toLowerCase().includes(searchTerm.toLowerCase())) ||
-    (issue.issueNumber && issue.issueNumber.toString().includes(searchTerm))
-  );
+  const searchLower = searchTerm.toLowerCase().trim();
   
+  const filtered = currentIssues.filter(issue => {
+    if (issue.title && issue.title.toLowerCase().includes(searchLower)) {
+      return true;
+    }
+    
+    if (issue.series && issue.series.toLowerCase().includes(searchLower)) {
+      return true;
+    }
+    
+    if (issue.genres) {
+      let genresStr = '';
+      if (Array.isArray(issue.genres)) {
+        genresStr = issue.genres.join(' ').toLowerCase();
+      } else if (typeof issue.genres === 'string') {
+        genresStr = issue.genres.toLowerCase();
+      }
+      if (genresStr.includes(searchLower)) {
+        return true;
+      }
+    }
+    
+    if (issue.issueNumber && issue.issueNumber.toString().includes(searchTerm)) {
+      return true;
+    }
+    
+    if (issue.year && issue.year.toString().includes(searchTerm)) {
+      return true;
+    }
+    
+    return false;
+  });
+  
+  console.log(`📋 Encontradas ${filtered.length} edições de ${currentIssues.length}`);
   renderIssues(filtered, currentComic);
 }
 
 async function loadComicIssues(comicId) {
   if (isLoading) return;
   
+  console.log('📚 Carregando edições para quadrinho ID:', comicId);
   showLoading();
   
   try {
@@ -201,12 +244,18 @@ async function loadComicIssues(comicId) {
     currentComic = comicResponse.data;
     currentIssues = issuesResponse.data;
     
+    console.log('✅ Dados carregados:');
+    console.log('🎯 Comic:', currentComic);
+    console.log('📖 Issues:', currentIssues);
+    
     renderIssues(currentIssues, currentComic);
     updateHeader();
     
   } catch (error) {
     console.error('❌ Erro ao carregar edições:', error);
     showError(error.message);
+    currentComic = null;
+    currentIssues = [];
   } finally {
     isLoading = false;
   }
@@ -227,18 +276,22 @@ function updateHeader() {
 }
 
 window.viewComicIssues = function(comicId) {
+  console.log('🎯 Navegando para edições do quadrinho ID:', comicId);
   currentView = 'issues';
   searchInput.value = '';
+  console.log('📍 View alterada para:', currentView);
   loadComicIssues(comicId);
 };
 
 window.backToHome = function() {
   if (currentView === 'home') return;
   
+  console.log('🏠 Voltando para home');
   currentView = 'home';
   currentComic = null;
   currentIssues = [];
   searchInput.value = '';
+  console.log('📍 View alterada para:', currentView);
   
   renderComics(allComics);
   updateHeader();
@@ -356,15 +409,26 @@ document.addEventListener('DOMContentLoaded', () => {
   function handleSearchInput(e) {
     const searchTerm = e.target.value;
     
+    console.log('🔍 Busca ativada:', searchTerm);
+    console.log('📍 View atual:', currentView);
+    
     if (currentView === 'home') {
+      console.log('🏠 Filtrando quadrinhos');
       filterComics(searchTerm);
     } else if (currentView === 'issues') {
+      console.log('📚 Filtrando edições');
       filterIssues(searchTerm);
+    } else {
+      console.warn('⚠️ View não reconhecida:', currentView);
     }
   }
   
   searchInput.addEventListener('input', handleSearchInput);
   searchInput.addEventListener('keyup', handleSearchInput);
+  
+  searchInput.addEventListener('paste', (e) => {
+    setTimeout(() => handleSearchInput(e), 10);
+  });
   
   function toggleMobileSearch(show) {
     if (show) {
