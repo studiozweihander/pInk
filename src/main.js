@@ -37,6 +37,23 @@ function showError(message) {
   `;
 }
 
+function handleImageError(imgElement, fallbackSrc = '/assets/covers/default.jpg') {
+  if (imgElement.dataset.errorHandled === 'true') {
+    console.log('🖼️ Imagem já processada para erro:', imgElement.src);
+    return;
+  }
+  
+  imgElement.dataset.errorHandled = 'true';
+  imgElement.src = fallbackSrc;
+  
+  setTimeout(() => {
+    if (imgElement.dataset.errorHandled === 'true' && imgElement.src.includes('default.jpg')) {
+      imgElement.style.opacity = '0.5';
+      imgElement.alt = 'Imagem não disponível';
+    }
+  }, 1000);
+}
+
 function createComicCard(comic) {
   const year = comic.year || '';
   const issues = comic.total_issues || 0;
@@ -46,7 +63,8 @@ function createComicCard(comic) {
     <div class="card" data-id="${comic.id}" onclick="viewComicIssues(${comic.id})">
       <div class="card-image">
         <img src="${comic.cover || '/assets/covers/default.jpg'}" alt="${comic.title}" 
-             onerror="this.src='/assets/covers/default.jpg'">
+             data-error-handled="false"
+             onerror="handleImageError(this)">
       </div>
       <div class="card-info">
         <h3 class="card-title">${comic.title}</h3>
@@ -68,7 +86,8 @@ function createIssueCard(issue) {
     <div class="card" data-id="${issue.id}" onclick="viewIssueDetails(${issue.id})">
       <div class="card-image">
         <img src="${issue.cover || '/assets/covers/default.jpg'}" alt="${issue.title}" 
-             onerror="this.src='/assets/covers/default.jpg'">
+             data-error-handled="false"
+             onerror="handleImageError(this)">
       </div>
       <div class="card-info">
         <h3 class="card-title">${issue.title}</h3>
@@ -243,27 +262,33 @@ async function openModal(issueId) {
   const modalLanguage = document.getElementById('modal-language');
   const downloadSize = document.getElementById('download-size');
   
-  // Mostrar modal com loading
   modal.classList.add('open');
   modalTitle.textContent = 'Carregando...';
   modalSynopsis.textContent = 'Carregando informações...';
   
-  // Reset outros campos
   modalSeries.textContent = '-';
   modalGenres.textContent = '-';
   modalYear.textContent = '-';
   modalSize.textContent = '-';
   modalLanguage.textContent = '-';
   downloadSize.textContent = '';
+  
   modalCover.src = '';
+  modalCover.alt = 'Carregando...';
+  modalCover.dataset.errorHandled = 'false';
+  modalCover.style.opacity = '1';
   
   try {
     const response = await api.getIssueById(issueId);
     currentIssueData = response.data;
     
     modalTitle.textContent = currentIssueData.title || 'Título não disponível';
-    modalCover.src = currentIssueData.cover || '/assets/covers/default.jpg';
     modalCover.alt = currentIssueData.title || 'Capa da edição';
+    
+    modalCover.dataset.errorHandled = 'false';
+    modalCover.style.opacity = '1';
+    const coverSrc = currentIssueData.cover || '/assets/covers/default.jpg';
+    modalCover.src = coverSrc;
     
     modalSynopsis.textContent = currentIssueData.synopsis || 'Sinopse não disponível para esta edição.';
     
@@ -298,7 +323,10 @@ window.closeModal = function() {
     currentIssueData = null;
     
     document.getElementById('modal-title').textContent = 'Carregando...';
-    document.getElementById('modal-cover').src = '';
+    const modalCover = document.getElementById('modal-cover');
+    modalCover.src = '';
+    modalCover.dataset.errorHandled = 'false';
+    modalCover.style.opacity = '1';
     document.getElementById('modal-synopsis').textContent = 'Carregando sinopse...';
     document.getElementById('modal-series').textContent = '-';
     document.getElementById('modal-genres').textContent = '-';
@@ -322,6 +350,8 @@ window.downloadIssue = function() {
   window.open(currentIssueData.link, '_blank');
 };
 
+window.handleImageError = handleImageError;
+
 document.addEventListener('DOMContentLoaded', () => {
   function handleSearchInput(e) {
     const searchTerm = e.target.value;
@@ -334,7 +364,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
   
   searchInput.addEventListener('input', handleSearchInput);
-  searchInput.addEventListener('keyup', handleSearchInput); // Fallback para alguns dispositivos
+  searchInput.addEventListener('keyup', handleSearchInput);
   
   function toggleMobileSearch(show) {
     if (show) {
@@ -374,11 +404,13 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
   
-  document.getElementById('modal-cover').addEventListener('error', function() {
-    this.src = '/assets/covers/default.jpg';
+  const modalCover = document.getElementById('modal-cover');
+  modalCover.addEventListener('error', function() {
+    handleImageError(this);
   });
   
   loadAllComics();
 });
+
 window.api = api;
 window.loadAllComics = loadAllComics;
