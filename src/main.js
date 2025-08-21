@@ -19,6 +19,7 @@ const searchClose = document.getElementById('search-close');
 
 function showLoading() {
   isLoading = true;
+  cardsContainer.className = 'cards state-message';
   cardsContainer.innerHTML = `
     <div class="loading">
       <div class="loading-spinner"></div>
@@ -28,6 +29,7 @@ function showLoading() {
 }
 
 function showError(message) {
+  cardsContainer.className = 'cards state-message';
   cardsContainer.innerHTML = `
     <div class="error">
       <h3>❌ Erro ao carregar quadrinhos</h3>
@@ -103,6 +105,7 @@ function createIssueCard(issue) {
 
 function renderComics(comics) {
   if (comics.length === 0) {
+    cardsContainer.className = 'cards state-message';
     cardsContainer.innerHTML = `
       <div class="empty-state">
         <h3>📚 Nenhum quadrinho encontrado</h3>
@@ -112,12 +115,14 @@ function renderComics(comics) {
     return;
   }
 
+  cardsContainer.className = 'cards has-content';
   const cardsHTML = comics.map(createComicCard).join('');
   cardsContainer.innerHTML = cardsHTML;
 }
 
 function renderIssues(issues, comic) {
   if (issues.length === 0) {
+    cardsContainer.className = 'cards state-message';
     cardsContainer.innerHTML = `
       <div class="empty-state">
         <h3>📖 Nenhuma edição encontrada</h3>
@@ -127,6 +132,7 @@ function renderIssues(issues, comic) {
     return;
   }
 
+  cardsContainer.className = 'cards has-content';
   const issuesHTML = issues.map(createIssueCard).join('');
   cardsContainer.innerHTML = issuesHTML;
 }

@@ -244,9 +244,23 @@ header {
     grid-template-columns: repeat(auto-fill, var(--card-width-mobile));
     gap: var(--spacing-sm);
     max-width: 100%;
-    justify-content: center;
+    justify-content: flex-start;
     align-content: start;
     min-height: 200px;
+}
+
+.cards.state-message {
+    justify-content: center;
+    align-content: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.cards.has-content {
+    justify-content: center;
+    align-content: start;
+    display: grid;
 }
 
 .card {
@@ -716,6 +730,11 @@ header {
         grid-template-columns: repeat(auto-fill, var(--card-width-tablet-sm));
         gap: var(--spacing-md);
     }
+
+    .cards.has-content {
+        grid-template-columns: repeat(auto-fill, var(--card-width-tablet-sm));
+        gap: var(--spacing-md);
+    }
     
     .card {
         width: var(--card-width-tablet-sm);
@@ -741,6 +760,10 @@ header {
     }
     
     .cards {
+        grid-template-columns: repeat(auto-fill, var(--card-width-tablet));
+    }
+
+    .cards.has-content {
         grid-template-columns: repeat(auto-fill, var(--card-width-tablet));
     }
     
@@ -870,6 +893,13 @@ header {
         max-width: 1700px;
         margin: 0 auto;
     }
+
+    .cards.has-content {
+        grid-template-columns: repeat(auto-fill, var(--card-width-desktop));
+        gap: var(--spacing-lg);
+        max-width: 1700px;
+        margin: 0 auto;
+    }
     
     .card {
         width: var(--card-width-desktop);
@@ -893,6 +923,10 @@ header {
 /* Desktop Grande (1440px+) */
 @media screen and (min-width: 1440px) {
     .cards {
+        grid-template-columns: repeat(auto-fill, var(--card-width-desktop-lg));
+    }
+
+    .cards.has-content {
         grid-template-columns: repeat(auto-fill, var(--card-width-desktop-lg));
     }
     
