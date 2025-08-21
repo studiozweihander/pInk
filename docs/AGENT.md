@@ -1,3 +1,5 @@
+# Projeto pInk - Refatoração
+
 ## 🔄 Decisões Arquiteturais
 
 ### **Tecnologias e Stack**
@@ -18,7 +20,7 @@
 11. **Feedback visual**: Sempre fornecer feedback para ações do usuário
 12. **Accessibility minded**: Considerar acessibilidade em todas as decisões de design
 
-> **⚠️ REGRA FUNDAMENTAL**: Qualquer IA trabalhando neste projeto deve **sempre** priorizar código limpo, profissional e bem estruturado seguindo os princípios estabelecidos.# Projeto pInk - Refatoração
+> **⚠️ REGRA FUNDAMENTAL**: Qualquer IA trabalhando neste projeto deve **sempre** priorizar código limpo, profissional e bem estruturado seguindo os princípios estabelecidos.
 
 ## 📋 Contexto do Projeto
 
