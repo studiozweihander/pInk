@@ -29,11 +29,11 @@
     --transition-slow: 0.5s ease;
     
     /* Card sizes */
-    --card-width-mobile: 280px;
-    --card-width-tablet-sm: 250px;
-    --card-width-tablet: 300px;
-    --card-width-desktop: 320px;
-    --card-width-desktop-lg: 350px;
+    --card-width-mobile: 380px;
+    --card-width-tablet-sm: 380px;
+    --card-width-tablet: 380px;
+    --card-width-desktop: 370px;
+    --card-width-desktop-lg: 370px;
 }
 * {
     box-sizing: border-box;
