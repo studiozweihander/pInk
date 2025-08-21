@@ -14,6 +14,7 @@
     --spacing-md: 1rem;
     --spacing-lg: 1.5rem;
     --spacing-xl: 2rem;
+    --spacing-xxl: 3rem;
     
     /* Border radius mobile-first */
     --border-radius-sm: 8px;
@@ -228,6 +229,7 @@ header {
     flex: 1;
     overflow-y: auto;
     padding: var(--spacing-sm);
+    padding-bottom: calc(var(--spacing-xl) + env(safe-area-inset-bottom, 0px));
 }
 .cards {
     display: grid;
@@ -385,6 +387,7 @@ header {
     border-radius: var(--border-radius-sm);
     padding: var(--spacing-md) var(--spacing-lg);
     margin: var(--spacing-md);
+    margin-bottom: calc(var(--spacing-md) + env(safe-area-inset-bottom, 0px));
     cursor: pointer;
     color: var(--primary-color);
     font-family: var(--font);
@@ -595,6 +598,7 @@ header {
     border: none;
     border-radius: var(--border-radius-md);
     padding: var(--spacing-md) var(--spacing-xl);
+    padding-bottom: calc(var(--spacing-md) + env(safe-area-inset-bottom, 8px));
     font-family: var(--font);
     font-weight: 600;
     font-size: 1rem;
@@ -674,6 +678,20 @@ header {
     font-family: var(--font);
     font-size: 0.9rem;
     text-align: right;
+}
+
+@media screen and (max-width: 479px) {
+    .scrollable-content {
+        padding-bottom: calc(var(--spacing-xxl, 3rem) + env(safe-area-inset-bottom, 0px));
+    }
+    
+    .back-button {
+        margin-bottom: calc(var(--spacing-lg) + env(safe-area-inset-bottom, 0px));
+    }
+    
+    .modal-info {
+        padding-bottom: calc(var(--spacing-lg) + env(safe-area-inset-bottom, 16px));
+    }
 }
 
 /* Tablet Pequeno (480px+) */
