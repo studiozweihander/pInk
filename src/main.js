@@ -12,7 +12,10 @@ let currentView = 'home';
 const cardsContainer = document.getElementById('cards');
 const searchInput = document.getElementById('search');
 const breadcrumb = document.getElementById('breadcrumb');
-const logo = document.getElementById('logo');
+const logoContainer = document.querySelector('.logo-container');
+const searchToggle = document.getElementById('search-toggle');
+const searchInputContainer = document.getElementById('search-input-container');
+const searchClose = document.getElementById('search-close');
 
 function showLoading() {
   isLoading = true;
@@ -149,6 +152,11 @@ function filterComics(searchTerm) {
 }
 
 function filterIssues(searchTerm) {
+  if (!currentIssues || currentIssues.length === 0 || !currentComic) {
+    console.warn('⚠️ Dados de edições não disponíveis para filtro');
+    return;
+  }
+  
   if (!searchTerm.trim()) {
     renderIssues(currentIssues, currentComic);
     return;
@@ -197,16 +205,20 @@ function updateHeader() {
   if (currentView === 'home') {
     breadcrumb.textContent = '';
     searchInput.placeholder = 'Buscar quadrinho...';
-    logo.style.cursor = 'default';
+    logoContainer.classList.remove('has-navigation');
+    logoContainer.style.cursor = 'default';
   } else if (currentView === 'issues' && currentComic) {
-    breadcrumb.textContent = ` > ${currentComic.title} (${currentComic.year || 'N/A'})`;
+    breadcrumb.textContent = `${currentComic.title} (${currentComic.year || 'N/A'})`;
     searchInput.placeholder = 'Buscar edição...';
-    logo.style.cursor = 'pointer';
+    logoContainer.classList.add('has-navigation');
+    logoContainer.style.cursor = 'pointer';
   }
 }
 
 window.viewComicIssues = function(comicId) {
   currentView = 'issues';
+  // Limpar busca ao navegar para página de edições
+  searchInput.value = '';
   loadComicIssues(comicId);
 };
 
@@ -343,19 +355,59 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log('✅ DOM carregado, iniciando aplicação...');
   
   // Event listener para busca
-  searchInput.addEventListener('input', (e) => {
+  function handleSearchInput(e) {
+    const searchTerm = e.target.value;
+    
     if (currentView === 'home') {
-      filterComics(e.target.value);
+      filterComics(searchTerm);
     } else if (currentView === 'issues') {
-      filterIssues(e.target.value);
+      filterIssues(searchTerm);
+    }
+  }
+  
+  searchInput.addEventListener('input', handleSearchInput);
+  searchInput.addEventListener('keyup', handleSearchInput); // Fallback para alguns dispositivos
+  
+  // Mobile Search Toggle Functions
+  function toggleMobileSearch(show) {
+    if (show) {
+      searchInputContainer.classList.add('active');
+      searchInput.focus();
+    } else {
+      searchInputContainer.classList.remove('active');
+      searchInput.blur();
+    }
+  }
+
+  // Event listeners para busca mobile
+  searchToggle.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleMobileSearch(true);
+  });
+
+  searchClose.addEventListener('click', (e) => {
+    e.stopPropagation();
+    toggleMobileSearch(false);
+  });
+
+  // Fechar busca ao clicar fora
+  document.addEventListener('click', (e) => {
+    if (!searchInputContainer.contains(e.target) && !searchToggle.contains(e.target)) {
+      if (searchInputContainer.classList.contains('active')) {
+        toggleMobileSearch(false);
+      }
     }
   });
-  
+
   // Event listeners do modal
   // Fechar modal ao pressionar ESC
   document.addEventListener('keydown', (e) => {
-    if (e.key === 'Escape' && document.getElementById('modal').classList.contains('open')) {
-      closeModal();
+    if (e.key === 'Escape') {
+      if (document.getElementById('modal').classList.contains('open')) {
+        closeModal();
+      } else if (searchInputContainer.classList.contains('active')) {
+        toggleMobileSearch(false);
+      }
     }
   });
   
