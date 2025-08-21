@@ -229,7 +229,7 @@ header {
     flex: 1;
     overflow-y: auto;
     padding: var(--spacing-sm);
-    padding-bottom: calc(var(--spacing-xl) + env(safe-area-inset-bottom, 0px));
+    padding-bottom: calc(var(--spacing-xxl) + env(safe-area-inset-bottom, 0px));
 }
 .cards {
     display: grid;
