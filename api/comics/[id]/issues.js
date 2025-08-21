@@ -6,7 +6,6 @@ const supabase = createClient(
 );
 
 module.exports = async (req, res) => {
-  // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -25,7 +24,6 @@ module.exports = async (req, res) => {
   try {
     const { id } = req.query;
     
-    // Primeiro verifica se o comic existe
     const { data: comic, error: comicError } = await supabase
       .from('Comic')
       .select('id')
@@ -42,7 +40,6 @@ module.exports = async (req, res) => {
       throw comicError;
     }
     
-    // Busca as edições
     const { data, error } = await supabase
       .from('Issue')
       .select(`
@@ -65,7 +62,6 @@ module.exports = async (req, res) => {
       throw error;
     }
     
-    // Transformar dados para formato esperado
     const issues = data.map(issue => ({
       id: issue.id,
       title: issue.title,

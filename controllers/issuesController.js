@@ -2,7 +2,6 @@ const { supabase } = require('../config/database');
 
 class IssuesController {
   
-  // GET /api/issues/:id - Detalhes completos de uma edição
   async getIssueById(req, res) {
     try {
       const { id } = req.params;
@@ -44,18 +43,15 @@ class IssuesController {
         throw error;
       }
       
-      // Parse genres se for string JSON
       let genres = data.genres;
       if (typeof genres === 'string') {
         try {
           genres = JSON.parse(genres);
         } catch (e) {
-          // Se não for JSON válido, converte em array
           genres = genres.split(',').map(g => g.trim());
         }
       }
       
-      // Transformar dados para formato esperado
       const issue = {
         id: data.id,
         title: data.title,
@@ -90,7 +86,6 @@ class IssuesController {
     }
   }
 
-  // GET /api/issues - Lista todas as edições (opcional, para busca geral)
   async getAllIssues(req, res) {
     try {
       const { limit = 50, offset = 0, search } = req.query;
@@ -108,12 +103,10 @@ class IssuesController {
           language:Idiom(name)
         `, { count: 'exact' });
       
-      // Filtro de busca
       if (search) {
         query = query.or(`title.ilike.%${search}%,comic.title.ilike.%${search}%`);
       }
       
-      // Ordenação e paginação
       const { data, error, count } = await query
         .order('comic.title', { ascending: true })
         .order('issueNumber', { ascending: true })
@@ -123,7 +116,6 @@ class IssuesController {
         throw error;
       }
       
-      // Transformar dados para formato esperado
       const issues = data.map(issue => ({
         id: issue.id,
         title: issue.title,

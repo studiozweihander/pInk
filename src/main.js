@@ -83,7 +83,7 @@ function renderComics(comics) {
     cardsContainer.innerHTML = `
       <div class="empty-state">
         <h3>📚 Nenhum quadrinho encontrado</h3>
-        <p>Tente ajustar sua busca ou verifique se o backend está rodando.</p>
+        <p>Verifique sua busca ou este quadrinho ainda não foi adicionado.</p>
       </div>
     `;
     return;
@@ -114,8 +114,6 @@ async function loadAllComics() {
   showLoading();
   
   try {
-    console.log('📡 Buscando quadrinhos da API...');
-    
     const isOnline = await api.healthCheck();
     if (!isOnline) {
       throw new Error('Backend não está respondendo. Execute "npm start" em outro terminal.');
@@ -124,7 +122,6 @@ async function loadAllComics() {
     const response = await api.getAllComics();
     allComics = response.data;
     
-    console.log(`✅ Carregados ${allComics.length} quadrinhos`);
     renderComics(allComics);
     
   } catch (error) {
@@ -148,7 +145,6 @@ function filterComics(searchTerm) {
   );
   
   renderComics(filtered);
-  console.log(`🔍 Encontrados ${filtered.length} quadrinhos para "${searchTerm}"`);
 }
 
 function filterIssues(searchTerm) {
@@ -170,7 +166,6 @@ function filterIssues(searchTerm) {
   );
   
   renderIssues(filtered, currentComic);
-  console.log(`🔍 Encontradas ${filtered.length} edições para "${searchTerm}"`);
 }
 
 async function loadComicIssues(comicId) {
@@ -179,8 +174,6 @@ async function loadComicIssues(comicId) {
   showLoading();
   
   try {
-    console.log(`📖 Carregando edições do quadrinho ID: ${comicId}`);
-    
     const [comicResponse, issuesResponse] = await Promise.all([
       api.getComicById(comicId),
       api.getComicIssues(comicId)
@@ -189,7 +182,6 @@ async function loadComicIssues(comicId) {
     currentComic = comicResponse.data;
     currentIssues = issuesResponse.data;
     
-    console.log(`✅ Carregadas ${currentIssues.length} edições para "${currentComic.title}"`);
     renderIssues(currentIssues, currentComic);
     updateHeader();
     
@@ -217,7 +209,6 @@ function updateHeader() {
 
 window.viewComicIssues = function(comicId) {
   currentView = 'issues';
-  // Limpar busca ao navegar para página de edições
   searchInput.value = '';
   loadComicIssues(comicId);
 };
@@ -232,13 +223,11 @@ window.backToHome = function() {
   
   renderComics(allComics);
   updateHeader();
-  console.log('🏠 Voltou para página inicial');
 };
 
 let currentIssueData = null;
 
 window.viewIssueDetails = async function(issueId) {
-  console.log(`📄 Abrindo detalhes da edição ID: ${issueId}`);
   await openModal(issueId);
 };
 
@@ -269,14 +258,9 @@ async function openModal(issueId) {
   modalCover.src = '';
   
   try {
-    // Buscar dados da edição
-    console.log(`🔍 Buscando dados da edição ID: ${issueId}`);
     const response = await api.getIssueById(issueId);
     currentIssueData = response.data;
     
-    console.log('✅ Dados da edição carregados:', currentIssueData);
-    
-    // Preencher modal com dados
     modalTitle.textContent = currentIssueData.title || 'Título não disponível';
     modalCover.src = currentIssueData.cover || '/assets/covers/default.jpg';
     modalCover.alt = currentIssueData.title || 'Capa da edição';
@@ -285,7 +269,6 @@ async function openModal(issueId) {
     
     modalSeries.textContent = currentIssueData.series || 'N/A';
     
-    // Formatar gêneros
     let genres = currentIssueData.genres;
     if (genres) {
       genres = Array.isArray(genres) ? genres.join(', ') : genres.replace(/,/g, ', ');
@@ -296,7 +279,6 @@ async function openModal(issueId) {
     modalSize.textContent = currentIssueData.size || 'N/A';
     modalLanguage.textContent = currentIssueData.language || 'N/A';
     
-    // Formatar tamanho do download
     if (currentIssueData.size) {
       downloadSize.textContent = `(${currentIssueData.size})`;
     }
@@ -312,11 +294,9 @@ window.closeModal = function() {
   const modal = document.getElementById('modal');
   modal.classList.remove('open');
   
-  // Aguardar animação antes de limpar dados
   setTimeout(() => {
     currentIssueData = null;
     
-    // Reset campos
     document.getElementById('modal-title').textContent = 'Carregando...';
     document.getElementById('modal-cover').src = '';
     document.getElementById('modal-synopsis').textContent = 'Carregando sinopse...';
@@ -327,8 +307,6 @@ window.closeModal = function() {
     document.getElementById('modal-language').textContent = '-';
     document.getElementById('download-size').textContent = '';
   }, 300);
-  
-  console.log('❌ Modal fechado');
 };
 
 window.downloadIssue = function() {
@@ -341,20 +319,10 @@ window.downloadIssue = function() {
     alert('❌ Link de download não disponível para esta edição.');
     return;
   }
-  
-  console.log(`📥 Iniciando download da edição: ${currentIssueData.title}`);
-  
-  // Abrir link em nova aba
   window.open(currentIssueData.link, '_blank');
-  
-  // Log para tracking
-  console.log(`✅ Download iniciado: ${currentIssueData.title} (${currentIssueData.size || 'Tamanho desconhecido'})`);
 };
 
 document.addEventListener('DOMContentLoaded', () => {
-  console.log('✅ DOM carregado, iniciando aplicação...');
-  
-  // Event listener para busca
   function handleSearchInput(e) {
     const searchTerm = e.target.value;
     
@@ -368,7 +336,6 @@ document.addEventListener('DOMContentLoaded', () => {
   searchInput.addEventListener('input', handleSearchInput);
   searchInput.addEventListener('keyup', handleSearchInput); // Fallback para alguns dispositivos
   
-  // Mobile Search Toggle Functions
   function toggleMobileSearch(show) {
     if (show) {
       searchInputContainer.classList.add('active');
@@ -379,7 +346,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  // Event listeners para busca mobile
   searchToggle.addEventListener('click', (e) => {
     e.stopPropagation();
     toggleMobileSearch(true);
@@ -390,7 +356,6 @@ document.addEventListener('DOMContentLoaded', () => {
     toggleMobileSearch(false);
   });
 
-  // Fechar busca ao clicar fora
   document.addEventListener('click', (e) => {
     if (!searchInputContainer.contains(e.target) && !searchToggle.contains(e.target)) {
       if (searchInputContainer.classList.contains('active')) {
@@ -399,8 +364,6 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  // Event listeners do modal
-  // Fechar modal ao pressionar ESC
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
       if (document.getElementById('modal').classList.contains('open')) {
@@ -411,12 +374,10 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
   
-  // Impedir erro na imagem do modal
   document.getElementById('modal-cover').addEventListener('error', function() {
     this.src = '/assets/covers/default.jpg';
   });
   
-  // Carregar dados iniciais
   loadAllComics();
 });
 window.api = api;

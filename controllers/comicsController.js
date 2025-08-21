@@ -2,7 +2,6 @@ const { supabase } = require('../config/database');
 
 class ComicsController {
   
-  // GET /api/comics - Lista todos os quadrinhos com metadados básicos
   async getAllComics(req, res) {
     try {
       const { data, error } = await supabase
@@ -23,7 +22,6 @@ class ComicsController {
         throw error;
       }
       
-      // Transformar dados para formato esperado
       const comics = data.map(comic => ({
         id: comic.id,
         title: comic.title,
@@ -51,7 +49,6 @@ class ComicsController {
     }
   }
 
-  // GET /api/comics/:id - Detalhes de um quadrinho específico
   async getComicById(req, res) {
     try {
       const { id } = req.params;
@@ -84,7 +81,6 @@ class ComicsController {
         throw error;
       }
       
-      // Transformar dados para formato esperado
       const comic = {
         id: data.id,
         title: data.title,
@@ -112,12 +108,10 @@ class ComicsController {
     }
   }
 
-  // GET /api/comics/:id/issues - Lista edições de um quadrinho
   async getComicIssues(req, res) {
     try {
       const { id } = req.params;
       
-      // Primeiro verifica se o comic existe
       const { data: comic, error: comicError } = await supabase
         .from('Comic')
         .select('id')
@@ -134,7 +128,6 @@ class ComicsController {
         throw comicError;
       }
       
-      // Busca as edições
       const { data, error } = await supabase
         .from('Issue')
         .select(`
@@ -157,7 +150,6 @@ class ComicsController {
         throw error;
       }
       
-      // Transformar dados para formato esperado
       const issues = data.map(issue => ({
         id: issue.id,
         title: issue.title,
