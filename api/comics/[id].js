@@ -1,12 +1,10 @@
 const { createClient } = require('@supabase/supabase-js');
 
-// Configuração Supabase
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_ANON_KEY
 );
 
-// GET /api/comics/[id] - Detalhes de um quadrinho específico
 module.exports = async (req, res) => {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');

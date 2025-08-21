@@ -1,6 +1,4 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap');
-
-/* ===== VARIÁVEIS CSS ===== */
 :root {
     --primary-color: #e78fde;
     --primary-surface: #181818;
@@ -29,8 +27,6 @@
     --transition-normal: 0.3s ease;
     --transition-slow: 0.5s ease;
 }
-
-/* ===== RESET E BASE STYLES ===== */
 * {
     box-sizing: border-box;
     margin: 0;
@@ -47,8 +43,6 @@ body {
     overflow: hidden;
     font-family: var(--font);
 }
-
-/* ===== HEADER ===== */
 header {
     background-color: var(--secondary-surface);
     color: var(--primary-font);
@@ -126,8 +120,6 @@ header h1:hover {
 #search::placeholder {
     color: #866282;
 }
-
-/* ===== CONTAINER ===== */
 .container {
     background: var(--secondary-surface);
     padding-top: 1rem;
@@ -145,16 +137,12 @@ header h1:hover {
     overflow-y: auto;
     padding: var(--spacing-sm);
 }
-
-/* ===== CARDS ===== */
 .cards {
     display: grid;
     grid-template-columns: 1fr;
     gap: var(--spacing-sm);
     max-width: 100%;
 }
-
-/* ===== CARD STYLES ===== */
 .card {
     background: var(--secondary-surface);
     border-radius: var(--border-radius-md);
@@ -226,8 +214,6 @@ header h1:hover {
     border-radius: var(--border-radius-sm);
     border: 1px solid rgba(231, 143, 222, 0.3);
 }
-
-/* ===== LOADING E ERROR STATES ===== */
 .loading {
     display: flex;
     flex-direction: column;
@@ -301,8 +287,6 @@ header h1:hover {
 .empty-state h3 {
     color: var(--primary-color);
 }
-
-/* ===== PÁGINA DE EDIÇÕES ===== */
 .back-button {
     background: rgba(231, 143, 222, 0.1);
     border: 1px solid rgba(231, 143, 222, 0.3);
@@ -384,8 +368,6 @@ header h1:hover {
     border-radius: var(--border-radius-sm);
     display: inline-block;
 }
-
-/* ===== MODAL STYLES ===== */
 .modal {
     display: none;
     position: fixed;
@@ -601,8 +583,6 @@ header h1:hover {
     font-size: 0.9rem;
     text-align: right;
 }
-
-/* ===== RESPONSIVE BREAKPOINTS ===== */
 
 /* Tablet Pequeno (480px+) */
 @media screen and (min-width: 480px) {

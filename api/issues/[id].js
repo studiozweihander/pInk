@@ -1,12 +1,10 @@
 const { createClient } = require('@supabase/supabase-js');
 
-// Configuração Supabase
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_ANON_KEY
 );
 
-// GET /api/issues/[id] - Detalhes completos de uma edição
 module.exports = async (req, res) => {
   // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
