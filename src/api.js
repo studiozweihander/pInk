@@ -1,7 +1,7 @@
-// API Client para comunicação com backend
-const API_BASE_URL = 'http://localhost:3000/api';
-
-// Timeout para requests
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:3000/api'
+  : '/api';
+  
 const REQUEST_TIMEOUT = 10000;
 
 class ApiClient {
@@ -9,7 +9,6 @@ class ApiClient {
     this.baseURL = API_BASE_URL;
   }
 
-  // Método genérico para fazer requests com timeout
   async request(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
     
@@ -55,27 +54,22 @@ class ApiClient {
     }
   }
 
-  // GET /api/comics - Lista todos os quadrinhos
   async getAllComics() {
     return this.request('/comics');
   }
 
-  // GET /api/comics/:id - Detalhes de um quadrinho
   async getComicById(id) {
     return this.request(`/comics/${id}`);
   }
 
-  // GET /api/comics/:id/issues - Lista edições de um quadrinho
   async getComicIssues(id) {
     return this.request(`/comics/${id}/issues`);
   }
 
-  // GET /api/issues/:id - Detalhes de uma edição
   async getIssueById(id) {
     return this.request(`/issues/${id}`);
   }
 
-  // GET /api/issues - Busca geral de edições
   async searchIssues(query = '', limit = 50, offset = 0) {
     const params = new URLSearchParams({
       search: query,
@@ -86,10 +80,12 @@ class ApiClient {
     return this.request(`/issues?${params}`);
   }
 
-  // Health check
   async healthCheck() {
     try {
-      const response = await fetch(`http://localhost:3000/health`);
+      const healthUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:3000/health'
+        : '/api/health';
+      const response = await fetch(healthUrl);
       return response.ok;
     } catch {
       return false;

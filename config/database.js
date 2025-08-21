@@ -25,7 +25,7 @@ async function testConnection() {
   console.log('🔍 Testing Supabase connection...');
   
   try {
-    console.log(`🔗 Connecting to: ${SUPABASE_URL}`);
+    console.log(`\n🔗 Connecting to: ${SUPABASE_URL}`);
     
     // Testa conexão fazendo uma query simples na tabela Idiom
     const { data, error, count } = await supabase

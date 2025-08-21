@@ -8,7 +8,10 @@
 </head>
 <body>
     <header>
-        <h1>pInk</h1>
+        <div class="header-title">
+            <h1 id="logo" onclick="backToHome()">pInk</h1>
+            <span id="breadcrumb"></span>
+        </div>
         <div class="search">
             <span class="search-icon">
                 <svg xmlns="http://www.w3.org/2000/svg" height="30px" viewBox="0 -960 960 960" width="30px" fill="#e78fde">
@@ -21,8 +24,59 @@
     
     <div class="container">
         <div class="scrollable-content">
-            <div id="cards" class="cards">
-                <!-- Cards serão carregados aqui -->
+            <div id="cards" class="cards"></div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="modal">
+        <div class="modal-overlay" onclick="closeModal()"></div>
+        <div class="modal-content">
+            <button class="modal-close" onclick="closeModal()" aria-label="Fechar modal">×</button>
+            <div class="modal-body">
+                <div class="modal-image">
+                    <img id="modal-cover" src="" alt="Capa da edição">
+                </div>
+                <div class="modal-info">
+                    <div class="modal-header">
+                        <h2 id="modal-title">Carregando...</h2>
+                        <button id="download-btn" class="download-button" onclick="downloadIssue()">
+                            <span>Download</span>
+                            <span id="download-size"></span>
+                        </button>
+                    </div>
+                    
+                    <div class="modal-section">
+                        <h3>Sinopse</h3>
+                        <p id="modal-synopsis">Carregando sinopse...</p>
+                    </div>
+                    
+                    <div class="modal-section">
+                        <h3>Detalhes</h3>
+                        <div class="modal-details">
+                            <div class="detail-item">
+                                <span class="detail-label">Série:</span>
+                                <span id="modal-series">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Gênero(s):</span>
+                                <span id="modal-genres">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Lançamento:</span>
+                                <span id="modal-year">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Tamanho:</span>
+                                <span id="modal-size">-</span>
+                            </div>
+                            <div class="detail-item">
+                                <span class="detail-label">Idioma:</span>
+                                <span id="modal-language">-</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
     </div>
