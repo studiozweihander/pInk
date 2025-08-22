@@ -23,13 +23,43 @@ const searchClose = document.getElementById('search-close');
 function handleImageError(imgElement) {
   if (imgElement.dataset.errorHandled === 'true') return;
   
+  const originalSrc = imgElement.src;
+  
+  console.log('❌ Erro ao carregar imagem:', originalSrc);
+  
+  if (originalSrc.includes('supabase.co/storage') && !imgElement.dataset.retried) {
+    
+    imgElement.dataset.retried = 'true';
+    imgElement.dataset.errorHandled = 'false';
+    
+    const testImg = new Image();
+    testImg.crossOrigin = 'anonymous';
+    testImg.referrerPolicy = 'no-referrer';
+    
+    testImg.onload = function() {
+      console.log('✅ Imagem carregou sem referrer');
+      imgElement.src = originalSrc;
+      imgElement.crossOrigin = 'anonymous';
+      imgElement.referrerPolicy = 'no-referrer';
+    };
+    
+    testImg.onerror = function() {
+      imgElement.dataset.errorHandled = 'true';
+      imgElement.src = PLACEHOLDER_IMAGE;
+      imgElement.alt = 'Capa não disponível';
+      imgElement.style.transition = 'opacity 0.3s ease';
+      imgElement.style.opacity = '0.8';
+    };
+    
+    testImg.src = originalSrc;
+    return;
+  }
+
   imgElement.dataset.errorHandled = 'true';
   imgElement.src = PLACEHOLDER_IMAGE;
   imgElement.alt = 'Capa não disponível';
   imgElement.style.transition = 'opacity 0.3s ease';
   imgElement.style.opacity = '0.8';
-  
-  console.log('🖼️ Fallback aplicado para imagem');
 }
 
 function showLoading() {
@@ -91,7 +121,10 @@ function createComicCard(comic) {
       <div class="card-image">
         <img src="${comic.cover || PLACEHOLDER_IMAGE}" 
              alt="${comic.title}" 
+             crossorigin="anonymous"
+             referrerpolicy="no-referrer"
              data-error-handled="false"
+             data-retried="false"
              onerror="handleImageError(this)">
       </div>
       <div class="card-info">
