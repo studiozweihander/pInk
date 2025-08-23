@@ -1,3 +1,4 @@
+// api/comics/index-simple.js
 const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(
@@ -22,47 +23,56 @@ module.exports = async (req, res) => {
   }
   
   try {
+    // Teste mais básico possível
     const { data, error } = await supabase
       .from('Comic')
-      .select(`
-        id,
-        title,
-        issues,
-        year,
-        link,
-        cover,
-        language:Idiom(name),
-        publisher:Publisher(name)
-      `)
-      .order('title', { ascending: true });
+      .select('id, title')
+      .limit(10);
     
     if (error) {
-      throw error;
+      console.error('Supabase error:', error);
+      return res.status(500).json({
+        success: false,
+        message: 'Database error',
+        error: {
+          message: error.message,
+          code: error.code,
+          details: error.details
+        }
+      });
     }
     
+    // Retorno mínimo para testar
     const comics = data.map(comic => ({
       id: comic.id,
       title: comic.title,
-      total_issues: comic.issues,
-      year: comic.year,
-      link: comic.link,
-      cover: comic.cover,
-      language: comic.language?.name || null,
-      publisher: comic.publisher?.name || null
+      total_issues: 0,
+      year: null,
+      cover: null,
+      language: null,
+      publisher: null
     }));
     
     res.json({
       success: true,
       count: comics.length,
-      data: comics
+      data: comics,
+      debug: {
+        timestamp: new Date().toISOString(),
+        query: 'SELECT id, title FROM Comic LIMIT 10'
+      }
     });
     
   } catch (error) {
-    console.error('Error fetching comics:', error);
+    console.error('Unexpected error:', error);
     res.status(500).json({
       success: false,
-      message: 'Error fetching comics',
-      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
+      message: 'Unexpected server error',
+      error: {
+        name: error.name,
+        message: error.message,
+        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
+      }
     });
   }
 };

@@ -42,24 +42,20 @@ module.exports = async (req, res) => {
     
     const { data, error } = await supabase
       .from('Issue')
-      .select(`
-        id,
-        title,
-        issueNumber,
-        year,
-        size,
-        series,
-        genres,
-        link,
-        cover,
-        synopsis,
-        language:Idiom(name)
-      `)
+      .select('*')
       .eq('comicId', id)
       .order('issueNumber', { ascending: true });
     
     if (error) {
       throw error;
+    }
+
+    const idiomIds = [...new Set(data.map(i => i.idiomId).filter(Boolean))];
+    let idiomsMap = new Map();
+    
+    if (idiomIds.length > 0) {
+      const { data: idioms } = await supabase.from('Idiom').select('*').in('id', idiomIds);
+      idiomsMap = new Map(idioms.map(i => [i.id, i.name]));
     }
     
     const issues = data.map(issue => ({
@@ -73,7 +69,7 @@ module.exports = async (req, res) => {
       link: issue.link,
       cover: issue.cover,
       synopsis: issue.synopsis,
-      language: issue.language?.name || null
+      language: idiomsMap.get(issue.idiomId) || null
     }));
     
     res.json({
