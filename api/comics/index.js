@@ -1,4 +1,3 @@
-// api/comics/index-simple.js
 const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(
@@ -23,56 +22,53 @@ module.exports = async (req, res) => {
   }
   
   try {
-    // Teste mais básico possível
     const { data, error } = await supabase
       .from('Comic')
-      .select('id, title')
-      .limit(10);
+      .select('id, title, year, cover, idiomId, publisherId, issues')
+      .order('title', { ascending: true });
     
     if (error) {
-      console.error('Supabase error:', error);
-      return res.status(500).json({
-        success: false,
-        message: 'Database error',
-        error: {
-          message: error.message,
-          code: error.code,
-          details: error.details
-        }
-      });
+      throw error;
+    }
+
+    const idiomIds = [...new Set(data.map(c => c.idiomId).filter(Boolean))];
+    const publisherIds = [...new Set(data.map(c => c.publisherId).filter(Boolean))];
+
+    let idiomsMap = new Map();
+    let publishersMap = new Map();
+
+    if (idiomIds.length > 0) {
+      const { data: idioms } = await supabase.from('Idiom').select('*').in('id', idiomIds);
+      idiomsMap = new Map(idioms.map(i => [i.id, i.name]));
+    }
+
+    if (publisherIds.length > 0) {
+      const { data: publishers } = await supabase.from('Publisher').select('*').in('id', publisherIds);
+      publishersMap = new Map(publishers.map(p => [p.id, p.name]));
     }
     
-    // Retorno mínimo para testar
     const comics = data.map(comic => ({
       id: comic.id,
       title: comic.title,
-      total_issues: 0,
-      year: null,
-      cover: null,
-      language: null,
-      publisher: null
+      total_issues: comic.issues,
+      year: comic.year,
+      cover: comic.cover,
+      language: idiomsMap.get(comic.idiomId) || null,
+      publisher: publishersMap.get(comic.publisherId) || null
     }));
     
     res.json({
       success: true,
       count: comics.length,
-      data: comics,
-      debug: {
-        timestamp: new Date().toISOString(),
-        query: 'SELECT id, title FROM Comic LIMIT 10'
-      }
+      data: comics
     });
     
   } catch (error) {
-    console.error('Unexpected error:', error);
+    console.error('Error fetching comics:', error);
     res.status(500).json({
       success: false,
-      message: 'Unexpected server error',
-      error: {
-        name: error.name,
-        message: error.message,
-        stack: process.env.NODE_ENV === 'development' ? error.stack : undefined
-      }
+      message: 'Error fetching comics',
+      error: process.env.NODE_ENV === 'development' ? error.message : 'Internal server error'
     });
   }
 };
