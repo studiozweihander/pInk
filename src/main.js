@@ -37,7 +37,6 @@ function handleImageError(imgElement) {
     testImg.referrerPolicy = 'no-referrer';
     
     testImg.onload = function() {
-      console.log('✅ Imagem carregou sem referrer');
       imgElement.src = originalSrc;
       imgElement.crossOrigin = 'anonymous';
       imgElement.referrerPolicy = 'no-referrer';
@@ -207,8 +206,6 @@ async function loadAllComics() {
 
 async function loadComicIssues(comicId) {
   if (isLoading) return;
-  
-  console.log('📚 Carregando edições para quadrinho ID:', comicId);
   showLoading();
   
   try {
@@ -271,8 +268,6 @@ function filterIssues(searchTerm) {
     
     return searchableText.includes(searchLower);
   });
-  
-  console.log(`📋 Filtro aplicado: ${filtered.length} de ${currentIssues.length} edições`);
   renderIssues(filtered);
 }
 
@@ -291,7 +286,6 @@ function updateHeader() {
 }
 
 window.viewComicIssues = function(comicId) {
-  console.log('🎯 Navegando para edições do quadrinho ID:', comicId);
   currentView = 'issues';
   searchInput.value = '';
   loadComicIssues(comicId);
@@ -300,7 +294,6 @@ window.viewComicIssues = function(comicId) {
 window.backToHome = function() {
   if (currentView === 'home') return;
   
-  console.log('🏠 Voltando para home');
   currentView = 'home';
   currentComic = null;
   currentIssues = [];
@@ -413,7 +406,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
   function handleSearchInput(e) {
     const searchTerm = e.target.value;
-    console.log(`🔍 Busca ativada: "${searchTerm}" na view: ${currentView}`);
     
     if (currentView === 'home') {
       filterComics(searchTerm);

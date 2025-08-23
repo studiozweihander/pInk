@@ -26,19 +26,7 @@ module.exports = async (req, res) => {
     
     const { data, error } = await supabase
       .from('Comic')
-      .select(`
-        id,
-        title,
-        issues,
-        year,
-        link,
-        cover,
-        language:Idiom(name),
-        publisher:Publisher(name),
-        authors:ComicAuthor(
-          Author(id, name)
-        )
-      `)
+      .select('*')
       .eq('id', id)
       .single();
     
@@ -51,17 +39,44 @@ module.exports = async (req, res) => {
       }
       throw error;
     }
+
+    let idiomName = null;
+    let publisherName = null;
+    let authors = [];
+
+    if (data.idiomId) {
+      const { data: idiom } = await supabase.from('Idiom').select('name').eq('id', data.idiomId).single();
+      idiomName = idiom?.name;
+    }
+
+    if (data.publisherId) {
+      const { data: publisher } = await supabase.from('Publisher').select('name').eq('id', data.publisherId).single();
+      publisherName = publisher?.name;
+    }
+
+    const { data: comicAuthors } = await supabase
+      .from('ComicAuthor')
+      .select('authorId')
+      .eq('comicId', id);
+    
+    if (comicAuthors && comicAuthors.length > 0) {
+      const authorIds = comicAuthors.map(ca => ca.authorId);
+      const { data: authorsData } = await supabase
+        .from('Author')
+        .select('*')
+        .in('id', authorIds);
+      authors = authorsData || [];
+    }
     
     const comic = {
       id: data.id,
       title: data.title,
       total_issues: data.issues,
       year: data.year,
-      link: data.link,
       cover: data.cover,
-      language: data.language?.name || null,
-      publisher: data.publisher?.name || null,
-      authors: data.authors?.map(ca => ca.Author) || []
+      language: idiomName,
+      publisher: publisherName,
+      authors: authors
     };
     
     res.json({

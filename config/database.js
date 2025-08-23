@@ -25,17 +25,17 @@ async function testConnection() {
     console.log(`\n🔗 Connecting to: ${SUPABASE_URL}`);
     
     const { data, error, count } = await supabase
-      .from('Idiom')
+      .from('Comic')
       .select('*', { count: 'exact' })
-      .limit(5);
+      .limit(1);
       
     if (error) {
       throw new Error(`Supabase query failed: ${error.message} (Code: ${error.code})`);
     }
     
     console.log('✅ Supabase connection SUCCESSFUL!');
-    console.log(`📊 Database test: Found ${count} languages in Idiom table`);
-    console.log(`🎯 Sample data: ${data.map(d => d.name).join(', ')}`);
+    console.log(`📊 Database test: Found ${count} comics in database`);
+    console.log(`🎯 Sample data:`, data[0] || 'No data');
     console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
     console.log('🚀 Database ready for API requests!');
     

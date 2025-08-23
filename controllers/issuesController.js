@@ -8,28 +8,7 @@ class IssuesController {
       
       const { data, error } = await supabase
         .from('Issue')
-        .select(`
-          id,
-          title,
-          issueNumber,
-          year,
-          size,
-          series,
-          genres,
-          link,
-          cover,
-          synopsis,
-          comicId,
-          language:Idiom(name),
-          comic:Comic(
-            title,
-            year,
-            publisher:Publisher(name),
-            authors:ComicAuthor(
-              Author(id, name)
-            )
-          )
-        `)
+        .select('*')
         .eq('id', id)
         .single();
       
@@ -41,6 +20,45 @@ class IssuesController {
           });
         }
         throw error;
+      }
+
+      let idiomName = null;
+      let comicTitle = null;
+      let comicYear = null;
+      let publisherName = null;
+      let authors = [];
+
+      if (data.idiomId) {
+        const { data: idiom } = await supabase.from('Idiom').select('name').eq('id', data.idiomId).single();
+        idiomName = idiom?.name;
+      }
+
+      if (data.comicId) {
+        const { data: comicData } = await supabase.from('Comic').select('*').eq('id', data.comicId).single();
+        
+        if (comicData) {
+          comicTitle = comicData.title;
+          comicYear = comicData.year;
+          
+          if (comicData.publisherId) {
+            const { data: publisher } = await supabase.from('Publisher').select('name').eq('id', comicData.publisherId).single();
+            publisherName = publisher?.name;
+          }
+
+          const { data: comicAuthors } = await supabase
+            .from('ComicAuthor')
+            .select('authorId')
+            .eq('comicId', data.comicId);
+          
+          if (comicAuthors && comicAuthors.length > 0) {
+            const authorIds = comicAuthors.map(ca => ca.authorId);
+            const { data: authorsData } = await supabase
+              .from('Author')
+              .select('*')
+              .in('id', authorIds);
+            authors = authorsData || [];
+          }
+        }
       }
       
       let genres = data.genres;
@@ -64,11 +82,11 @@ class IssuesController {
         cover: data.cover,
         synopsis: data.synopsis,
         comicId: data.comicId,
-        language: data.language?.name || null,
-        comic_title: data.comic?.title || null,
-        comic_year: data.comic?.year || null,
-        publisher: data.comic?.publisher?.name || null,
-        authors: data.comic?.authors?.map(ca => ca.Author) || []
+        language: idiomName,
+        comic_title: comicTitle,
+        comic_year: comicYear,
+        publisher: publisherName,
+        authors: authors
       };
       
       res.json({
@@ -92,28 +110,34 @@ class IssuesController {
       
       let query = supabase
         .from('Issue')
-        .select(`
-          id,
-          title,
-          issueNumber,
-          year,
-          cover,
-          comicId,
-          comic:Comic(title),
-          language:Idiom(name)
-        `, { count: 'exact' });
+        .select('*', { count: 'exact' });
       
       if (search) {
-        query = query.or(`title.ilike.%${search}%,comic.title.ilike.%${search}%`);
+        query = query.ilike('title', `%${search}%`);
       }
       
       const { data, error, count } = await query
-        .order('comic.title', { ascending: true })
         .order('issueNumber', { ascending: true })
         .range(parseInt(offset), parseInt(offset) + parseInt(limit) - 1);
       
       if (error) {
         throw error;
+      }
+
+      const comicIds = [...new Set(data.map(i => i.comicId).filter(Boolean))];
+      const idiomIds = [...new Set(data.map(i => i.idiomId).filter(Boolean))];
+      
+      let comicsMap = new Map();
+      let idiomsMap = new Map();
+
+      if (comicIds.length > 0) {
+        const { data: comics } = await supabase.from('Comic').select('id, title').in('id', comicIds);
+        comicsMap = new Map(comics.map(c => [c.id, c.title]));
+      }
+
+      if (idiomIds.length > 0) {
+        const { data: idioms } = await supabase.from('Idiom').select('id, name').in('id', idiomIds);
+        idiomsMap = new Map(idioms.map(i => [i.id, i.name]));
       }
       
       const issues = data.map(issue => ({
@@ -123,8 +147,8 @@ class IssuesController {
         year: issue.year,
         cover: issue.cover,
         comicId: issue.comicId,
-        comic_title: issue.comic?.title || null,
-        language: issue.language?.name || null
+        comic_title: comicsMap.get(issue.comicId) || null,
+        language: idiomsMap.get(issue.idiomId) || null
       }));
       
       res.json({

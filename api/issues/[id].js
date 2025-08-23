@@ -6,7 +6,6 @@ const supabase = createClient(
 );
 
 module.exports = async (req, res) => {
-  // CORS headers
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
@@ -27,25 +26,7 @@ module.exports = async (req, res) => {
     
     const { data, error } = await supabase
       .from('Issue')
-      .select(`
-        id,
-        title,
-        issueNumber,
-        year,
-        size,
-        series,
-        genres,
-        link,
-        cover,
-        synopsis,
-        comicId,
-        language:Idiom(name),
-        comic:Comic(
-          id,
-          title,
-          publisher:Publisher(name)
-        )
-      `)
+      .select('*')
       .eq('id', id)
       .single();
     
@@ -58,8 +39,33 @@ module.exports = async (req, res) => {
       }
       throw error;
     }
+
+    let idiomName = null;
+    let comic = null;
+
+    if (data.idiomId) {
+      const { data: idiom } = await supabase.from('Idiom').select('name').eq('id', data.idiomId).single();
+      idiomName = idiom?.name;
+    }
+
+    if (data.comicId) {
+      const { data: comicData } = await supabase.from('Comic').select('*').eq('id', data.comicId).single();
+      
+      if (comicData) {
+        let publisherName = null;
+        if (comicData.publisherId) {
+          const { data: publisher } = await supabase.from('Publisher').select('name').eq('id', comicData.publisherId).single();
+          publisherName = publisher?.name;
+        }
+        
+        comic = {
+          id: comicData.id,
+          title: comicData.title,
+          publisher: publisherName
+        };
+      }
+    }
     
-    // Transformar dados para formato esperado
     const issue = {
       id: data.id,
       title: data.title,
@@ -72,12 +78,8 @@ module.exports = async (req, res) => {
       cover: data.cover,
       synopsis: data.synopsis,
       comicId: data.comicId,
-      language: data.language?.name || null,
-      comic: data.comic ? {
-        id: data.comic.id,
-        title: data.comic.title,
-        publisher: data.comic.publisher?.name || null
-      } : null
+      language: idiomName,
+      comic: comic
     };
     
     res.json({
