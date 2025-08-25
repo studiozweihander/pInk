@@ -86,7 +86,9 @@ class IssuesController {
         comic_title: comicTitle,
         comic_year: comicYear,
         publisher: publisherName,
-        authors: authors
+        authors: authors,
+        credito: data.credito,
+        creditoLink: data.creditoLink
       };
       
       res.json({
@@ -148,7 +150,9 @@ class IssuesController {
         cover: issue.cover,
         comicId: issue.comicId,
         comic_title: comicsMap.get(issue.comicId) || null,
-        language: idiomsMap.get(issue.idiomId) || null
+        language: idiomsMap.get(issue.idiomId) || null,
+        credito: issue.credito || null,
+        creditoLink: issue.creditoLink || null
       }));
       
       res.json({

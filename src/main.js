@@ -318,7 +318,9 @@ async function openModal(issueId) {
     year: document.getElementById('modal-year'),
     size: document.getElementById('modal-size'),
     language: document.getElementById('modal-language'),
-    downloadSize: document.getElementById('download-size')
+    downloadSize: document.getElementById('download-size'),
+    creditsItem: document.getElementById('credits-item'),
+    modalCredits: document.getElementById('modal-credits')
   };
   
 
@@ -331,7 +333,11 @@ async function openModal(issueId) {
     elements[key].textContent = '-';
   });
   elements.downloadSize.textContent = '';
-  
+
+  elements.creditsItem.style.display = 'none';
+  elements.modalCredits.textContent = '-';
+  elements.modalCredits.className = '';
+  elements.modalCredits.onclick = null;
 
   elements.cover.src = PLACEHOLDER_IMAGE;
   elements.cover.alt = 'Carregando...';
@@ -367,13 +373,57 @@ async function openModal(issueId) {
     if (currentIssueData.size) {
       elements.downloadSize.textContent = `(${currentIssueData.size})`;
     }
+
+    handleCreditsDisplay(currentIssueData, elements);
     
   } catch (error) {
-    console.error('❌ Erro ao carregar dados da edição:', error);
-    elements.title.textContent = 'Erro ao carregar';
-    elements.synopsis.textContent = 'Não foi possível carregar os detalhes desta edição. Tente novamente mais tarde.';
+    elements.creditsItem.style.display = 'none';
+    elements.modalCredits.textContent = 'Não informado';
   }
 }
+
+function handleCreditsDisplay(issueData, elements) {
+  const { credito, creditoLink } = issueData;
+  if (!credito || credito.trim() === '') {
+    elements.creditsSection.style.display = 'none';
+    return;
+  }
+  
+  elements.creditsItem.style.display = 'flex';
+  
+  if (creditoLink && creditoLink.trim() !== '' && isValidUrl(creditoLink)) {
+    elements.modalCredits.textContent = credito;
+    elements.modalCredits.className = 'credits-link clickable';
+    elements.modalCredits.onclick = () => {
+      try {
+        window.open(creditoLink, '_blank', 'noopener,noreferrer');
+      } catch (error) {
+        console.warn('❌ Erro ao abrir link de créditos:', error);
+        alert('❌ Não foi possível abrir o link de créditos.');
+      }
+    };
+    elements.modalCredits.setAttribute('aria-label', `Abrir site do ${credito}`);
+    elements.modalCredits.setAttribute('title', `Clique para visitar ${creditoLink}`);
+  } else {
+    elements.modalCredits.textContent = credito;
+    elements.modalCredits.className = 'credits-link';
+    elements.modalCredits.onclick = null;
+    elements.modalCredits.removeAttribute('aria-label');
+    elements.modalCredits.removeAttribute('title');
+  }
+}
+
+function isValidUrl(string) {
+  try {
+    const url = new URL(string);
+    return url.protocol === 'http:' || url.protocol === 'https:';
+  } catch {
+    return false;
+  }
+}
+
+window.handleCreditsDisplay = handleCreditsDisplay;
+window.isValidUrl = isValidUrl;
 
 window.closeModal = function() {
   const modal = document.getElementById('modal');

@@ -79,7 +79,9 @@ module.exports = async (req, res) => {
       synopsis: data.synopsis,
       comicId: data.comicId,
       language: idiomName,
-      comic: comic
+      comic: comic,
+      credito: data.credito,
+      creditoLink: data.creditoLink
     };
     
     res.json({
