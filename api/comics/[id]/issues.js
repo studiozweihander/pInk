@@ -69,7 +69,9 @@ module.exports = async (req, res) => {
       link: issue.link,
       cover: issue.cover,
       synopsis: issue.synopsis,
-      language: idiomsMap.get(issue.idiomId) || null
+      language: idiomsMap.get(issue.idiomId) || null,
+      credito: data.credito || null,
+      creditoLink: data.creditoLink || null
     }));
     
     res.json({
