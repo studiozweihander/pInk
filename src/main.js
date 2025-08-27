@@ -11,6 +11,7 @@ let currentIssues = [];
 let currentIssueData = null;
 let isLoading = false;
 let currentView = 'home';
+let viewMode = 'grid';
 
 const cardsContainer = document.getElementById('cards');
 const searchInput = document.getElementById('search');
@@ -19,6 +20,10 @@ const logoContainer = document.querySelector('.logo-container');
 const searchToggle = document.getElementById('search-toggle');
 const searchInputContainer = document.getElementById('search-input-container');
 const searchClose = document.getElementById('search-close');
+const controlsBar = document.querySelector('.controls-bar');
+const backButtonControls = document.getElementById('back-button');
+const viewGridButton = document.getElementById('view-grid');
+const viewListButton = document.getElementById('view-list');
 
 function handleImageError(imgElement) {
   if (imgElement.dataset.errorHandled === 'true') return;
@@ -61,76 +66,6 @@ function handleImageError(imgElement) {
   imgElement.style.opacity = '0.8';
 }
 
-function showControlsBar() {
-  if (!controlsBar) return;
-  
-  isBarHidden = false;
-  controlsBar.classList.remove('hidden');
-  controlsBar.classList.add('visible');
-  container.classList.remove('bar-hidden');
-  
-  setTimeout(() => {
-    controlsBar.classList.remove('visible');
-  }, 300);
-}
-
-function hideControlsBar() {
-  if (!controlsBar) return;
-  
-  isBarHidden = true;
-  controlsBar.classList.add('hidden');
-  controlsBar.classList.remove('visible');
-  container.classList.add('bar-hidden');
-}
-
-function resetControlsBar() {
-  if (!controlsBar) return;
-  
-  clearTimeout(scrollTimeout);
-  showControlsBar();
-  lastScrollTop = 0;
-  isScrollingDown = false;
-}
-
-function handleScroll() {
-  if (!scrollableContent || !controlsBar) return;
-  
-  const scrollTop = scrollableContent.scrollTop;
-  const scrollDifference = Math.abs(scrollTop - lastScrollTop);
-  
-  if (scrollDifference < scrollThreshold) {
-    return;
-  }
-  
-  const scrollingDown = scrollTop > lastScrollTop;
-  const scrollingUp = scrollTop < lastScrollTop;
-  
-  if (scrollTop <= 50) {
-    if (isBarHidden) {
-      showControlsBar();
-    }
-    lastScrollTop = scrollTop;
-    return;
-  }
-  
-  if (scrollingDown && !isBarHidden) {
-    hideControlsBar();
-    isScrollingDown = true;
-  }
-  
-  if (scrollingUp && isBarHidden) {
-    showControlsBar();
-    isScrollingDown = false;
-  }
-  
-  lastScrollTop = scrollTop;
-}
-
-function debouncedScrollHandler() {
-  clearTimeout(scrollTimeout);
-  scrollTimeout = setTimeout(handleScroll, scrollDebounceTime);
-}
-
 function showLoading() {
   isLoading = true;
   cardsContainer.className = 'cards state-message';
@@ -140,10 +75,6 @@ function showLoading() {
       <p>Carregando quadrinhos...</p>
     </div>
   `;
-  
-  if (controlsBar) {
-    controlsBar.classList.add('loading');
-  }
 }
 
 function showError(message) {
@@ -155,10 +86,6 @@ function showError(message) {
       <button onclick="location.reload()" class="retry-btn">Tentar novamente</button>
     </div>
   `;
-  
-  if (controlsBar) {
-    controlsBar.classList.remove('loading');
-  }
 }
 
 function showEmptyState(type = 'quadrinhos') {
@@ -247,10 +174,6 @@ function renderComics(comics) {
 
   cardsContainer.className = `cards has-content${viewMode === 'list' ? ' list-view' : ''}`;
   cardsContainer.innerHTML = comics.map(createComicCard).join('');
-  
-  if (controlsBar) {
-    controlsBar.classList.remove('loading');
-  }
 }
 
 function renderIssues(issues) {
@@ -261,16 +184,16 @@ function renderIssues(issues) {
 
   cardsContainer.className = `cards has-content${viewMode === 'list' ? ' list-view' : ''}`;
   cardsContainer.innerHTML = issues.map(createIssueCard).join('');
-  
-  if (controlsBar) {
-    controlsBar.classList.remove('loading');
-  }
 }
 
 async function loadAllComics() {
   if (isLoading) return;
   
   showLoading();
+  
+  if (controlsBar) {
+    controlsBar.style.opacity = '0.7';
+  }
   
   try {
     const isOnline = await api.healthCheck();
@@ -281,6 +204,20 @@ async function loadAllComics() {
     const response = await api.getAllComics();
     allComics = response.data;
     renderComics(allComics);
+    
+    if (controlsBar) {
+      controlsBar.style.opacity = '1';
+    }
+    
+    if (viewMode === 'list') {
+      cardsContainer.classList.add('list-view');
+    }
+    
+    setTimeout(() => {
+      if (currentView === 'home') {
+        console.log('💡 Dicas: Ctrl+1 (Grade), Ctrl+2 (Lista), ESC (Voltar)');
+      }
+    }, 2000);
     
   } catch (error) {
     console.error('❌ Erro ao carregar quadrinhos:', error);
@@ -297,7 +234,6 @@ async function loadAllComics() {
 async function loadComicIssues(comicId) {
   if (isLoading) return;
   showLoading();
-  resetControlsBar();
   
   try {
     const [comicResponse, issuesResponse] = await Promise.all([
@@ -404,7 +340,6 @@ window.backToHome = function() {
   
   renderComics(allComics);
   updateHeader();
-  resetControlsBar();
 };
 
 window.viewIssueDetails = async function(issueId) {
@@ -531,9 +466,6 @@ window.closeModal = function() {
   
   setTimeout(() => {
     currentIssueData = null;
-    if (scrollableContent && scrollableContent.scrollTop <= 50) {
-      resetControlsBar();
-    }
   }, 300);
 };
 
@@ -555,8 +487,128 @@ function toggleMobileSearch(show) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function loadViewModePreference() {
+  try {
+    const savedMode = window.viewModePreference || 'grid';
+    if (savedMode && (savedMode === 'grid' || savedMode === 'list')) {
+      setViewMode(savedMode);
+    }
+  } catch (e) {
+    console.warn('Não foi possível carregar preferência de visualização:', e);
+    setViewMode('grid');
+  }
+}
 
+function animateViewChange() {
+  cardsContainer.style.opacity = '0.7';
+  cardsContainer.style.transform = 'scale(0.98)';
+  
+  setTimeout(() => {
+    cardsContainer.style.opacity = '1';
+    cardsContainer.style.transform = 'scale(1)';
+  }, 150);
+}
+
+function highlightActiveControl(mode) {
+  const activeButton = mode === 'grid' ? viewGridButton : viewListButton;
+  
+  activeButton.style.transform = 'scale(1.1)';
+  activeButton.style.boxShadow = '0 0 8px rgba(231, 143, 222, 0.5)';
+  
+  setTimeout(() => {
+    activeButton.style.transform = '';
+    activeButton.style.boxShadow = '';
+  }, 300);
+}
+
+window.setViewMode = function(mode) {
+  const previousMode = viewMode;
+  viewMode = mode;
+  
+  viewGridButton.classList.toggle('active', mode === 'grid');
+  viewListButton.classList.toggle('active', mode === 'list');
+  
+  cardsContainer.classList.toggle('list-view', mode === 'list');
+  
+  try {
+    window.viewModePreference = mode;
+  } catch (e) {
+    console.warn('Não foi possível salvar preferência:', e);
+  }
+  
+  if (previousMode !== mode) {
+    highlightActiveControl(mode);
+  }
+};
+
+function initializeControlsBar() {
+  if (backButtonControls) {
+    backButtonControls.addEventListener('click', (e) => {
+      e.preventDefault();
+      backToHome();
+    });
+  }
+  
+  if (viewGridButton) {
+    viewGridButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (viewMode !== 'grid') {
+        animateViewChange();
+        setTimeout(() => setViewMode('grid'), 75);
+      }
+    });
+  }
+  
+  if (viewListButton) {
+    viewListButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (viewMode !== 'list') {
+        animateViewChange();
+        setTimeout(() => setViewMode('list'), 75);
+      }
+    });
+  }
+  
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey || e.metaKey) {
+      if (e.key === '1') {
+        e.preventDefault();
+        animateViewChange();
+        setTimeout(() => setViewMode('grid'), 75);
+      } else if (e.key === '2') {
+        e.preventDefault();
+        animateViewChange();
+        setTimeout(() => setViewMode('list'), 75);
+      }
+    }
+    
+    if (e.key === 'Escape' && currentView === 'issues') {
+      const modal = document.getElementById('modal');
+      if (!modal.classList.contains('open')) {
+        e.preventDefault();
+        backToHome();
+      }
+    }
+  });
+  
+  cardsContainer.style.transition = 'opacity 0.15s ease, transform 0.15s ease';
+}
+
+function initializeTooltips() {
+  if (backButtonControls) {
+    backButtonControls.setAttribute('title', 'Voltar para quadrinhos (ESC)');
+  }
+  
+  if (viewGridButton) {
+    viewGridButton.setAttribute('title', 'Visualização em Grade (Ctrl+1)');
+  }
+  
+  if (viewListButton) {
+    viewListButton.setAttribute('title', 'Visualização em Lista (Ctrl+2)');
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
   function handleSearchInput(e) {
     const searchTerm = e.target.value;
     
@@ -595,7 +647,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      if (document.getElementById('modal').classList.contains('open')) {
+      const modal = document.getElementById('modal');
+      if (modal.classList.contains('open')) {
         closeModal();
       } else if (searchInputContainer.classList.contains('active')) {
         toggleMobileSearch(false);
@@ -609,19 +662,23 @@ document.addEventListener('DOMContentLoaded', () => {
 
   logoContainer.addEventListener('click', () => {
     if (currentView === 'issues') {
-      window.backToHome();
+      backToHome();
     }
   });
-  
 
+  initializeControlsBar();
+  initializeTooltips();
+  loadViewModePreference();
+  
+  setTimeout(() => {
+    if (currentView === 'home') {
+      console.log('💡 Dicas: Ctrl+1 (Grade), Ctrl+2 (Lista), ESC (Voltar)');
+    }
+  }, 3000);
+  
   loadAllComics();
 });
 
 window.handleImageError = handleImageError;
 window.api = api;
 window.loadAllComics = loadAllComics;
-window.scrollBehavior = {
-  show: showControlsBar,
-  hide: hideControlsBar,
-  reset: resetControlsBar
-};
