@@ -906,7 +906,7 @@ header {
         padding-bottom: calc(var(--spacing-lg) + env(safe-area-inset-bottom, 16px));
     }
     .controls-bar {
-        padding: var(--spacing-xs);
+        padding: var(--spacing-sm);
     }
     
     .control-text {
@@ -914,7 +914,7 @@ header {
     }
     
     .control-button {
-        padding: var(--spacing-xs);
+        padding: var(--spacing-sm);
         width: 28px;
         height: 28px;
         justify-content: center;
