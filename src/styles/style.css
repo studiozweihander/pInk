@@ -232,11 +232,18 @@ header {
     flex-direction: column;
 }
 
+.container.bar-hidden {
+    margin-top: calc(-40px + var(--spacing-xs));
+}
+
 .scrollable-content {
     flex: 1;
     overflow-y: auto;
     padding: var(--spacing-sm);
     padding-bottom: calc(var(--spacing-xl) + env(safe-area-inset-bottom, 0px));
+    scroll-behavior: smooth;
+    -webkit-overflow-scrolling: touch;
+    overscroll-behavior: contain;
 }
 
 .cards {
@@ -738,159 +745,6 @@ header {
     transform: translate(1px, -1px);
 }
 
-.controls-bar {
-    background: var(--primary-surface);
-    padding: var(--spacing-sm) var(--spacing-xs);
-    margin: 0 var(--spacing-xs);
-    margin-top: calc(-1 * var(--spacing-xs));
-    border-radius: 0 0 var(--border-radius-md) var(--border-radius-md);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    min-height: 40px;
-    position: relative;
-    z-index: 2;
-    border-top: none;
-}
-
-.controls-left,
-.controls-right {
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-sm);
-}
-
-/* Botão de voltar camuflado */
-.control-button {
-    background: transparent;
-    border: 1px solid rgba(231, 143, 222, 0.2);
-    border-radius: var(--border-radius-sm);
-    color: var(--secondary-font);
-    font-family: var(--font);
-    font-weight: 400;
-    font-size: 0.8rem;
-    cursor: pointer;
-    transition: var(--transition-fast);
-    display: flex;
-    align-items: center;
-    gap: var(--spacing-xs);
-    opacity: 0.8;
-}
-
-.control-button:hover {
-    background: rgba(231, 143, 222, 0.1);
-    border-color: rgba(231, 143, 222, 0.4);
-    color: var(--primary-color);
-    opacity: 1;
-    transform: translateY(-1px);
-}
-
-.control-button.back-btn {
-    color: var(--secondary-font);
-    padding: 11px 24px;
-}
-
-.control-button.back-btn:hover {
-    color: var(--primary-color);
-}
-
-.control-text {
-    font-size: 0.75rem;
-    font-weight: 500;
-}
-
-/* Toggle de visualização camuflado */
-.view-toggle {
-    display: flex;
-    gap: 2px;
-    background: rgba(231, 143, 222, 0.05);
-    padding: 2px;
-    border-radius: var(--border-radius-sm);
-    border: 1px solid rgba(231, 143, 222, 0.15);
-}
-
-.toggle-button {
-    background: transparent;
-    border: none;
-    padding: var(--spacing-xs);
-    border-radius: calc(var(--border-radius-sm) - 2px);
-    color: var(--secondary-font);
-    cursor: pointer;
-    transition: var(--transition-fast);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 28px;
-    height: 28px;
-    opacity: 0.6;
-}
-
-.toggle-button:hover {
-    background: rgba(231, 143, 222, 0.1);
-    color: var(--primary-color);
-    opacity: 1;
-    transform: scale(1.05);
-}
-
-.toggle-button.active {
-    background: rgba(231, 143, 222, 0.2);
-    color: var(--primary-color);
-    opacity: 1;
-    box-shadow: 0 0 0 1px rgba(231, 143, 222, 0.3);
-}
-
-.toggle-button.active:hover {
-    background: rgba(231, 143, 222, 0.25);
-    transform: scale(1.05);
-}
-
-/* Cards em modo lista (horizontal) */
-.cards.list-view {
-    grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
-    max-width: 100%;
-    gap: var(--spacing-md);
-}
-
-.cards.list-view .card {
-    width: 100%;
-    max-width: none;
-    display: flex;
-    flex-direction: row;
-    height: 160px;
-}
-
-.cards.list-view .card-image {
-    width: 107px;
-    height: 100%;
-    aspect-ratio: unset;
-    flex-shrink: 0;
-}
-
-.cards.list-view .card-info {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-    padding: var(--spacing-md);
-}
-
-.cards.list-view .card-title {
-    font-size: 1rem;
-    margin-bottom: var(--spacing-sm);
-    line-height: 1.3;
-}
-
-.cards.list-view .card-meta {
-    font-size: 0.8rem;
-    line-height: 1.4;
-    margin-bottom: var(--spacing-sm);
-    opacity: 0.9;
-}
-
-.cards.list-view .card-details {
-    margin-top: auto;
-}
-
 /* RESPONSIVE BREAKPOINTS */
 
 @media screen and (max-width: 479px) {
@@ -906,7 +760,7 @@ header {
         padding-bottom: calc(var(--spacing-lg) + env(safe-area-inset-bottom, 16px));
     }
     .controls-bar {
-        padding: var(--spacing-sm);
+        padding: var(--spacing-xs);
     }
     
     .control-text {
@@ -914,7 +768,7 @@ header {
     }
     
     .control-button {
-        padding: var(--spacing-sm);
+        padding: var(--spacing-xs);
         width: 28px;
         height: 28px;
         justify-content: center;
@@ -990,32 +844,6 @@ header {
     
     .card {
         width: var(--card-width-tablet);
-    }
-    .logo-text {
-        font-size: 1.4rem;
-    }
-    
-    #breadcrumb {
-        font-size: 1.1rem;
-    }
-    
-    .controls-bar {
-        padding: var(--spacing-sm) var(--spacing-md);
-    }
-    
-    .control-button {
-        padding: var(--spacing-sm) var(--spacing-md);
-        font-size: 0.85rem;
-    }
-    
-    .toggle-button {
-        width: 30px;
-        height: 30px;
-    }
-    
-    .view-toggle {
-        padding: 3px;
-        gap: 3px;
     }
 }
 
@@ -1130,8 +958,16 @@ header {
     }
     
     .container {
+        background: var(--secondary-surface);
+        padding-top: 1rem;
         margin: 0px var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
+        flex: 1;
         border-radius: var(--border-radius-xxl);
+        z-index: 1;
+        overflow: hidden;
+        display: flex;
+        flex-direction: column;
+        transition: margin-top 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     
     .cards {
@@ -1169,72 +1005,6 @@ header {
     .modal-info h2 {
         font-size: 2rem;
     }
-
-    header {
-        padding: var(--spacing-xl);
-        margin: var(--spacing-lg);
-        border-radius: var(--border-radius-xxl);
-    }
-    
-    .logo-text {
-        font-size: 2rem;
-    }
-    
-    .logo-chevron {
-        font-size: 1.5rem;
-    }
-    
-    #breadcrumb {
-        font-size: 1.5rem;
-        font-weight: 600;
-    }
-    
-    .controls-bar {
-        margin: 0 var(--spacing-lg);
-        margin-top: calc(-1 * var(--spacing-lg));
-        padding: var(--spacing-md) var(--spacing-xl);
-        border-radius: 0 0 var(--border-radius-xxl) var(--border-radius-xxl);
-    }
-    
-    .control-button {
-        font-size: 0.9rem;
-        padding: var(--spacing-sm) var(--spacing-lg);
-    }
-    
-    .toggle-button {
-        width: 32px;
-        height: 32px;
-    }
-    
-    .view-toggle {
-        padding: 4px;
-        gap: 4px;
-    }
-    
-    .container {
-        margin: 0px var(--spacing-lg) var(--spacing-lg) var(--spacing-lg);
-        border-radius: var(--border-radius-xxl);
-    }
-    
-    .cards.list-view .card {
-        height: 180px;
-    }
-    
-    .cards.list-view .card-image {
-        width: 120px;
-    }
-    
-    .cards.list-view .card-info {
-        padding: var(--spacing-lg);
-    }
-    
-    .cards.list-view .card-title {
-        font-size: 1.2rem;
-    }
-    
-    .cards.list-view .card-meta {
-        font-size: 0.9rem;
-    }
 }
 
 /* Desktop Grande (1440px+) */
@@ -1262,33 +1032,5 @@ header {
     
     .modal-info {
         padding: var(--spacing-xl);
-    }
-
-    .controls-bar {
-        padding: var(--spacing-lg) var(--spacing-xxl);
-    }
-    
-    .cards.list-view {
-        grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-    }
-
-    .cards.list-view .card {
-        height: 200px;
-    }
-    
-    .cards.list-view .card-image {
-        width: 133px;
-    }
-    
-    .cards.list-view .card-info {
-        padding: var(--spacing-xl);
-    }
-    
-    .cards.list-view .card-title {
-        font-size: 1.3rem;
-    }
-    
-    .cards.list-view .card-meta {
-        font-size: 1rem;
     }
 }
