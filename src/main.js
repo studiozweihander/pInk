@@ -608,6 +608,275 @@ function initializeTooltips() {
   }
 }
 
+class ControlsBarAutoHide {
+  constructor() {
+    this.controlsBar = document.querySelector('.controls-bar');
+    this.scrollableContent = document.querySelector('.scrollable-content');
+    
+    if (!this.controlsBar) return;
+    
+    this.lastScrollTop = 0;
+    this.isHidden = false;
+    this.scrollThreshold = 50; // Minimum scroll distance to trigger hide/show
+    this.hideTimeout = null;
+    this.showTimeout = null;
+    
+    this.init();
+  }
+  
+  init() {
+    // Setup initial styles
+    this.setupStyles();
+    
+    // Bind scroll listeners
+    this.bindScrollListeners();
+    
+    // Handle window resize
+    window.addEventListener('resize', () => this.setupStyles());
+  }
+  
+  setupStyles() {
+    if (!this.controlsBar) return;
+    
+    // Ensure smooth transitions
+    this.controlsBar.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease';
+    this.controlsBar.style.transform = 'translateY(0)';
+    this.controlsBar.style.opacity = '1';
+    
+    // Make sure the controls bar stays in place
+    const computedStyle = getComputedStyle(this.controlsBar);
+    if (computedStyle.position !== 'sticky' && computedStyle.position !== 'fixed') {
+      this.controlsBar.style.position = 'relative';
+      this.controlsBar.style.zIndex = '10';
+    }
+  }
+  
+  bindScrollListeners() {
+    // Throttled scroll handler for better performance
+    let ticking = false;
+    
+    const handleScroll = (scrollElement) => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          this.onScroll(scrollElement);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    
+    // Listen to main scrollable content (primary)
+    if (this.scrollableContent) {
+      this.scrollableContent.addEventListener('scroll', () => {
+        handleScroll(this.scrollableContent);
+      }, { passive: true });
+    }
+    
+    // Fallback: listen to window scroll
+    window.addEventListener('scroll', () => {
+      // Only use window scroll if scrollable content doesn't have scroll
+      if (!this.scrollableContent || this.scrollableContent.scrollHeight <= this.scrollableContent.clientHeight) {
+        handleScroll(window);
+      }
+    }, { passive: true });
+  }
+  
+  onScroll(scrollElement) {
+    if (!this.controlsBar) return;
+    
+    const currentScrollTop = scrollElement === window 
+      ? window.pageYOffset || document.documentElement.scrollTop
+      : scrollElement.scrollTop;
+    
+    // Don't hide if we're at the very top
+    if (currentScrollTop <= 10) {
+      this.showControls();
+      this.lastScrollTop = currentScrollTop;
+      return;
+    }
+    
+    const scrollDifference = Math.abs(currentScrollTop - this.lastScrollTop);
+    
+    // Only react if scroll difference is significant enough
+    if (scrollDifference < this.scrollThreshold) {
+      return;
+    }
+    
+    // Scrolling down - hide controls
+    if (currentScrollTop > this.lastScrollTop && !this.isHidden) {
+      this.hideControls();
+    }
+    // Scrolling up - show controls
+    else if (currentScrollTop < this.lastScrollTop && this.isHidden) {
+      this.showControls();
+    }
+    
+    this.lastScrollTop = currentScrollTop;
+  }
+  
+  hideControls() {
+    if (!this.controlsBar || this.isHidden) return;
+    
+    // Clear any pending show timeout
+    if (this.showTimeout) {
+      clearTimeout(this.showTimeout);
+      this.showTimeout = null;
+    }
+    
+    // Add slight delay to prevent flickering
+    this.hideTimeout = setTimeout(() => {
+      if (!this.controlsBar) return;
+      
+      // Get controls bar height for smooth animation
+      const controlsHeight = this.controlsBar.offsetHeight;
+      const container = document.querySelector('.container');
+      
+      this.controlsBar.style.transform = 'translateY(100%)';
+      this.controlsBar.style.opacity = '0';
+      
+      // Move container up to fill the gap
+      if (container) {
+        container.style.transition = 'margin-top 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+        container.style.marginTop = `calc(-${controlsHeight}px + 10px)`;
+      }
+      
+      this.isHidden = true;
+      
+      // Add hidden class for additional styling if needed
+      this.controlsBar.classList.add('controls-hidden');
+      
+      console.log('🫥 Controls hidden');
+    }, 100);
+  }
+  
+  showControls() {
+    if (!this.controlsBar || !this.isHidden) return;
+    
+    // Clear any pending hide timeout
+    if (this.hideTimeout) {
+      clearTimeout(this.hideTimeout);
+      this.hideTimeout = null;
+    }
+    
+    this.showTimeout = setTimeout(() => {
+      if (!this.controlsBar) return;
+      
+      const container = document.querySelector('.container');
+      
+      this.controlsBar.style.transform = 'translateY(0)';
+      this.controlsBar.style.opacity = '1';
+      
+      // Reset container margin
+      if (container) {
+        container.style.transition = 'margin-bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+        container.style.marginTop = '';
+      }
+      
+      this.isHidden = false;
+      
+      // Remove hidden class
+      this.controlsBar.classList.remove('controls-hidden');
+      
+      console.log('👁️ Controls shown');
+    }, 50);
+  }
+  
+  // Public method to force show controls (useful for navigation changes)
+  forceShow() {
+    if (this.hideTimeout) {
+      clearTimeout(this.hideTimeout);
+      this.hideTimeout = null;
+    }
+    
+    // Reset container margin immediately
+    const container = document.querySelector('.container');
+    if (container) {
+      container.style.marginTop = '';
+    }
+    
+    this.showControls();
+  }
+  
+  // Public method to reset state
+  reset() {
+    this.lastScrollTop = 0;
+    this.isHidden = false;
+    
+    // Reset container margin
+    const container = document.querySelector('.container');
+    if (container) {
+      container.style.transition = '';
+      container.style.marginTop = '';
+    }
+    
+    this.forceShow();
+  }
+  
+  // Cleanup method
+  destroy() {
+    if (this.hideTimeout) clearTimeout(this.hideTimeout);
+    if (this.showTimeout) clearTimeout(this.showTimeout);
+    
+    if (this.controlsBar) {
+      this.controlsBar.style.transform = '';
+      this.controlsBar.style.opacity = '';
+      this.controlsBar.classList.remove('controls-hidden');
+    }
+    
+    // Reset container styles
+    const container = document.querySelector('.container');
+    if (container) {
+      container.style.transition = '';
+      container.style.marginTop = '';
+    }
+  }
+}
+
+// Integration with your existing code
+let controlsAutoHide = null;
+
+// Initialize auto-hide when controls are ready
+function initializeControlsAutoHide() {
+  if (controlsAutoHide) {
+    controlsAutoHide.destroy();
+  }
+  
+  controlsAutoHide = new ControlsBarAutoHide();
+}
+
+// Enhanced navigation functions that work with auto-hide
+function enhancedBackToHome() {
+  if (currentView === 'home') return;
+
+  currentView = 'home';
+  currentComic = null;
+  currentIssues = [];
+  searchInput.value = '';
+  
+  renderComics(allComics);
+  updateHeader();
+  
+  // Reset auto-hide state when navigating
+  if (controlsAutoHide) {
+    controlsAutoHide.reset();
+  }
+}
+
+function enhancedViewComicIssues(comicId) {
+  currentView = 'issues';
+  searchInput.value = '';
+  loadComicIssues(comicId);
+  
+  // Reset auto-hide state when navigating
+  if (controlsAutoHide) {
+    setTimeout(() => {
+      if (controlsAutoHide) {
+        controlsAutoHide.reset();
+      }
+    }, 100);
+  }
+}
+
 document.addEventListener('DOMContentLoaded', () => {
   function handleSearchInput(e) {
     const searchTerm = e.target.value;
@@ -671,14 +940,15 @@ document.addEventListener('DOMContentLoaded', () => {
   loadViewModePreference();
   
   setTimeout(() => {
-    if (currentView === 'home') {
-      console.log('💡 Dicas: Ctrl+1 (Grade), Ctrl+2 (Lista), ESC (Voltar)');
-    }
-  }, 3000);
+    initializeControlsAutoHide();
+  }, 500);
   
   loadAllComics();
 });
 
+window.backToHome = enhancedBackToHome;
+window.viewComicIssues = enhancedViewComicIssues;
 window.handleImageError = handleImageError;
 window.api = api;
 window.loadAllComics = loadAllComics;
+window.controlsAutoHide = () => controlsAutoHide;
