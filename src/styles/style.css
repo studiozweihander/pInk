@@ -738,6 +738,10 @@ header {
     transform: translate(1px, -1px);
 }
 
+.controls-bar * {
+    transition: inherit;
+}
+
 .controls-bar {
     background: var(--primary-surface);
     padding: var(--spacing-sm) var(--spacing-xs);
@@ -749,8 +753,22 @@ header {
     align-items: center;
     min-height: 40px;
     position: relative;
-    z-index: 2;
+    transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opcaity 0.3s ease, box-shadow 0.3s ease;
+    z-index: 10;
     border-top: none;
+}
+
+.controls-bar.controls-hidden {
+    pointer-events: none;
+}
+
+.controls-bar:not(.controls-hidden) {
+    pointer-events: auto;
+}
+
+.controls-bar:not(.controls-hidden) .control-button:hover,
+.controls-bar:not(.controls-hidden) .toggle-button:hover {
+  transform: translateY(-1px) scale(1.02);
 }
 
 .controls-left,
@@ -907,6 +925,11 @@ header {
     }
     .controls-bar {
         padding: var(--spacing-xs);
+        transition-duration: 0.25s;
+    }
+
+    .controls-bar.controls-hidden {
+        transform: translateY(calc(100% + 10px)) !important;
     }
     
     .control-text {
@@ -959,6 +982,14 @@ header {
     .control-button {
         width: auto;
         padding: var(--spacing-xs) var(--spacing-sm);
+    }
+
+    .controls-bar {
+        transition-timing-function: cubic-bezier(0.23, 1, 0.32, 1);
+    }
+    
+    .controls-bar:not(.controls-hidden):hover {
+        box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15);
     }
 }
 
