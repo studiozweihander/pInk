@@ -7,6 +7,7 @@
     <title>pInk</title>
 </head>
 <body>
+    <!-- Header -->
     <header>
         <div class="header-title">
             <div class="logo-container" onclick="backToHome()">
@@ -32,6 +33,34 @@
         </div>
     </header>
     
+    <!-- Barra de Controles -->
+    <div class="controls-bar">
+        <div class="controls-left">
+            <button id="back-button" class="control-button back-btn" onclick="backToHome()" style="display: none;">
+                <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px" fill="currentColor">
+                    <path d="m313-440 196 196q12 12 11.5 28T508-188q-12 11-28 11.5T452-188L188-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l264-264q11-11 27.5-11t28.5 11q12 12 12 28.5T508-715L313-520h447q17 0 28.5 11.5T800-480q0 17-11.5 28.5T760-440H313Z"/>
+                </svg>
+                <span class="control-text">Voltar</span>
+            </button>
+        </div>
+
+        <div class="controls-right">
+            <div class="view-toggle">
+                <button id="view-grid" class="toggle-button active" onclick="setViewMode('grid')" title="Visualização em grade">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px" fill="currentColor">
+                        <path d="M120-520v-320q0-33 23.5-56.5T200-920h160q33 0 56.5 23.5T440-840v320q0 33-23.5 56.5T360-440H200q-33 0-56.5-23.5T120-520Zm400 0v-320q0-33 23.5-56.5T600-920h160q33 0 56.5 23.5T840-840v320q0 33-23.5 56.5T760-440H600q-33 0-56.5-23.5T520-520ZM120-120v-320q0-33 23.5-56.5T200-520h160q33 0 56.5 23.5T440-440v320q0 33-23.5 56.5T360-40H200q-33 0-56.5-23.5T120-120Zm400 0v-320q0-33 23.5-56.5T600-520h160q33 0 56.5 23.5T840-440v320q0 33-23.5 56.5T760-40H600q-33 0-56.5-23.5T520-120Z"/>
+                    </svg>
+                </button>
+                <button id="view-list" class="toggle-button" onclick="setViewMode('list')" title="Visualização em lista">
+                    <svg xmlns="http://www.w3.org/2000/svg" height="16px" viewBox="0 -960 960 960" width="16px" fill="currentColor">
+                        <path d="M280-600v-80h560v80H280Zm0 160v-80h560v80H280Zm0 160v-80h560v80H280ZM160-600q-17 0-28.5-11.5T120-640q0-17 11.5-28.5T160-680q17 0 28.5 11.5T200-640q0 17-11.5 28.5T160-600Zm0 160q-17 0-28.5-11.5T120-480q0-17 11.5-28.5T160-520q17 0 28.5 11.5T200-480q0 17-11.5 28.5T160-440Zm0 160q-17 0-28.5-11.5T120-320q0-17 11.5-28.5T160-360q17 0 28.5 11.5T200-320q0 17-11.5 28.5T160-280Z"/>
+                    </svg>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Main -->
     <div class="container">
         <div class="scrollable-content">
             <div id="cards" class="cards"></div>

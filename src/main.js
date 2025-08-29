@@ -11,6 +11,7 @@ let currentIssues = [];
 let currentIssueData = null;
 let isLoading = false;
 let currentView = 'home';
+let viewMode = 'grid';
 
 const cardsContainer = document.getElementById('cards');
 const searchInput = document.getElementById('search');
@@ -19,6 +20,10 @@ const logoContainer = document.querySelector('.logo-container');
 const searchToggle = document.getElementById('search-toggle');
 const searchInputContainer = document.getElementById('search-input-container');
 const searchClose = document.getElementById('search-close');
+const controlsBar = document.querySelector('.controls-bar');
+const backButtonControls = document.getElementById('back-button');
+const viewGridButton = document.getElementById('view-grid');
+const viewListButton = document.getElementById('view-list');
 
 function handleImageError(imgElement) {
   if (imgElement.dataset.errorHandled === 'true') return;
@@ -167,7 +172,7 @@ function renderComics(comics) {
     return;
   }
 
-  cardsContainer.className = 'cards has-content';
+  cardsContainer.className = `cards has-content${viewMode === 'list' ? ' list-view' : ''}`;
   cardsContainer.innerHTML = comics.map(createComicCard).join('');
 }
 
@@ -177,7 +182,7 @@ function renderIssues(issues) {
     return;
   }
 
-  cardsContainer.className = 'cards has-content';
+  cardsContainer.className = `cards has-content${viewMode === 'list' ? ' list-view' : ''}`;
   cardsContainer.innerHTML = issues.map(createIssueCard).join('');
 }
 
@@ -185,6 +190,10 @@ async function loadAllComics() {
   if (isLoading) return;
   
   showLoading();
+  
+  if (controlsBar) {
+    controlsBar.style.opacity = '0.7';
+  }
   
   try {
     const isOnline = await api.healthCheck();
@@ -196,9 +205,27 @@ async function loadAllComics() {
     allComics = response.data;
     renderComics(allComics);
     
+    if (controlsBar) {
+      controlsBar.style.opacity = '1';
+    }
+    
+    if (viewMode === 'list') {
+      cardsContainer.classList.add('list-view');
+    }
+    
+    setTimeout(() => {
+      if (currentView === 'home') {
+        console.log('💡 Dicas: Ctrl+1 (Grade), Ctrl+2 (Lista), ESC (Voltar)');
+      }
+    }, 2000);
+    
   } catch (error) {
     console.error('❌ Erro ao carregar quadrinhos:', error);
     showError(error.message);
+    
+    if (controlsBar) {
+      controlsBar.style.opacity = '1';
+    }
   } finally {
     isLoading = false;
   }
@@ -271,6 +298,16 @@ function filterIssues(searchTerm) {
   renderIssues(filtered);
 }
 
+function updateControlsVisibility() {
+  if (currentView === 'home') {
+    backButtonControls.style.display = 'none';
+    document.querySelector('.view-toggle').style.display = 'flex';
+  } else if (currentView === 'issues') {
+    backButtonControls.style.display = 'flex';
+    document.querySelector('.view-toggle').style.display = 'flex';
+  }
+}
+
 function updateHeader() {
   if (currentView === 'home') {
     breadcrumb.textContent = '';
@@ -283,6 +320,8 @@ function updateHeader() {
     logoContainer.classList.add('has-navigation');
     logoContainer.style.cursor = 'pointer';
   }
+  
+  updateControlsVisibility();
 }
 
 window.viewComicIssues = function(comicId) {
@@ -293,7 +332,7 @@ window.viewComicIssues = function(comicId) {
 
 window.backToHome = function() {
   if (currentView === 'home') return;
-  
+
   currentView = 'home';
   currentComic = null;
   currentIssues = [];
@@ -322,12 +361,10 @@ async function openModal(issueId) {
     creditsItem: document.getElementById('credits-item'),
     modalCredits: document.getElementById('modal-credits')
   };
-  
 
   modal.classList.add('open');
   elements.title.textContent = 'Carregando...';
   elements.synopsis.textContent = 'Carregando informações...';
-  
 
   ['series', 'genres', 'year', 'size', 'language'].forEach(key => {
     elements[key].textContent = '-';
@@ -349,13 +386,11 @@ async function openModal(issueId) {
     const response = await api.getIssueById(issueId);
     currentIssueData = response.data;
     
-  
     elements.title.textContent = currentIssueData.title || 'Título não disponível';
     elements.cover.alt = currentIssueData.title || 'Capa da edição';
     elements.cover.src = currentIssueData.cover || PLACEHOLDER_IMAGE;
     elements.synopsis.textContent = currentIssueData.synopsis || 'Sinopse não disponível para esta edição.';
     
-  
     const metadata = {
       series: currentIssueData.series,
       genres: Array.isArray(currentIssueData.genres) 
@@ -385,7 +420,7 @@ async function openModal(issueId) {
 function handleCreditsDisplay(issueData, elements) {
   const { credito, creditoLink } = issueData;
   if (!credito || credito.trim() === '') {
-    elements.creditsSection.style.display = 'none';
+    elements.creditsItem.style.display = 'none';
     return;
   }
   
@@ -452,8 +487,364 @@ function toggleMobileSearch(show) {
   }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
+function loadViewModePreference() {
+  try {
+    const savedMode = window.viewModePreference || 'grid';
+    if (savedMode && (savedMode === 'grid' || savedMode === 'list')) {
+      setViewMode(savedMode);
+    }
+  } catch (e) {
+    console.warn('Não foi possível carregar preferência de visualização:', e);
+    setViewMode('grid');
+  }
+}
 
+function animateViewChange() {
+  cardsContainer.style.opacity = '0.7';
+  cardsContainer.style.transform = 'scale(0.98)';
+  
+  setTimeout(() => {
+    cardsContainer.style.opacity = '1';
+    cardsContainer.style.transform = 'scale(1)';
+  }, 150);
+}
+
+function highlightActiveControl(mode) {
+  const activeButton = mode === 'grid' ? viewGridButton : viewListButton;
+  
+  activeButton.style.transform = 'scale(1.1)';
+  activeButton.style.boxShadow = '0 0 8px rgba(231, 143, 222, 0.5)';
+  
+  setTimeout(() => {
+    activeButton.style.transform = '';
+    activeButton.style.boxShadow = '';
+  }, 300);
+}
+
+window.setViewMode = function(mode) {
+  const previousMode = viewMode;
+  viewMode = mode;
+  
+  viewGridButton.classList.toggle('active', mode === 'grid');
+  viewListButton.classList.toggle('active', mode === 'list');
+  
+  cardsContainer.classList.toggle('list-view', mode === 'list');
+  
+  try {
+    window.viewModePreference = mode;
+  } catch (e) {
+    console.warn('Não foi possível salvar preferência:', e);
+  }
+  
+  if (previousMode !== mode) {
+    highlightActiveControl(mode);
+  }
+};
+
+function initializeControlsBar() {
+  if (backButtonControls) {
+    backButtonControls.addEventListener('click', (e) => {
+      e.preventDefault();
+      backToHome();
+    });
+  }
+  
+  if (viewGridButton) {
+    viewGridButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (viewMode !== 'grid') {
+        animateViewChange();
+        setTimeout(() => setViewMode('grid'), 75);
+      }
+    });
+  }
+  
+  if (viewListButton) {
+    viewListButton.addEventListener('click', (e) => {
+      e.preventDefault();
+      if (viewMode !== 'list') {
+        animateViewChange();
+        setTimeout(() => setViewMode('list'), 75);
+      }
+    });
+  }
+  
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey || e.metaKey) {
+      if (e.key === '1') {
+        e.preventDefault();
+        animateViewChange();
+        setTimeout(() => setViewMode('grid'), 75);
+      } else if (e.key === '2') {
+        e.preventDefault();
+        animateViewChange();
+        setTimeout(() => setViewMode('list'), 75);
+      }
+    }
+    
+    if (e.key === 'Escape' && currentView === 'issues') {
+      const modal = document.getElementById('modal');
+      if (!modal.classList.contains('open')) {
+        e.preventDefault();
+        backToHome();
+      }
+    }
+  });
+  
+  cardsContainer.style.transition = 'opacity 0.15s ease, transform 0.15s ease';
+}
+
+function initializeTooltips() {
+  if (backButtonControls) {
+    backButtonControls.setAttribute('title', 'Voltar para quadrinhos (ESC)');
+  }
+  
+  if (viewGridButton) {
+    viewGridButton.setAttribute('title', 'Visualização em Grade (Ctrl+1)');
+  }
+  
+  if (viewListButton) {
+    viewListButton.setAttribute('title', 'Visualização em Lista (Ctrl+2)');
+  }
+}
+
+class ControlsBarAutoHide {
+  constructor() {
+    this.controlsBar = document.querySelector('.controls-bar');
+    this.scrollableContent = document.querySelector('.scrollable-content');
+    
+    if (!this.controlsBar) return;
+    
+    this.lastScrollTop = 0;
+    this.isHidden = false;
+    this.scrollThreshold = 50
+    this.hideTimeout = null;
+    this.showTimeout = null;
+    
+    this.init();
+  }
+  
+  init() {
+    this.setupStyles();
+    
+    this.bindScrollListeners();
+    
+    window.addEventListener('resize', () => this.setupStyles());
+  }
+  
+  setupStyles() {
+    if (!this.controlsBar) return;
+    
+    this.controlsBar.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease';
+    this.controlsBar.style.transform = 'translateY(0)';
+    this.controlsBar.style.opacity = '1';
+    
+    const computedStyle = getComputedStyle(this.controlsBar);
+    if (computedStyle.position !== 'sticky' && computedStyle.position !== 'fixed') {
+      this.controlsBar.style.position = 'relative';
+      this.controlsBar.style.zIndex = '10';
+    }
+  }
+  
+  bindScrollListeners() {
+
+    let ticking = false;
+    
+    const handleScroll = (scrollElement) => {
+      if (!ticking) {
+        requestAnimationFrame(() => {
+          this.onScroll(scrollElement);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    
+
+    if (this.scrollableContent) {
+      this.scrollableContent.addEventListener('scroll', () => {
+        handleScroll(this.scrollableContent);
+      }, { passive: true });
+    }
+    
+    window.addEventListener('scroll', () => {
+  
+      if (!this.scrollableContent || this.scrollableContent.scrollHeight <= this.scrollableContent.clientHeight) {
+        handleScroll(window);
+      }
+    }, { passive: true });
+  }
+  
+  onScroll(scrollElement) {
+    if (!this.controlsBar) return;
+    
+    const currentScrollTop = scrollElement === window 
+      ? window.pageYOffset || document.documentElement.scrollTop
+      : scrollElement.scrollTop;
+    
+    if (currentScrollTop <= 10) {
+      this.showControls();
+      this.lastScrollTop = currentScrollTop;
+      return;
+    }
+    
+    const scrollDifference = Math.abs(currentScrollTop - this.lastScrollTop);
+    
+    if (scrollDifference < this.scrollThreshold) {
+      return;
+    }
+
+    if (currentScrollTop > this.lastScrollTop && !this.isHidden) {
+      this.hideControls();
+    }
+
+    else if (currentScrollTop < this.lastScrollTop && this.isHidden) {
+      this.showControls();
+    }
+    
+    this.lastScrollTop = currentScrollTop;
+  }
+  
+  hideControls() {
+    if (!this.controlsBar || this.isHidden) return;
+    
+    if (this.showTimeout) {
+      clearTimeout(this.showTimeout);
+      this.showTimeout = null;
+    }
+    
+    this.hideTimeout = setTimeout(() => {
+      if (!this.controlsBar) return;
+      
+      const controlsHeight = this.controlsBar.offsetHeight;
+      const container = document.querySelector('.container');
+      
+      this.controlsBar.style.transform = 'translateY(100%)';
+      this.controlsBar.style.opacity = '0';
+      
+      if (container) {
+        container.style.transition = 'margin-top 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+        container.style.marginTop = `calc(-${controlsHeight}px + 10px)`;
+      }
+      
+      this.isHidden = true;
+      
+      this.controlsBar.classList.add('controls-hidden');
+      
+      console.log('🫥 Controls hidden');
+    }, 100);
+  }
+  
+  showControls() {
+    if (!this.controlsBar || !this.isHidden) return;
+    
+    if (this.hideTimeout) {
+      clearTimeout(this.hideTimeout);
+      this.hideTimeout = null;
+    }
+    
+    this.showTimeout = setTimeout(() => {
+      if (!this.controlsBar) return;
+      
+      const container = document.querySelector('.container');
+      
+      this.controlsBar.style.transform = 'translateY(0)';
+      this.controlsBar.style.opacity = '1';
+      
+      if (container) {
+        container.style.transition = 'margin-bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
+        container.style.marginTop = '';
+      }
+      
+      this.isHidden = false;
+      
+      this.controlsBar.classList.remove('controls-hidden');
+    }, 50);
+  }
+  
+  forceShow() {
+    if (this.hideTimeout) {
+      clearTimeout(this.hideTimeout);
+      this.hideTimeout = null;
+    }
+    
+    const container = document.querySelector('.container');
+    if (container) {
+      container.style.marginTop = '';
+    }
+    
+    this.showControls();
+  }
+  
+  reset() {
+    this.lastScrollTop = 0;
+    this.isHidden = false;
+    
+    const container = document.querySelector('.container');
+    if (container) {
+      container.style.transition = '';
+      container.style.marginTop = '';
+    }
+    
+    this.forceShow();
+  }
+  
+  destroy() {
+    if (this.hideTimeout) clearTimeout(this.hideTimeout);
+    if (this.showTimeout) clearTimeout(this.showTimeout);
+    
+    if (this.controlsBar) {
+      this.controlsBar.style.transform = '';
+      this.controlsBar.style.opacity = '';
+      this.controlsBar.classList.remove('controls-hidden');
+    }
+    
+    const container = document.querySelector('.container');
+    if (container) {
+      container.style.transition = '';
+      container.style.marginTop = '';
+    }
+  }
+}
+let controlsAutoHide = null;
+function initializeControlsAutoHide() {
+  if (controlsAutoHide) {
+    controlsAutoHide.destroy();
+  }
+  
+  controlsAutoHide = new ControlsBarAutoHide();
+}
+function enhancedBackToHome() {
+  if (currentView === 'home') return;
+
+  currentView = 'home';
+  currentComic = null;
+  currentIssues = [];
+  searchInput.value = '';
+  
+  renderComics(allComics);
+  updateHeader();
+  
+  if (controlsAutoHide) {
+    controlsAutoHide.reset();
+  }
+}
+
+function enhancedViewComicIssues(comicId) {
+  currentView = 'issues';
+  searchInput.value = '';
+  loadComicIssues(comicId);
+  
+  if (controlsAutoHide) {
+    setTimeout(() => {
+      if (controlsAutoHide) {
+        controlsAutoHide.reset();
+      }
+    }, 100);
+  }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
   function handleSearchInput(e) {
     const searchTerm = e.target.value;
     
@@ -471,7 +862,6 @@ document.addEventListener('DOMContentLoaded', () => {
   searchInput.addEventListener('paste', (e) => {
     setTimeout(() => handleSearchInput(e), 10);
   });
-  
 
   searchToggle.addEventListener('click', (e) => {
     e.stopPropagation();
@@ -482,7 +872,6 @@ document.addEventListener('DOMContentLoaded', () => {
     e.stopPropagation();
     toggleMobileSearch(false);
   });
-  
 
   document.addEventListener('click', (e) => {
     if (!searchInputContainer.contains(e.target) && !searchToggle.contains(e.target)) {
@@ -491,34 +880,42 @@ document.addEventListener('DOMContentLoaded', () => {
       }
     }
   });
-  
 
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') {
-      if (document.getElementById('modal').classList.contains('open')) {
+      const modal = document.getElementById('modal');
+      if (modal.classList.contains('open')) {
         closeModal();
       } else if (searchInputContainer.classList.contains('active')) {
         toggleMobileSearch(false);
       }
     }
   });
-  
 
   document.getElementById('modal-cover').addEventListener('error', function() {
     handleImageError(this);
   });
-  
 
   logoContainer.addEventListener('click', () => {
     if (currentView === 'issues') {
       backToHome();
     }
   });
-  
 
+  initializeControlsBar();
+  initializeTooltips();
+  loadViewModePreference();
+  
+  setTimeout(() => {
+    initializeControlsAutoHide();
+  }, 500);
+  
   loadAllComics();
 });
 
+window.backToHome = enhancedBackToHome;
+window.viewComicIssues = enhancedViewComicIssues;
 window.handleImageError = handleImageError;
 window.api = api;
 window.loadAllComics = loadAllComics;
+window.controlsAutoHide = () => controlsAutoHide;
