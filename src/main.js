@@ -617,9 +617,15 @@ class ControlsBarAutoHide {
     
     this.lastScrollTop = 0;
     this.isHidden = false;
-    this.scrollThreshold = 50
+    this.isTransitioning;
+    this.scrollThreshold = 30;
+    this.hideDelay = 150;
+    this.showDelay = 80;
+    this.scrollVelocity = 0;
+    this.velocityHistory = [];
     this.hideTimeout = null;
     this.showTimeout = null;
+    this.rafId = null;
     
     this.init();
   }
@@ -635,31 +641,53 @@ class ControlsBarAutoHide {
   setupStyles() {
     if (!this.controlsBar) return;
     
-    this.controlsBar.style.transition = 'transform 0.3s cubic-bezier(0.4, 0, 0.2, 1), opacity 0.3s ease';
+    this.controlsBar.style.transition = 'transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)';
     this.controlsBar.style.transform = 'translateY(0)';
     this.controlsBar.style.opacity = '1';
+    this.controlsBar.style.willChange = 'transform opacity';
     
     const computedStyle = getComputedStyle(this.controlsBar);
     if (computedStyle.position !== 'sticky' && computedStyle.position !== 'fixed') {
       this.controlsBar.style.position = 'relative';
-      this.controlsBar.style.zIndex = '10';
+      this.controlsBar.style.zIndex = '1';
+    }
+
+    const container = document.querySelector('.container');
+    if (container) {
+      container.style.transition = 'margin-top 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)';
+      container.style.willChange = 'margin-top';
     }
   }
   
   bindScrollListeners() {
-
     let ticking = false;
+    let lastTimestamp = 0;
     
     const handleScroll = (scrollElement) => {
       if (!ticking) {
-        requestAnimationFrame(() => {
-          this.onScroll(scrollElement);
+        this.rafId = requestAnimationFrame((timestamp) => {
+          const timeDelta = timestamp - lastTimestamp;
+          if (timeDelta > 0) {
+            const currentScrollTop = scrollElement === window 
+              ? window.pageYOffset || document.documentElement.scrollTop
+              : scrollElement.scrollTop;
+            
+            const scrollDelta = currentScrollTop - this.lastScrollTop;
+            this.scrollVelocity = scrollDelta / timeDelta;
+            
+            this.velocityHistory.push(this.scrollVelocity);
+            if (this.velocityHistory.length > 3) {
+              this.velocityHistory.shift();
+            }
+            
+            this.onScroll(scrollElement, currentScrollTop);
+            lastTimestamp = timestamp;
+          }
           ticking = false;
         });
         ticking = true;
       }
     };
-    
 
     if (this.scrollableContent) {
       this.scrollableContent.addEventListener('scroll', () => {
@@ -668,37 +696,46 @@ class ControlsBarAutoHide {
     }
     
     window.addEventListener('scroll', () => {
-  
       if (!this.scrollableContent || this.scrollableContent.scrollHeight <= this.scrollableContent.clientHeight) {
         handleScroll(window);
       }
     }, { passive: true });
   }
   
-  onScroll(scrollElement) {
-    if (!this.controlsBar) return;
+  onScroll(scrollElement, currentScrollTop) {
+    if (!this.controlsBar || this.isTransitioning) return;
     
-    const currentScrollTop = scrollElement === window 
-      ? window.pageYOffset || document.documentElement.scrollTop
-      : scrollElement.scrollTop;
+    if (currentScrollTop === undefined) {
+      currentScrollTop = scrollElement === window 
+        ? window.pageYOffset || document.documentElement.scrollTop
+        : scrollElement.scrollTop;
+    }
     
-    if (currentScrollTop <= 10) {
-      this.showControls();
+    if (currentScrollTop <= 5) {
+      if (this.isHidden) {
+        this.showControls();
+      }
       this.lastScrollTop = currentScrollTop;
       return;
     }
     
     const scrollDifference = Math.abs(currentScrollTop - this.lastScrollTop);
+    const scrollDirection = currentScrollTop > this.lastScrollTop ? 'down' : 'up';
     
-    if (scrollDifference < this.scrollThreshold) {
+    const avgVelocity = this.velocityHistory.length > 0 
+      ? this.velocityHistory.reduce((sum, v) => sum + v, 0) / this.velocityHistory.length 
+      : 0;
+    
+    const dynamicThreshold = Math.max(this.scrollThreshold, Math.abs(avgVelocity) * 10);
+    
+    if (scrollDifference < this.scrollThreshold && Math.abs(avgVelocity) < 0.3) {
       return;
     }
-
-    if (currentScrollTop > this.lastScrollTop && !this.isHidden) {
+    
+    if (scrollDirection === 'down' && !this.isHidden && (scrollDifference > dynamicThreshold || avgVelocity > 0.5)) {
       this.hideControls();
     }
-
-    else if (currentScrollTop < this.lastScrollTop && this.isHidden) {
+    else if (scrollDirection === 'up' && this.isHidden && (scrollDifference > this.scrollThreshold * 0.7 || avgVelocity < -0.3)) {
       this.showControls();
     }
     
@@ -706,60 +743,79 @@ class ControlsBarAutoHide {
   }
   
   hideControls() {
-    if (!this.controlsBar || this.isHidden) return;
+    if (!this.controlsBar || this.isHidden || this.isTransitioning) return;
     
     if (this.showTimeout) {
       clearTimeout(this.showTimeout);
       this.showTimeout = null;
     }
     
+    this.isTransitioning = true;
+    
     this.hideTimeout = setTimeout(() => {
-      if (!this.controlsBar) return;
+      if (!this.controlsBar) {
+        this.isTransitioning = false;
+        return;
+      }
       
       const controlsHeight = this.controlsBar.offsetHeight;
       const container = document.querySelector('.container');
       
-      this.controlsBar.style.transform = 'translateY(100%)';
-      this.controlsBar.style.opacity = '0';
+      this.controlsBar.classList.add('controls-hidden');
+      
+      this.controlsBar.style.transform = 'translateY(-100%)';
+      this.controlsBar.style.opacity = '0.3';
       
       if (container) {
-        container.style.transition = 'margin-top 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
         container.style.marginTop = `calc(-${controlsHeight}px + 10px)`;
       }
       
-      this.isHidden = true;
+      setTimeout(() => {
+        this.isHidden = true;
+        this.isTransitioning = false;
+        if (this.controlsBar) {
+          this.controlsBar.style.opacity = '0';
+        }
+      }, 100);
       
-      this.controlsBar.classList.add('controls-hidden');
-      
-      console.log('🫥 Controls hidden');
-    }, 100);
+    }, this.hideDelay);
   }
   
   showControls() {
-    if (!this.controlsBar || !this.isHidden) return;
+    if (!this.controlsBar || !this.isHidden || this.isTransitioning) return;
     
     if (this.hideTimeout) {
       clearTimeout(this.hideTimeout);
       this.hideTimeout = null;
     }
     
+    this.isTransitioning = true;
+    
     this.showTimeout = setTimeout(() => {
-      if (!this.controlsBar) return;
+      if (!this.controlsBar) {
+        this.isTransitioning = false;
+        return;
+      }
       
       const container = document.querySelector('.container');
       
+      this.controlsBar.style.opacity = '0.7';
       this.controlsBar.style.transform = 'translateY(0)';
-      this.controlsBar.style.opacity = '1';
       
       if (container) {
-        container.style.transition = 'margin-bottom 0.3s cubic-bezier(0.4, 0, 0.2, 1)';
         container.style.marginTop = '';
       }
       
-      this.isHidden = false;
+      setTimeout(() => {
+        if (this.controlsBar) {
+          this.controlsBar.style.opacity = '1';
+          this.controlsBar.classList.remove('controls-hidden');
+        }
+        this.isHidden = false;
+        this.isTransitioning = false;
+      }, 30);
       
-      this.controlsBar.classList.remove('controls-hidden');
-    }, 50);
+    }, this.showDelay);
   }
   
   forceShow() {
@@ -767,23 +823,47 @@ class ControlsBarAutoHide {
       clearTimeout(this.hideTimeout);
       this.hideTimeout = null;
     }
+    if (this.showTimeout) {
+      clearTimeout(this.showTimeout);
+      this.showTimeout = null;
+    }
+    if (this.rafId) {
+      cancelAnimationFrame(this.rafId);
+      this.rafId = null;
+    }
+    
+    this.isTransitioning = false;
     
     const container = document.querySelector('.container');
     if (container) {
       container.style.marginTop = '';
     }
     
-    this.showControls();
+    if (this.controlsBar) {
+      this.controlsBar.style.transform = 'translateY(0)';
+      this.controlsBar.style.opacity = '1';
+      this.controlsBar.classList.remove('controls-hidden');
+    }
+    
+    this.isHidden = false;
   }
   
   reset() {
     this.lastScrollTop = 0;
+    this.scrollVelocity = 0;
+    this.velocityHistory = [];
     this.isHidden = false;
+    this.isTransitioning = false;
     
     const container = document.querySelector('.container');
     if (container) {
       container.style.transition = '';
       container.style.marginTop = '';
+      setTimeout(() => {
+        if (container) {
+          container.style.transition = 'margin-top 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)';
+        }
+      }, 30);
     }
     
     this.forceShow();
@@ -792,10 +872,12 @@ class ControlsBarAutoHide {
   destroy() {
     if (this.hideTimeout) clearTimeout(this.hideTimeout);
     if (this.showTimeout) clearTimeout(this.showTimeout);
+    if (this.rafId) cancelAnimationFrame(this.rafId);
     
     if (this.controlsBar) {
       this.controlsBar.style.transform = '';
       this.controlsBar.style.opacity = '';
+      this.controlsBar.style.willChange = '';
       this.controlsBar.classList.remove('controls-hidden');
     }
     
@@ -803,10 +885,13 @@ class ControlsBarAutoHide {
     if (container) {
       container.style.transition = '';
       container.style.marginTop = '';
+      container.style.willChange = '';
     }
   }
 }
+
 let controlsAutoHide = null;
+
 function initializeControlsAutoHide() {
   if (controlsAutoHide) {
     controlsAutoHide.destroy();
@@ -814,6 +899,7 @@ function initializeControlsAutoHide() {
   
   controlsAutoHide = new ControlsBarAutoHide();
 }
+
 function enhancedBackToHome() {
   if (currentView === 'home') return;
 
