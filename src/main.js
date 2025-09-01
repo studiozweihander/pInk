@@ -12,6 +12,17 @@ let currentIssueData = null;
 let isLoading = false;
 let currentView = 'home';
 let viewMode = 'grid';
+let activeFilters = {
+    publisher: [],
+    year: [],
+    language: []
+};
+let availableFilters = {
+    publishers: [],
+    years: [],
+    languages: []
+};
+let isFilterDropdownOpen = false;
 
 const cardsContainer = document.getElementById('cards');
 const searchInput = document.getElementById('search');
@@ -186,48 +197,250 @@ function renderIssues(issues) {
   cardsContainer.innerHTML = issues.map(createIssueCard).join('');
 }
 
+function extractFiltersFromComics(comics) {
+    const publishers = new Set();
+    const years = new Set();
+    const languages = new Set();
+    
+    comics.forEach(comic => {
+        if (comic.publisher && comic.publisher !== 'N/A') {
+            publishers.add(comic.publisher);
+        }
+        if (comic.year && comic.year !== 'N/A') {
+            years.add(comic.year.toString());
+        }
+        if (comic.language && comic.language !== 'N/A') {
+            languages.add(comic.language);
+        }
+    });
+    
+    availableFilters.publishers = Array.from(publishers).sort();
+    availableFilters.years = Array.from(years).sort((a, b) => b - a); // Anos em ordem decrescente
+    availableFilters.languages = Array.from(languages).sort();
+    
+    populateFilterOptions();
+}
+
+function populateFilterOptions() {
+    // Editoras
+    const publisherOptions = document.getElementById('publisher-options');
+    if (availableFilters.publishers.length > 0) {
+        publisherOptions.innerHTML = availableFilters.publishers.map(publisher => `
+            <label class="filter-option">
+                <input type="checkbox" value="${publisher}" onchange="toggleFilter('publisher', '${publisher}')">
+                <span class="filter-label">${publisher}</span>
+            </label>
+        `).join('');
+    } else {
+        publisherOptions.innerHTML = '<div class="filter-empty">Nenhuma editora encontrada</div>';
+    }
+    
+    const yearOptions = document.getElementById('year-options');
+    if (availableFilters.years.length > 0) {
+        yearOptions.innerHTML = availableFilters.years.map(year => `
+            <label class="filter-option">
+                <input type="checkbox" value="${year}" onchange="toggleFilter('year', '${year}')">
+                <span class="filter-label">${year}</span>
+            </label>
+        `).join('');
+    } else {
+        yearOptions.innerHTML = '<div class="filter-empty">Nenhum ano encontrado</div>';
+    }
+    
+    const languageOptions = document.getElementById('language-options');
+    if (availableFilters.languages.length > 0) {
+        languageOptions.innerHTML = availableFilters.languages.map(language => `
+            <label class="filter-option">
+                <input type="checkbox" value="${language}" onchange="toggleFilter('language', '${language}')">
+                <span class="filter-label">${language}</span>
+            </label>
+        `).join('');
+    } else {
+        languageOptions.innerHTML = '<div class="filter-empty">Nenhum idioma encontrado</div>';
+    }
+}
+
+function toggleFilter(type, value) {
+    if (activeFilters[type].includes(value)) {
+        activeFilters[type] = activeFilters[type].filter(item => item !== value);
+    } else {
+        activeFilters[type].push(value);
+    }
+    
+    updateFilterButton();
+    applyFilters();
+}
+
+function clearFilter(type) {
+    activeFilters[type] = [];
+    updateFilterCheckboxes(type);
+    updateFilterButton();
+    applyFilters();
+}
+
+function clearAllFilters() {
+    Object.keys(activeFilters).forEach(key => {
+        activeFilters[key] = [];
+    });
+    updateAllFilterCheckboxes();
+    updateFilterButton();
+    applyFilters();
+}
+
+function updateFilterCheckboxes(type) {
+    const container = document.getElementById(`${type}-options`);
+    if (container) {
+        const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+        checkboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+    }
+}
+
+function updateAllFilterCheckboxes() {
+    Object.keys(activeFilters).forEach(type => {
+        updateFilterCheckboxes(type === 'publisher' ? 'publisher' : type);
+    });
+}
+
+function updateFilterButton() {
+    const filterButton = document.getElementById('filter-button');
+    const totalActiveFilters = Object.values(activeFilters).reduce((sum, filters) => sum + filters.length, 0);
+    
+    if (totalActiveFilters > 0) {
+        filterButton.classList.add('has-filters');
+        filterButton.setAttribute('data-count', totalActiveFilters);
+    } else {
+        filterButton.classList.remove('has-filters');
+        filterButton.removeAttribute('data-count');
+    }
+}
+
+function applyFilters() {
+    if (!allComics || allComics.length === 0) return;
+    
+    const searchTerm = searchInput.value;
+    let filteredComics = [...allComics];
+    
+    if (searchTerm.trim()) {
+        const searchLower = searchTerm.toLowerCase();
+        filteredComics = filteredComics.filter(comic => 
+            comic.title.toLowerCase().includes(searchLower) ||
+            (comic.publisher || '').toLowerCase().includes(searchLower) ||
+            (comic.language || '').toLowerCase().includes(searchLower)
+        );
+    }
+    
+    if (activeFilters.publisher.length > 0) {
+        filteredComics = filteredComics.filter(comic => 
+            activeFilters.publisher.includes(comic.publisher)
+        );
+    }
+    
+    if (activeFilters.year.length > 0) {
+        filteredComics = filteredComics.filter(comic => 
+            activeFilters.year.includes(comic.year?.toString())
+        );
+    }
+    
+    if (activeFilters.language.length > 0) {
+        filteredComics = filteredComics.filter(comic => 
+            activeFilters.language.includes(comic.language)
+        );
+    }
+    
+    renderComics(filteredComics);
+}
+
+function toggleFilters() {
+    const dropdown = document.getElementById('filter-dropdown');
+    const filterButton = document.getElementById('filter-button');
+    
+    if (isFilterDropdownOpen) {
+        closeFilters();
+    } else {
+        openFilters();
+    }
+}
+
+function openFilters() {
+    const dropdown = document.getElementById('filter-dropdown');
+    const filterButton = document.getElementById('filter-button');
+    
+    dropdown.classList.add('open');
+    filterButton.classList.add('active');
+    isFilterDropdownOpen = true;
+    
+    setTimeout(() => {
+        document.addEventListener('click', closeFiltersOnClickOutside);
+    }, 10);
+}
+
+function closeFilters() {
+    const dropdown = document.getElementById('filter-dropdown');
+    const filterButton = document.getElementById('filter-button');
+    
+    dropdown.classList.remove('open');
+    filterButton.classList.remove('active');
+    isFilterDropdownOpen = false;
+    
+    document.removeEventListener('click', closeFiltersOnClickOutside);
+}
+
+function closeFiltersOnClickOutside(event) {
+    const dropdown = document.getElementById('filter-dropdown');
+    const filterContainer = document.querySelector('.filter-container');
+    
+    if (!filterContainer.contains(event.target)) {
+        closeFilters();
+    }
+}
+
 async function loadAllComics() {
   if (isLoading) return;
-  
-  showLoading();
-  
+    
+    showLoading();
+    
   if (controlsBar) {
-    controlsBar.style.opacity = '0.7';
+      controlsBar.style.opacity = '0.7';
   }
   
   try {
-    const isOnline = await api.healthCheck();
-    if (!isOnline) {
-      throw new Error('Backend não está respondendo. Execute "npm start" em outro terminal.');
-    }
-    
-    const response = await api.getAllComics();
-    allComics = response.data;
-    renderComics(allComics);
-    
-    if (controlsBar) {
-      controlsBar.style.opacity = '1';
-    }
-    
-    if (viewMode === 'list') {
-      cardsContainer.classList.add('list-view');
-    }
-    
-    setTimeout(() => {
-      if (currentView === 'home') {
-        console.log('💡 Dicas: Ctrl+1 (Grade), Ctrl+2 (Lista), ESC (Voltar)');
+      const isOnline = await api.healthCheck();
+      if (!isOnline) {
+          throw new Error('Backend não está respondendo. Execute "npm start" em outro terminal.');
       }
-    }, 2000);
-    
+      
+      const response = await api.getAllComics();
+      allComics = response.data;
+      
+      extractFiltersFromComics(allComics);
+      
+      renderComics(allComics);
+      
+      if (controlsBar) {
+          controlsBar.style.opacity = '1';
+      }
+      
+      if (viewMode === 'list') {
+          cardsContainer.classList.add('list-view');
+      }
+      
+      setTimeout(() => {
+          if (currentView === 'home') {
+              console.log('💡 Dicas: Ctrl+1 (Grade), Ctrl+2 (Lista), ESC (Voltar)');
+          }
+      }, 2000);
+      
   } catch (error) {
-    console.error('❌ Erro ao carregar quadrinhos:', error);
-    showError(error.message);
-    
-    if (controlsBar) {
-      controlsBar.style.opacity = '1';
-    }
+      console.error('❌ Erro ao carregar quadrinhos:', error);
+      showError(error.message);
+      
+      if (controlsBar) {
+          controlsBar.style.opacity = '1';
+      }
   } finally {
-    isLoading = false;
+      isLoading = false;
   }
 }
 
@@ -260,7 +473,7 @@ async function loadComicIssues(comicId) {
 }
 
 function filterComics(searchTerm) {
-  if (!searchTerm.trim()) {
+  if (!searchTerm.trim() && Object.values(activeFilters).every(arr => arr.length === 0)) {
     renderComics(allComics);
     return;
   }
@@ -582,6 +795,10 @@ function initializeControlsBar() {
       }
     }
     
+    if (e.key === 'Escape' && isFilterDropdownOpen) {
+        closeFilters();
+    }
+
     if (e.key === 'Escape' && currentView === 'issues') {
       const modal = document.getElementById('modal');
       if (!modal.classList.contains('open')) {
@@ -999,6 +1216,10 @@ document.addEventListener('DOMContentLoaded', () => {
   loadAllComics();
 });
 
+window.toggleFilters = toggleFilters;
+window.toggleFilter = toggleFilter;
+window.clearFilter = clearFilter;
+window.clearAllFilters = clearAllFilters;
 window.backToHome = enhancedBackToHome;
 window.viewComicIssues = enhancedViewComicIssues;
 window.handleImageError = handleImageError;
