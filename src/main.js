@@ -857,21 +857,20 @@ class ControlsBarAutoHide {
   
   setupStyles() {
     if (!this.controlsBar) return;
-    
-    this.controlsBar.style.transition = 'transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)';
+
+    this.controlsBar.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)';
     this.controlsBar.style.transform = 'translateY(0)';
     this.controlsBar.style.opacity = '1';
-    this.controlsBar.style.willChange = 'transform opacity';
-    
-    const computedStyle = getComputedStyle(this.controlsBar);
-    if (computedStyle.position !== 'sticky' && computedStyle.position !== 'fixed') {
-      this.controlsBar.style.position = 'relative';
-      this.controlsBar.style.zIndex = '1';
-    }
+    this.controlsBar.style.willChange = 'transform, opacity';
+
+    // Remove any forced positioning from CSS conflicts
+    this.controlsBar.style.position = 'sticky';
+    this.controlsBar.style.top = '0';
+    this.controlsBar.style.zIndex = '100';
 
     const container = document.querySelector('.container');
     if (container) {
-      container.style.transition = 'margin-top 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)';
+      container.style.transition = 'margin-top 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)';
       container.style.willChange = 'margin-top';
     }
   }
