@@ -3,7 +3,7 @@
 ## 📋 Contexto do Projeto
 
 **Objetivo**: Sistema completo para catálogo e download de quadrinhos digitais
-**Localização**: `c:/Users/Zweihander/pInk/`
+**Site**: https://p-ink-comics.vercel.app/
 **Repositório**: https://github.com/studio-zweihander/pInk
 **Status**: 98% completo - Pronto para produção
 
