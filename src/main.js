@@ -17,10 +17,16 @@ let activeFilters = {
     year: [],
     language: []
 };
+let activeIssueFilters = {
+    year: []
+};
 let availableFilters = {
     publishers: [],
     years: [],
     languages: []
+};
+let availableIssueFilters = {
+    years: []
 };
 let isFilterDropdownOpen = false;
 
@@ -221,7 +227,35 @@ function extractFiltersFromComics(comics) {
     populateFilterOptions();
 }
 
+function extractFiltersFromIssues(issues) {
+    const years = new Set();
+    
+    issues.forEach(issue => {
+        if (issue.year && issue.year !== 'N/A') {
+            years.add(issue.year.toString());
+        }
+    });
+    
+    availableIssueFilters.years = Array.from(years).sort((a, b) => b - a); // Anos em ordem decrescente
+    
+    populateIssueFilterOptions();
+}
+
 function populateFilterOptions() {
+    const title1 = document.getElementById('filter-title-1');
+    const title2 = document.getElementById('filter-title-2');
+    const title3 = document.getElementById('filter-title-3');
+    
+    if (title1) title1.textContent = 'Editora';
+    if (title2) title2.textContent = 'Ano de Lançamento';
+    if (title3) title3.textContent = 'Idioma';
+    
+    // Mostrar todas as seções na homepage
+    const sections = document.querySelectorAll('.filter-section');
+    sections.forEach(section => {
+        section.style.display = 'block';
+    });
+    
     // Editoras
     const publisherOptions = document.getElementById('publisher-options');
     if (availableFilters.publishers.length > 0) {
@@ -260,6 +294,32 @@ function populateFilterOptions() {
     }
 }
 
+function populateIssueFilterOptions() {
+    const title2 = document.getElementById('filter-title-2');
+    
+    if (title2) title2.textContent = 'Ano de Lançamento';
+    
+    // Ocultar as seções que não queremos mostrar na view issues
+    const sections = document.querySelectorAll('.filter-section');
+    sections.forEach((section, index) => {
+        // Mostrar apenas a segunda seção (índice 1) que contém o ano
+        section.style.display = index === 1 ? 'block' : 'none';
+    });
+    
+    // Para issues, só mostrar o filtro de ano no segundo container (year-options)
+    const yearOptions = document.getElementById('year-options');
+    if (availableIssueFilters.years.length > 0) {
+        yearOptions.innerHTML = availableIssueFilters.years.map(year => `
+            <label class="filter-option">
+                <input type="checkbox" value="${year}" onchange="toggleIssueFilter('year', '${year}')">
+                <span class="filter-label">${year}</span>
+            </label>
+        `).join('');
+    } else {
+        yearOptions.innerHTML = '<div class="filter-empty">Nenhum ano encontrado</div>';
+    }
+}
+
 function toggleFilter(type, value) {
     if (activeFilters[type].includes(value)) {
         activeFilters[type] = activeFilters[type].filter(item => item !== value);
@@ -271,17 +331,38 @@ function toggleFilter(type, value) {
     applyFilters();
 }
 
+function toggleIssueFilter(type, value) {
+    if (activeIssueFilters[type].includes(value)) {
+        activeIssueFilters[type] = activeIssueFilters[type].filter(item => item !== value);
+    } else {
+        activeIssueFilters[type].push(value);
+    }
+    
+    updateFilterButton();
+    applyFilters();
+}
+
 function clearFilter(type) {
-    activeFilters[type] = [];
+    if (currentView === 'home') {
+        activeFilters[type] = [];
+    } else if (currentView === 'issues') {
+        activeIssueFilters[type] = [];
+    }
     updateFilterCheckboxes(type);
     updateFilterButton();
     applyFilters();
 }
 
 function clearAllFilters() {
-    Object.keys(activeFilters).forEach(key => {
-        activeFilters[key] = [];
-    });
+    if (currentView === 'home') {
+        Object.keys(activeFilters).forEach(key => {
+            activeFilters[key] = [];
+        });
+    } else if (currentView === 'issues') {
+        Object.keys(activeIssueFilters).forEach(key => {
+            activeIssueFilters[key] = [];
+        });
+    }
     updateAllFilterCheckboxes();
     updateFilterButton();
     applyFilters();
@@ -298,14 +379,25 @@ function updateFilterCheckboxes(type) {
 }
 
 function updateAllFilterCheckboxes() {
-    Object.keys(activeFilters).forEach(type => {
-        updateFilterCheckboxes(type === 'publisher' ? 'publisher' : type);
-    });
+    if (currentView === 'home') {
+        Object.keys(activeFilters).forEach(type => {
+            updateFilterCheckboxes(type === 'publisher' ? 'publisher' : type);
+        });
+    } else if (currentView === 'issues') {
+        // Para issues, só limpar o container de ano
+        updateFilterCheckboxes('year');
+    }
 }
 
 function updateFilterButton() {
     const filterButton = document.getElementById('filter-button');
-    const totalActiveFilters = Object.values(activeFilters).reduce((sum, filters) => sum + filters.length, 0);
+    let totalActiveFilters = 0;
+    
+    if (currentView === 'home') {
+        totalActiveFilters = Object.values(activeFilters).reduce((sum, filters) => sum + filters.length, 0);
+    } else if (currentView === 'issues') {
+        totalActiveFilters = Object.values(activeIssueFilters).reduce((sum, filters) => sum + filters.length, 0);
+    }
     
     if (totalActiveFilters > 0) {
         filterButton.classList.add('has-filters');
@@ -317,39 +409,66 @@ function updateFilterButton() {
 }
 
 function applyFilters() {
-    if (!allComics || allComics.length === 0) return;
-    
     const searchTerm = searchInput.value;
-    let filteredComics = [...allComics];
     
-    if (searchTerm.trim()) {
-        const searchLower = searchTerm.toLowerCase();
-        filteredComics = filteredComics.filter(comic => 
-            comic.title.toLowerCase().includes(searchLower) ||
-            (comic.publisher || '').toLowerCase().includes(searchLower) ||
-            (comic.language || '').toLowerCase().includes(searchLower)
-        );
+    if (currentView === 'home') {
+        // Filtros para comics (homepage)
+        if (!allComics || allComics.length === 0) return;
+        
+        let filteredComics = [...allComics];
+        
+        if (searchTerm.trim()) {
+            const searchLower = searchTerm.toLowerCase();
+            filteredComics = filteredComics.filter(comic => 
+                comic.title.toLowerCase().includes(searchLower) ||
+                (comic.publisher || '').toLowerCase().includes(searchLower) ||
+                (comic.language || '').toLowerCase().includes(searchLower)
+            );
+        }
+        
+        if (activeFilters.publisher.length > 0) {
+            filteredComics = filteredComics.filter(comic => 
+                activeFilters.publisher.includes(comic.publisher)
+            );
+        }
+        
+        if (activeFilters.year.length > 0) {
+            filteredComics = filteredComics.filter(comic => 
+                activeFilters.year.includes(comic.year?.toString())
+            );
+        }
+        
+        if (activeFilters.language.length > 0) {
+            filteredComics = filteredComics.filter(comic => 
+                activeFilters.language.includes(comic.language)
+            );
+        }
+        
+        renderComics(filteredComics);
+        
+    } else if (currentView === 'issues') {
+        // Filtros para issues
+        if (!currentIssues || currentIssues.length === 0) return;
+        
+        let filteredIssues = [...currentIssues];
+        
+        if (searchTerm.trim()) {
+            const searchLower = searchTerm.toLowerCase().trim();
+            const filtered = currentIssues.filter(issue => {
+                const titleText = (issue.title || '').toLowerCase();
+                return titleText.includes(searchLower);
+            });
+            filteredIssues = filtered;
+        }
+        
+        if (activeIssueFilters.year.length > 0) {
+            filteredIssues = filteredIssues.filter(issue => 
+                activeIssueFilters.year.includes(issue.year?.toString())
+            );
+        }
+        
+        renderIssues(filteredIssues);
     }
-    
-    if (activeFilters.publisher.length > 0) {
-        filteredComics = filteredComics.filter(comic => 
-            activeFilters.publisher.includes(comic.publisher)
-        );
-    }
-    
-    if (activeFilters.year.length > 0) {
-        filteredComics = filteredComics.filter(comic => 
-            activeFilters.year.includes(comic.year?.toString())
-        );
-    }
-    
-    if (activeFilters.language.length > 0) {
-        filteredComics = filteredComics.filter(comic => 
-            activeFilters.language.includes(comic.language)
-        );
-    }
-    
-    renderComics(filteredComics);
 }
 
 function toggleFilters() {
@@ -459,6 +578,9 @@ async function loadComicIssues(comicId) {
     
     console.log('✅ Dados carregados:', { comic: currentComic, issues: currentIssues.length });
     
+    // Extrair filtros das issues
+    extractFiltersFromIssues(currentIssues);
+    
     renderIssues(currentIssues);
     updateHeader();
     
@@ -498,15 +620,9 @@ function filterIssues(searchTerm) {
   
   const searchLower = searchTerm.toLowerCase().trim();
   const filtered = currentIssues.filter(issue => {
-    const searchableText = [
-      issue.title || '',
-      issue.series || '',
-      Array.isArray(issue.genres) ? issue.genres.join(' ') : (issue.genres || ''),
-      issue.issueNumber?.toString() || '',
-      issue.year?.toString() || ''
-    ].join(' ').toLowerCase();
-    
-    return searchableText.includes(searchLower);
+    const titleText = (issue.title || '').toLowerCase();
+
+    return titleText.includes(searchLower);
   });
   renderIssues(filtered);
 }
@@ -527,11 +643,18 @@ function updateHeader() {
     searchInput.placeholder = 'Buscar quadrinho...';
     logoContainer.classList.remove('has-navigation');
     logoContainer.style.cursor = 'default';
+    
+    // Atualizar filtros para homepage
+    populateFilterOptions();
+    
   } else if (currentView === 'issues' && currentComic) {
     breadcrumb.textContent = `${currentComic.title} (${currentComic.year || 'N/A'})`;
     searchInput.placeholder = 'Buscar edição...';
     logoContainer.classList.add('has-navigation');
     logoContainer.style.cursor = 'pointer';
+    
+    // Atualizar filtros para issues
+    populateIssueFilterOptions();
   }
   
   updateControlsVisibility();
@@ -547,12 +670,27 @@ window.backToHome = function() {
   if (currentView === 'home') return;
 
   currentView = 'home';
-  currentComic = null;
-  currentIssues = [];
   searchInput.value = '';
+  
+  // Limpar filtros das issues quando voltar para home
+  Object.keys(activeIssueFilters).forEach(key => {
+    activeIssueFilters[key] = [];
+  });
+  
+  // Re-extrair filtros dos comics
+  if (allComics && allComics.length > 0) {
+    extractFiltersFromComics(allComics);
+  }
   
   renderComics(allComics);
   updateHeader();
+  
+  // Atualizar o botão de filtro para refletir os filtros corretos
+  updateFilterButton();
+  
+  if (controlsAutoHide) {
+    controlsAutoHide.reset();
+  }
 };
 
 window.viewIssueDetails = async function(issueId) {
@@ -835,11 +973,8 @@ class ControlsBarAutoHide {
     this.lastScrollTop = 0;
     this.isHidden = false;
     this.isTransitioning;
-    this.scrollThreshold = 30;
     this.hideDelay = 150;
     this.showDelay = 80;
-    this.scrollVelocity = 0;
-    this.velocityHistory = [];
     this.hideTimeout = null;
     this.showTimeout = null;
     this.rafId = null;
@@ -882,23 +1017,11 @@ class ControlsBarAutoHide {
     const handleScroll = (scrollElement) => {
       if (!ticking) {
         this.rafId = requestAnimationFrame((timestamp) => {
-          const timeDelta = timestamp - lastTimestamp;
-          if (timeDelta > 0) {
-            const currentScrollTop = scrollElement === window 
-              ? window.pageYOffset || document.documentElement.scrollTop
-              : scrollElement.scrollTop;
-            
-            const scrollDelta = currentScrollTop - this.lastScrollTop;
-            this.scrollVelocity = scrollDelta / timeDelta;
-            
-            this.velocityHistory.push(this.scrollVelocity);
-            if (this.velocityHistory.length > 3) {
-              this.velocityHistory.shift();
-            }
-            
-            this.onScroll(scrollElement, currentScrollTop);
-            lastTimestamp = timestamp;
-          }
+          const currentScrollTop = scrollElement === window 
+            ? window.pageYOffset || document.documentElement.scrollTop
+            : scrollElement.scrollTop;
+          
+          this.onScroll(scrollElement, currentScrollTop);
           ticking = false;
         });
         ticking = true;
@@ -920,41 +1043,30 @@ class ControlsBarAutoHide {
   
   onScroll(scrollElement, currentScrollTop) {
     if (!this.controlsBar || this.isTransitioning) return;
-    
+
     if (currentScrollTop === undefined) {
-      currentScrollTop = scrollElement === window 
+      currentScrollTop = scrollElement === window
         ? window.pageYOffset || document.documentElement.scrollTop
         : scrollElement.scrollTop;
     }
-    
+
     if (currentScrollTop <= 5) {
       if (this.isHidden) {
-        this.showControls();
+        this.isHidden = true;
       }
       this.lastScrollTop = currentScrollTop;
       return;
     }
-    
-    const scrollDifference = Math.abs(currentScrollTop - this.lastScrollTop);
+
     const scrollDirection = currentScrollTop > this.lastScrollTop ? 'down' : 'up';
-    
-    const avgVelocity = this.velocityHistory.length > 0 
-      ? this.velocityHistory.reduce((sum, v) => sum + v, 0) / this.velocityHistory.length 
-      : 0;
-    
-    const dynamicThreshold = Math.max(this.scrollThreshold, Math.abs(avgVelocity) * 10);
-    
-    if (scrollDifference < this.scrollThreshold && Math.abs(avgVelocity) < 0.3) {
-      return;
-    }
-    
-    if (scrollDirection === 'down' && !this.isHidden && (scrollDifference > dynamicThreshold || avgVelocity > 0.5)) {
+
+    if (scrollDirection === 'down' && !this.isHidden) {
       this.hideControls();
     }
-    else if (scrollDirection === 'up' && this.isHidden && (scrollDifference > this.scrollThreshold * 0.7 || avgVelocity < -0.3)) {
+    else if (scrollDirection === 'up' && this.isHidden) {
       this.showControls();
     }
-    
+
     this.lastScrollTop = currentScrollTop;
   }
   
@@ -1066,8 +1178,6 @@ class ControlsBarAutoHide {
   
   reset() {
     this.lastScrollTop = 0;
-    this.scrollVelocity = 0;
-    this.velocityHistory = [];
     this.isHidden = false;
     this.isTransitioning = false;
     
@@ -1116,21 +1226,32 @@ function initializeControlsAutoHide() {
   controlsAutoHide = new ControlsBarAutoHide();
 }
 
-function enhancedBackToHome() {
+window.backToHome = function() {
   if (currentView === 'home') return;
 
   currentView = 'home';
-  currentComic = null;
-  currentIssues = [];
   searchInput.value = '';
+  
+  // Limpar filtros das issues quando voltar para home
+  Object.keys(activeIssueFilters).forEach(key => {
+    activeIssueFilters[key] = [];
+  });
+  
+  // Re-extrair filtros dos comics
+  if (allComics && allComics.length > 0) {
+    extractFiltersFromComics(allComics);
+  }
   
   renderComics(allComics);
   updateHeader();
   
+  // Atualizar o botão de filtro para refletir os filtros corretos
+  updateFilterButton();
+  
   if (controlsAutoHide) {
     controlsAutoHide.reset();
   }
-}
+};
 
 function enhancedViewComicIssues(comicId) {
   currentView = 'issues';
@@ -1217,9 +1338,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
 window.toggleFilters = toggleFilters;
 window.toggleFilter = toggleFilter;
+window.toggleIssueFilter = toggleIssueFilter;
 window.clearFilter = clearFilter;
 window.clearAllFilters = clearAllFilters;
-window.backToHome = enhancedBackToHome;
 window.viewComicIssues = enhancedViewComicIssues;
 window.handleImageError = handleImageError;
 window.api = api;
