@@ -1,27 +1,33 @@
-# pInk - Catálogo de Quadrinhos
+# pInk Comics
 
-Catálogo de quadrinhos refatorado com tecnologias simples e modernas.
+O website pInk é um catálogo web de quadrinhos desenvolvido em JavaScript utilizando Supabase PostgreSQL como banco de dados.
 
 ## 🛠️ Tecnologias
 
-- **Frontend**: Vite + Vanilla JavaScript + CSS
-- **Backend**: Express.js + PostgreSQL
-- **Database**: Supabase PostgreSQL
+- **Frontend:** JavaScript
+- **Backend:** Express.js
+- **Database:** Supabase PostgreSQL
+
+## ⚙ Funcionalidades
+
+- **Catálogo:** A página inicial conta com o catálogo onde você poderá visualizar todos os quadrinhos cadastrados, ao selecionar um quadrinho específico você é direcionado à página das edições.
+- **Pesquisa:** A pesquisa está presente tanto na página inicial quanto na página das edições.
+- **Layout:** Você pode alterar a disposição dos cards entre grade e lista em ambas as páginas.
+- **Filtro:** Com o filtro você pode selecionar entre as categorias editora, ano de lançamento e idioma para encontrar o seu quadrinho desejado. Esta funcionalidade ainda está sendo trabalhada, então pode haver alguns bugs.
 
 ## 📁 Estrutura do Projeto
 
 ```
 pInk/
-├── src/               # Frontend (components, styles, utils)
-├── public/            # Assets estáticos
-├── api/               # Rotas da API
-├── routes/            # Express routes
-├── controllers/       # Lógica de negócio
-├── config/            # Configurações
-├── docs/              # Documentação
-├── assets/            # Recursos estáticos
-├── server.js          # Express server
-└── index.html         # Frontend entry point
+├── src/
+├── public/
+├── api/
+├── routes/
+├── controllers/
+├── config/
+├── docs/
+├── assets/
+└── index.html
 ```
 
 ## 🚀 Como Rodar
@@ -31,11 +37,5 @@ npm install
 npm run dev    # Desenvolvimento (Vite)
 npm start      # Produção (Express)
 ```
-
-## 📖 Documentação
-
-- [Git Flow Strategy](./docs/Git%20Flow.md)
-- [Contexto do Projeto](./docs/AGENT.md)
-
 ---
 Desenvolvido por Zweihander
