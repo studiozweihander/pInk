@@ -13,20 +13,20 @@ let isLoading = false;
 let currentView = 'home';
 let viewMode = 'grid';
 let activeFilters = {
-    publisher: [],
-    year: [],
-    language: []
+  publisher: [],
+  year: [],
+  language: []
 };
 let activeIssueFilters = {
-    year: []
+  year: []
 };
 let availableFilters = {
-    publishers: [],
-    years: [],
-    languages: []
+  publishers: [],
+  years: [],
+  languages: []
 };
 let availableIssueFilters = {
-    years: []
+  years: []
 };
 let isFilterDropdownOpen = false;
 
@@ -44,34 +44,34 @@ const viewListButton = document.getElementById('view-list');
 
 function handleImageError(imgElement) {
   if (imgElement.dataset.errorHandled === 'true') return;
-  
+
   const originalSrc = imgElement.src;
-  
+
   console.log('❌ Erro ao carregar imagem:', originalSrc);
-  
+
   if (originalSrc.includes('supabase.co/storage') && !imgElement.dataset.retried) {
-    
+
     imgElement.dataset.retried = 'true';
     imgElement.dataset.errorHandled = 'false';
-    
+
     const testImg = new Image();
     testImg.crossOrigin = 'anonymous';
     testImg.referrerPolicy = 'no-referrer';
-    
-    testImg.onload = function() {
+
+    testImg.onload = function () {
       imgElement.src = originalSrc;
       imgElement.crossOrigin = 'anonymous';
       imgElement.referrerPolicy = 'no-referrer';
     };
-    
-    testImg.onerror = function() {
+
+    testImg.onerror = function () {
       imgElement.dataset.errorHandled = 'true';
       imgElement.src = PLACEHOLDER_IMAGE;
       imgElement.alt = 'Capa não disponível';
       imgElement.style.transition = 'opacity 0.3s ease';
       imgElement.style.opacity = '0.8';
     };
-    
+
     testImg.src = originalSrc;
     return;
   }
@@ -119,7 +119,7 @@ function showEmptyState(type = 'quadrinhos') {
       subtitle: 'Este quadrinho ainda não possui edições cadastradas.'
     }
   };
-  
+
   const msg = messages[type];
   cardsContainer.innerHTML = `
     <div class="empty-state">
@@ -136,7 +136,7 @@ function createComicCard(comic) {
     `Idioma: ${comic.language || 'N/A'}`,
     `Editora: ${comic.publisher || 'N/A'}`
   ].join(' | ');
-  
+
   return `
     <div class="card" data-id="${comic.id}" onclick="viewComicIssues(${comic.id})">
       <div class="card-image">
@@ -157,16 +157,16 @@ function createComicCard(comic) {
 }
 
 function createIssueCard(issue) {
-  const genres = Array.isArray(issue.genres) 
-    ? issue.genres.join(', ') 
+  const genres = Array.isArray(issue.genres)
+    ? issue.genres.join(', ')
     : (issue.genres || '').replace(/,/g, ', ');
-    
+
   const metaInfo = [
     `Ano: ${issue.year || 'N/A'}`,
     `Tamanho: ${issue.size || 'N/A'}`,
     `Gêneros: ${genres || 'N/A'}`
   ].join(' | ');
-  
+
   return `
     <div class="card" data-id="${issue.id}" onclick="viewIssueDetails(${issue.id})">
       <div class="card-image">
@@ -204,377 +204,375 @@ function renderIssues(issues) {
 }
 
 function extractFiltersFromComics(comics) {
-    const publishers = new Set();
-    const years = new Set();
-    const languages = new Set();
-    
-    comics.forEach(comic => {
-        if (comic.publisher && comic.publisher !== 'N/A') {
-            publishers.add(comic.publisher);
-        }
-        if (comic.year && comic.year !== 'N/A') {
-            years.add(comic.year.toString());
-        }
-        if (comic.language && comic.language !== 'N/A') {
-            languages.add(comic.language);
-        }
-    });
-    
-    availableFilters.publishers = Array.from(publishers).sort();
-    availableFilters.years = Array.from(years).sort((a, b) => b - a);
-    availableFilters.languages = Array.from(languages).sort((a, b) => a.localeCompare(b));
-    
-    populateFilterOptions();
+  const publishers = new Set();
+  const years = new Set();
+  const languages = new Set();
+
+  comics.forEach(comic => {
+    if (comic.publisher && comic.publisher !== 'N/A') {
+      publishers.add(comic.publisher);
+    }
+    if (comic.year && comic.year !== 'N/A') {
+      years.add(comic.year.toString());
+    }
+    if (comic.language && comic.language !== 'N/A') {
+      languages.add(comic.language);
+    }
+  });
+
+  availableFilters.publishers = Array.from(publishers).sort();
+  availableFilters.years = Array.from(years).sort((a, b) => b - a);
+  availableFilters.languages = Array.from(languages).sort((a, b) => a.localeCompare(b));
+
+  populateFilterOptions();
 }
 
 function extractFiltersFromIssues(issues) {
-    const years = new Set();
-    
-    issues.forEach(issue => {
-        if (issue.year && issue.year !== 'N/A') {
-            years.add(issue.year.toString());
-        }
-    });
-    
-    availableIssueFilters.years = Array.from(years).sort((a, b) => b - a);
-    
-    populateIssueFilterOptions();
+  const years = new Set();
+
+  issues.forEach(issue => {
+    if (issue.year && issue.year !== 'N/A') {
+      years.add(issue.year.toString());
+    }
+  });
+
+  availableIssueFilters.years = Array.from(years).sort((a, b) => b - a);
+
+  populateIssueFilterOptions();
 }
 
 function populateFilterOptions() {
-    const title1 = document.getElementById('filter-title-1');
-    const title2 = document.getElementById('filter-title-2');
-    const title3 = document.getElementById('filter-title-3');
-    
-    if (title1) title1.textContent = 'Editora';
-    if (title2) title2.textContent = 'Ano de Lançamento';
-    if (title3) title3.textContent = 'Idioma';
-    
-    const sections = document.querySelectorAll('.filter-section');
-    sections.forEach(section => {
-        section.style.display = 'block';
-    });
-    
-    const publisherOptions = document.getElementById('publisher-options');
-    if (availableFilters.publishers.length > 0) {
-        publisherOptions.innerHTML = availableFilters.publishers.map(publisher => `
+  const title1 = document.getElementById('filter-title-1');
+  const title2 = document.getElementById('filter-title-2');
+  const title3 = document.getElementById('filter-title-3');
+
+  if (title1) title1.textContent = 'Editora';
+  if (title2) title2.textContent = 'Ano de Lançamento';
+  if (title3) title3.textContent = 'Idioma';
+
+  const sections = document.querySelectorAll('.filter-section');
+  sections.forEach(section => {
+    section.style.display = 'block';
+  });
+
+  const publisherOptions = document.getElementById('publisher-options');
+  if (availableFilters.publishers.length > 0) {
+    publisherOptions.innerHTML = availableFilters.publishers.map(publisher => `
             <label class="filter-option">
                 <input type="checkbox" value="${publisher}" onchange="toggleFilter('publisher', '${publisher}')">
                 <span class="filter-label">${publisher}</span>
             </label>
         `).join('');
-    } else {
-        publisherOptions.innerHTML = '<div class="filter-empty">Nenhuma editora encontrada</div>';
-    }
-    
-    const yearOptions = document.getElementById('year-options');
-    if (availableFilters.years.length > 0) {
-        yearOptions.innerHTML = availableFilters.years.map(year => `
+  } else {
+    publisherOptions.innerHTML = '<div class="filter-empty">Nenhuma editora encontrada</div>';
+  }
+
+  const yearOptions = document.getElementById('year-options');
+  if (availableFilters.years.length > 0) {
+    yearOptions.innerHTML = availableFilters.years.map(year => `
             <label class="filter-option">
                 <input type="checkbox" value="${year}" onchange="toggleFilter('year', '${year}')">
                 <span class="filter-label">${year}</span>
             </label>
         `).join('');
-    } else {
-        yearOptions.innerHTML = '<div class="filter-empty">Nenhum ano encontrado</div>';
-    }
-    
-    const languageOptions = document.getElementById('language-options');
-    if (availableFilters.languages.length > 0) {
-        languageOptions.innerHTML = availableFilters.languages.map(language => `
+  } else {
+    yearOptions.innerHTML = '<div class="filter-empty">Nenhum ano encontrado</div>';
+  }
+
+  const languageOptions = document.getElementById('language-options');
+  if (availableFilters.languages.length > 0) {
+    languageOptions.innerHTML = availableFilters.languages.map(language => `
             <label class="filter-option">
                 <input type="checkbox" value="${language}" onchange="toggleFilter('language', '${language}')">
                 <span class="filter-label">${language}</span>
             </label>
         `).join('');
-    } else {
-        languageOptions.innerHTML = '<div class="filter-empty">Nenhum idioma encontrado</div>';
-    }
+  } else {
+    languageOptions.innerHTML = '<div class="filter-empty">Nenhum idioma encontrado</div>';
+  }
 }
 
 function populateIssueFilterOptions() {
-    const title2 = document.getElementById('filter-title-2');
-    
-    if (title2) title2.textContent = 'Ano de Lançamento';
-    
-    const sections = document.querySelectorAll('.filter-section');
-    sections.forEach((section, index) => {
-        section.style.display = index === 1 ? 'block' : 'none';
-    });
-    
-    const yearOptions = document.getElementById('year-options');
-    if (availableIssueFilters.years.length > 0) {
-        yearOptions.innerHTML = availableIssueFilters.years.map(year => `
+  const title2 = document.getElementById('filter-title-2');
+
+  if (title2) title2.textContent = 'Ano de Lançamento';
+
+  const sections = document.querySelectorAll('.filter-section');
+  sections.forEach((section, index) => {
+    section.style.display = index === 1 ? 'block' : 'none';
+  });
+
+  const yearOptions = document.getElementById('year-options');
+  if (availableIssueFilters.years.length > 0) {
+    yearOptions.innerHTML = availableIssueFilters.years.map(year => `
             <label class="filter-option">
                 <input type="checkbox" value="${year}" onchange="toggleIssueFilter('year', '${year}')">
                 <span class="filter-label">${year}</span>
             </label>
         `).join('');
-    } else {
-        yearOptions.innerHTML = '<div class="filter-empty">Nenhum ano encontrado</div>';
-    }
+  } else {
+    yearOptions.innerHTML = '<div class="filter-empty">Nenhum ano encontrado</div>';
+  }
 }
 
 function toggleFilter(type, value) {
-    if (activeFilters[type].includes(value)) {
-        activeFilters[type] = activeFilters[type].filter(item => item !== value);
-    } else {
-        activeFilters[type].push(value);
-    }
-    
-    updateFilterButton();
-    applyFilters();
+  if (activeFilters[type].includes(value)) {
+    activeFilters[type] = activeFilters[type].filter(item => item !== value);
+  } else {
+    activeFilters[type].push(value);
+  }
+
+  updateFilterButton();
+  applyFilters();
 }
 
 function toggleIssueFilter(type, value) {
-    if (activeIssueFilters[type].includes(value)) {
-        activeIssueFilters[type] = activeIssueFilters[type].filter(item => item !== value);
-    } else {
-        activeIssueFilters[type].push(value);
-    }
-    
-    updateFilterButton();
-    applyFilters();
+  if (activeIssueFilters[type].includes(value)) {
+    activeIssueFilters[type] = activeIssueFilters[type].filter(item => item !== value);
+  } else {
+    activeIssueFilters[type].push(value);
+  }
+
+  updateFilterButton();
+  applyFilters();
 }
 
 function clearFilter(type) {
-    if (currentView === 'home') {
-        activeFilters[type] = [];
-    } else if (currentView === 'issues') {
-        activeIssueFilters[type] = [];
-    }
-    updateFilterCheckboxes(type);
-    updateFilterButton();
-    applyFilters();
+  if (currentView === 'home') {
+    activeFilters[type] = [];
+  } else if (currentView === 'issues') {
+    activeIssueFilters[type] = [];
+  }
+  updateFilterCheckboxes(type);
+  updateFilterButton();
+  applyFilters();
 }
 
 function clearAllFilters() {
-    if (currentView === 'home') {
-        Object.keys(activeFilters).forEach(key => {
-            activeFilters[key] = [];
-        });
-    } else if (currentView === 'issues') {
-        Object.keys(activeIssueFilters).forEach(key => {
-            activeIssueFilters[key] = [];
-        });
-    }
-    updateAllFilterCheckboxes();
-    updateFilterButton();
-    applyFilters();
+  if (currentView === 'home') {
+    Object.keys(activeFilters).forEach(key => {
+      activeFilters[key] = [];
+    });
+  } else if (currentView === 'issues') {
+    Object.keys(activeIssueFilters).forEach(key => {
+      activeIssueFilters[key] = [];
+    });
+  }
+  updateAllFilterCheckboxes();
+  updateFilterButton();
+  applyFilters();
 }
 
 function updateFilterCheckboxes(type) {
-    const container = document.getElementById(`${type}-options`);
-    if (container) {
-        const checkboxes = container.querySelectorAll('input[type="checkbox"]');
-        checkboxes.forEach(checkbox => {
-            checkbox.checked = false;
-        });
-    }
+  const container = document.getElementById(`${type}-options`);
+  if (container) {
+    const checkboxes = container.querySelectorAll('input[type="checkbox"]');
+    checkboxes.forEach(checkbox => {
+      checkbox.checked = false;
+    });
+  }
 }
 
 function updateAllFilterCheckboxes() {
-    if (currentView === 'home') {
-        Object.keys(activeFilters).forEach(type => {
-            updateFilterCheckboxes(type === 'publisher' ? 'publisher' : type);
-        });
-    } else if (currentView === 'issues') {
-        updateFilterCheckboxes('year');
-    }
+  if (currentView === 'home') {
+    Object.keys(activeFilters).forEach(type => {
+      updateFilterCheckboxes(type === 'publisher' ? 'publisher' : type);
+    });
+  } else if (currentView === 'issues') {
+    updateFilterCheckboxes('year');
+  }
 }
 
 function updateFilterButton() {
-    const filterButton = document.getElementById('filter-button');
-    let totalActiveFilters = 0;
-    
-    if (currentView === 'home') {
-        totalActiveFilters = Object.values(activeFilters).reduce((sum, filters) => sum + filters.length, 0);
-    } else if (currentView === 'issues') {
-        totalActiveFilters = Object.values(activeIssueFilters).reduce((sum, filters) => sum + filters.length, 0);
-    }
-    
-    if (totalActiveFilters > 0) {
-        filterButton.classList.add('has-filters');
-        filterButton.setAttribute('data-count', totalActiveFilters);
-    } else {
-        filterButton.classList.remove('has-filters');
-        filterButton.removeAttribute('data-count');
-    }
+  const filterButton = document.getElementById('filter-button');
+  let totalActiveFilters = 0;
+
+  if (currentView === 'home') {
+    totalActiveFilters = Object.values(activeFilters).reduce((sum, filters) => sum + filters.length, 0);
+  } else if (currentView === 'issues') {
+    totalActiveFilters = Object.values(activeIssueFilters).reduce((sum, filters) => sum + filters.length, 0);
+  }
+
+  if (totalActiveFilters > 0) {
+    filterButton.classList.add('has-filters');
+    filterButton.setAttribute('data-count', totalActiveFilters);
+  } else {
+    filterButton.classList.remove('has-filters');
+    filterButton.removeAttribute('data-count');
+  }
 }
 
 function applyFilters() {
-    const searchTerm = searchInput.value;
-    
-    if (currentView === 'home') {
-        if (!allComics || allComics.length === 0) return;
-        
-        let filteredComics = [...allComics];
-        
-        if (searchTerm.trim()) {
-            const searchLower = searchTerm.toLowerCase();
-            filteredComics = filteredComics.filter(comic => 
-                comic.title.toLowerCase().includes(searchLower) ||
-                (comic.publisher || '').toLowerCase().includes(searchLower) ||
-                (comic.language || '').toLowerCase().includes(searchLower)
-            );
-        }
-        
-        if (activeFilters.publisher.length > 0) {
-            filteredComics = filteredComics.filter(comic => 
-                activeFilters.publisher.includes(comic.publisher)
-            );
-        }
-        
-        if (activeFilters.year.length > 0) {
-            filteredComics = filteredComics.filter(comic => 
-                activeFilters.year.includes(comic.year?.toString())
-            );
-        }
-        
-        if (activeFilters.language.length > 0) {
-            filteredComics = filteredComics.filter(comic => 
-                activeFilters.language.includes(comic.language)
-            );
-        }
-        
-        renderComics(filteredComics);
-        
-    } else if (currentView === 'issues') {
-        if (!currentIssues || currentIssues.length === 0) return;
-        
-        let filteredIssues = [...currentIssues];
-        
-        if (searchTerm.trim()) {
-            const searchLower = searchTerm.toLowerCase().trim();
-            const filtered = currentIssues.filter(issue => {
-                const titleText = (issue.title || '').toLowerCase();
-                return titleText.includes(searchLower);
-            });
-            filteredIssues = filtered;
-        }
-        
-        if (activeIssueFilters.year.length > 0) {
-            filteredIssues = filteredIssues.filter(issue => 
-                activeIssueFilters.year.includes(issue.year?.toString())
-            );
-        }
-        
-        renderIssues(filteredIssues);
+  const searchTerm = searchInput.value;
+
+  if (currentView === 'home') {
+    if (!allComics || allComics.length === 0) return;
+
+    let filteredComics = [...allComics];
+
+    if (searchTerm.trim()) {
+      const searchLower = searchTerm.toLowerCase();
+      filteredComics = filteredComics.filter(comic =>
+        comic.title.toLowerCase().includes(searchLower)
+      );
     }
+
+    if (activeFilters.publisher.length > 0) {
+      filteredComics = filteredComics.filter(comic =>
+        activeFilters.publisher.includes(comic.publisher)
+      );
+    }
+
+    if (activeFilters.year.length > 0) {
+      filteredComics = filteredComics.filter(comic =>
+        activeFilters.year.includes(comic.year?.toString())
+      );
+    }
+
+    if (activeFilters.language.length > 0) {
+      filteredComics = filteredComics.filter(comic =>
+        activeFilters.language.includes(comic.language)
+      );
+    }
+
+    renderComics(filteredComics);
+
+  } else if (currentView === 'issues') {
+    if (!currentIssues || currentIssues.length === 0) return;
+
+    let filteredIssues = [...currentIssues];
+
+    if (searchTerm.trim()) {
+      const searchLower = searchTerm.toLowerCase().trim();
+      const filtered = currentIssues.filter(issue => {
+        const titleText = (issue.title || '').toLowerCase();
+        return titleText.includes(searchLower);
+      });
+      filteredIssues = filtered;
+    }
+
+    if (activeIssueFilters.year.length > 0) {
+      filteredIssues = filteredIssues.filter(issue =>
+        activeIssueFilters.year.includes(issue.year?.toString())
+      );
+    }
+
+    renderIssues(filteredIssues);
+  }
 }
 
 function toggleFilters() {
-    const dropdown = document.getElementById('filter-dropdown');
-    const filterButton = document.getElementById('filter-button');
-    
-    if (isFilterDropdownOpen) {
-        closeFilters();
-    } else {
-        openFilters();
-    }
+  const dropdown = document.getElementById('filter-dropdown');
+  const filterButton = document.getElementById('filter-button');
+
+  if (isFilterDropdownOpen) {
+    closeFilters();
+  } else {
+    openFilters();
+  }
 }
 
 function openFilters() {
-    const dropdown = document.getElementById('filter-dropdown');
-    const filterButton = document.getElementById('filter-button');
-    
-    dropdown.classList.add('open');
-    filterButton.classList.add('active');
-    isFilterDropdownOpen = true;
-    
-    setTimeout(() => {
-        document.addEventListener('click', closeFiltersOnClickOutside);
-    }, 10);
+  const dropdown = document.getElementById('filter-dropdown');
+  const filterButton = document.getElementById('filter-button');
+
+  dropdown.classList.add('open');
+  filterButton.classList.add('active');
+  isFilterDropdownOpen = true;
+
+  setTimeout(() => {
+    document.addEventListener('click', closeFiltersOnClickOutside);
+  }, 10);
 }
 
 function closeFilters() {
-    const dropdown = document.getElementById('filter-dropdown');
-    const filterButton = document.getElementById('filter-button');
-    
-    dropdown.classList.remove('open');
-    filterButton.classList.remove('active');
-    isFilterDropdownOpen = false;
-    
-    document.removeEventListener('click', closeFiltersOnClickOutside);
+  const dropdown = document.getElementById('filter-dropdown');
+  const filterButton = document.getElementById('filter-button');
+
+  dropdown.classList.remove('open');
+  filterButton.classList.remove('active');
+  isFilterDropdownOpen = false;
+
+  document.removeEventListener('click', closeFiltersOnClickOutside);
 }
 
 function closeFiltersOnClickOutside(event) {
-    const dropdown = document.getElementById('filter-dropdown');
-    const filterContainer = document.querySelector('.filter-container');
-    
-    if (!filterContainer.contains(event.target)) {
-        closeFilters();
-    }
+  const dropdown = document.getElementById('filter-dropdown');
+  const filterContainer = document.querySelector('.filter-container');
+
+  if (!filterContainer.contains(event.target)) {
+    closeFilters();
+  }
 }
 
 async function loadAllComics() {
   if (isLoading) return;
-    
-    showLoading();
-    
+
+  showLoading();
+
   if (controlsBar) {
-      controlsBar.style.opacity = '0.7';
+    controlsBar.style.opacity = '0.7';
   }
-  
+
   try {
-      const isOnline = await api.healthCheck();
-      if (!isOnline) {
-          throw new Error('Backend não está respondendo. Execute "npm start" em outro terminal.');
+    const isOnline = await api.healthCheck();
+    if (!isOnline) {
+      throw new Error('Backend não está respondendo. Execute "npm start" em outro terminal.');
+    }
+
+    const response = await api.getAllComics();
+    allComics = response.data;
+
+    extractFiltersFromComics(allComics);
+
+    renderComics(allComics);
+
+    if (controlsBar) {
+      controlsBar.style.opacity = '1';
+    }
+
+    if (viewMode === 'list') {
+      cardsContainer.classList.add('list-view');
+    }
+
+    setTimeout(() => {
+      if (currentView === 'home') {
+        console.log('💡 Dicas: Ctrl+1 (Grade), Ctrl+2 (Lista), ESC (Voltar)');
       }
-      
-      const response = await api.getAllComics();
-      allComics = response.data;
-      
-      extractFiltersFromComics(allComics);
-      
-      renderComics(allComics);
-      
-      if (controlsBar) {
-          controlsBar.style.opacity = '1';
-      }
-      
-      if (viewMode === 'list') {
-          cardsContainer.classList.add('list-view');
-      }
-      
-      setTimeout(() => {
-          if (currentView === 'home') {
-              console.log('💡 Dicas: Ctrl+1 (Grade), Ctrl+2 (Lista), ESC (Voltar)');
-          }
-      }, 2000);
-      
+    }, 2000);
+
   } catch (error) {
-      console.error('❌ Erro ao carregar quadrinhos:', error);
-      showError(error.message);
-      
-      if (controlsBar) {
-          controlsBar.style.opacity = '1';
-      }
+    console.error('❌ Erro ao carregar quadrinhos:', error);
+    showError(error.message);
+
+    if (controlsBar) {
+      controlsBar.style.opacity = '1';
+    }
   } finally {
-      isLoading = false;
+    isLoading = false;
   }
 }
 
 async function loadComicIssues(comicId) {
   if (isLoading) return;
   showLoading();
-  
+
   try {
     const [comicResponse, issuesResponse] = await Promise.all([
       api.getComicById(comicId),
       api.getComicIssues(comicId)
     ]);
-    
+
     currentComic = comicResponse.data;
     currentIssues = issuesResponse.data;
-    
+
     console.log('✅ Dados carregados:', { comic: currentComic, issues: currentIssues.length });
-    
+
     extractFiltersFromIssues(currentIssues);
-    
+
     renderIssues(currentIssues);
     updateHeader();
-    
+
   } catch (error) {
     console.error('❌ Erro ao carregar edições:', error);
     showError(error.message);
@@ -590,25 +588,23 @@ function filterComics(searchTerm) {
     renderComics(allComics);
     return;
   }
-  
+
   const searchLower = searchTerm.toLowerCase();
-  const filtered = allComics.filter(comic => 
-    comic.title.toLowerCase().includes(searchLower) ||
-    (comic.publisher || '').toLowerCase().includes(searchLower) ||
-    (comic.language || '').toLowerCase().includes(searchLower)
+  const filtered = allComics.filter(comic =>
+    comic.title.toLowerCase().includes(searchLower)
   );
-  
+
   renderComics(filtered);
 }
 
 function filterIssues(searchTerm) {
   if (!currentIssues || currentIssues.length === 0) return;
-  
+
   if (!searchTerm.trim()) {
     renderIssues(currentIssues);
     return;
   }
-  
+
   const searchLower = searchTerm.toLowerCase().trim();
   const filtered = currentIssues.filter(issue => {
     const titleText = (issue.title || '').toLowerCase();
@@ -634,49 +630,49 @@ function updateHeader() {
     searchInput.placeholder = 'Buscar quadrinho...';
     logoContainer.classList.remove('has-navigation');
     logoContainer.style.cursor = 'default';
-    
+
     populateFilterOptions();
-    
+
   } else if (currentView === 'issues' && currentComic) {
     breadcrumb.textContent = `${currentComic.title} (${currentComic.year || 'N/A'})`;
     searchInput.placeholder = 'Buscar edição...';
     logoContainer.classList.add('has-navigation');
     logoContainer.style.cursor = 'pointer';
-    
+
     populateIssueFilterOptions();
   }
-  
+
   updateControlsVisibility();
 }
 
-window.viewComicIssues = function(comicId) {
+window.viewComicIssues = function (comicId) {
   currentView = 'issues';
   searchInput.value = '';
   loadComicIssues(comicId);
 };
 
-window.backToHome = function() {
+window.backToHome = function () {
   if (currentView === 'home') return;
 
   currentView = 'home';
   searchInput.value = '';
-  
+
   Object.keys(activeIssueFilters).forEach(key => {
     activeIssueFilters[key] = [];
   });
-  
+
   if (allComics && allComics.length > 0) {
     extractFiltersFromComics(allComics);
   }
-  
+
   renderComics(allComics);
   updateHeader();
-  
+
   updateFilterButton();
-  
+
 };
 
-window.viewIssueDetails = async function(issueId) {
+window.viewIssueDetails = async function (issueId) {
   await openModal(issueId);
 };
 
@@ -715,36 +711,36 @@ async function openModal(issueId) {
   elements.cover.dataset.errorHandled = 'false';
   elements.cover.style.transition = 'opacity 0.3s ease';
   elements.cover.style.opacity = '1';
-  
+
   try {
     const response = await api.getIssueById(issueId);
     currentIssueData = response.data;
-    
+
     elements.title.textContent = currentIssueData.title || 'Título não disponível';
     elements.cover.alt = currentIssueData.title || 'Capa da edição';
     elements.cover.src = currentIssueData.cover || PLACEHOLDER_IMAGE;
     elements.synopsis.textContent = currentIssueData.synopsis || 'Sinopse não disponível para esta edição.';
-    
+
     const metadata = {
       series: currentIssueData.series,
-      genres: Array.isArray(currentIssueData.genres) 
-        ? currentIssueData.genres.join(', ') 
+      genres: Array.isArray(currentIssueData.genres)
+        ? currentIssueData.genres.join(', ')
         : (currentIssueData.genres || '').replace(/,/g, ', '),
       year: currentIssueData.year,
       size: currentIssueData.size,
       language: currentIssueData.language
     };
-    
+
     Object.entries(metadata).forEach(([key, value]) => {
       elements[key].textContent = value || 'N/A';
     });
-    
+
     if (currentIssueData.size) {
       elements.downloadSize.textContent = `(${currentIssueData.size})`;
     }
 
     handleCreditsDisplay(currentIssueData, elements);
-    
+
   } catch (error) {
     elements.creditsItem.style.display = 'none';
     elements.modalCredits.textContent = 'Não informado';
@@ -757,9 +753,9 @@ function handleCreditsDisplay(issueData, elements) {
     elements.creditsItem.style.display = 'none';
     return;
   }
-  
+
   elements.creditsItem.style.display = 'flex';
-  
+
   if (creditoLink && creditoLink.trim() !== '' && isValidUrl(creditoLink)) {
     elements.modalCredits.textContent = credito;
     elements.modalCredits.className = 'credits-link clickable';
@@ -794,16 +790,16 @@ function isValidUrl(string) {
 window.handleCreditsDisplay = handleCreditsDisplay;
 window.isValidUrl = isValidUrl;
 
-window.closeModal = function() {
+window.closeModal = function () {
   const modal = document.getElementById('modal');
   modal.classList.remove('open');
-  
+
   setTimeout(() => {
     currentIssueData = null;
   }, 300);
 };
 
-window.downloadIssue = function() {
+window.downloadIssue = function () {
   if (!currentIssueData?.link) {
     alert('❌ Link de download não disponível para esta edição.');
     return;
@@ -836,7 +832,7 @@ function loadViewModePreference() {
 function animateViewChange() {
   cardsContainer.style.opacity = '0.7';
   cardsContainer.style.transform = 'scale(0.98)';
-  
+
   setTimeout(() => {
     cardsContainer.style.opacity = '1';
     cardsContainer.style.transform = 'scale(1)';
@@ -845,31 +841,31 @@ function animateViewChange() {
 
 function highlightActiveControl(mode) {
   const activeButton = mode === 'grid' ? viewGridButton : viewListButton;
-  
+
   activeButton.style.transform = 'scale(1.1)';
   activeButton.style.boxShadow = '0 0 8px rgba(231, 143, 222, 0.5)';
-  
+
   setTimeout(() => {
     activeButton.style.transform = '';
     activeButton.style.boxShadow = '';
   }, 300);
 }
 
-window.setViewMode = function(mode) {
+window.setViewMode = function (mode) {
   const previousMode = viewMode;
   viewMode = mode;
-  
+
   viewGridButton.classList.toggle('active', mode === 'grid');
   viewListButton.classList.toggle('active', mode === 'list');
-  
+
   cardsContainer.classList.toggle('list-view', mode === 'list');
-  
+
   try {
     window.viewModePreference = mode;
   } catch (e) {
     console.warn('Não foi possível salvar preferência:', e);
   }
-  
+
   if (previousMode !== mode) {
     highlightActiveControl(mode);
   }
@@ -882,7 +878,7 @@ function initializeControlsBar() {
       backToHome();
     });
   }
-  
+
   if (viewGridButton) {
     viewGridButton.addEventListener('click', (e) => {
       e.preventDefault();
@@ -892,7 +888,7 @@ function initializeControlsBar() {
       }
     });
   }
-  
+
   if (viewListButton) {
     viewListButton.addEventListener('click', (e) => {
       e.preventDefault();
@@ -902,7 +898,7 @@ function initializeControlsBar() {
       }
     });
   }
-  
+
   document.addEventListener('keydown', (e) => {
     if (e.ctrlKey || e.metaKey) {
       if (e.key === '1') {
@@ -915,9 +911,9 @@ function initializeControlsBar() {
         setTimeout(() => setViewMode('list'), 75);
       }
     }
-    
+
     if (e.key === 'Escape' && isFilterDropdownOpen) {
-        closeFilters();
+      closeFilters();
     }
 
     if (e.key === 'Escape' && currentView === 'issues') {
@@ -928,7 +924,7 @@ function initializeControlsBar() {
       }
     }
   });
-  
+
   cardsContainer.style.transition = 'opacity 0.15s ease, transform 0.15s ease';
 }
 
@@ -936,11 +932,11 @@ function initializeTooltips() {
   if (backButtonControls) {
     backButtonControls.setAttribute('title', 'Voltar para quadrinhos (ESC)');
   }
-  
+
   if (viewGridButton) {
     viewGridButton.setAttribute('title', 'Visualização em Grade (Ctrl+1)');
   }
-  
+
   if (viewListButton) {
     viewListButton.setAttribute('title', 'Visualização em Lista (Ctrl+2)');
   }
@@ -952,24 +948,24 @@ function initializeControlsAutoHide() {
   if (controlsAutoHide) {
     controlsAutoHide.destroy();
   }
-  
+
   controlsAutoHide = new ControlsBarAutoHide();
 }
 
-window.backToHome = function() {
+window.backToHome = function () {
   if (currentView === 'home') return;
 
   currentView = 'home';
   searchInput.value = '';
-  
+
   Object.keys(activeIssueFilters).forEach(key => {
     activeIssueFilters[key] = [];
   });
-  
+
   if (allComics && allComics.length > 0) {
     extractFiltersFromComics(allComics);
   }
-  
+
   renderComics(allComics);
   updateHeader();
   updateFilterButton();
@@ -984,18 +980,18 @@ function enhancedViewComicIssues(comicId) {
 document.addEventListener('DOMContentLoaded', () => {
   function handleSearchInput(e) {
     const searchTerm = e.target.value;
-    
+
     if (currentView === 'home') {
       filterComics(searchTerm);
     } else if (currentView === 'issues') {
       filterIssues(searchTerm);
     }
   }
-  
+
   ['input', 'keyup'].forEach(event => {
     searchInput.addEventListener(event, handleSearchInput);
   });
-  
+
   searchInput.addEventListener('paste', (e) => {
     setTimeout(() => handleSearchInput(e), 10);
   });
@@ -1004,7 +1000,7 @@ document.addEventListener('DOMContentLoaded', () => {
     e.stopPropagation();
     toggleMobileSearch(true);
   });
-  
+
   searchClose.addEventListener('click', (e) => {
     e.stopPropagation();
     toggleMobileSearch(false);
@@ -1029,7 +1025,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  document.getElementById('modal-cover').addEventListener('error', function() {
+  document.getElementById('modal-cover').addEventListener('error', function () {
     handleImageError(this);
   });
 
@@ -1039,18 +1035,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
-  document.getElementById('footer-email').addEventListener('keypress', function(e) {
+  document.getElementById('footer-email').addEventListener('keypress', function (e) {
     if (e.key === 'Enter') {
-        sendEmailWithBody();
+      sendEmailWithBody();
     }
   });
 
   initializeControlsBar();
   initializeTooltips();
   loadViewModePreference();
-  
+
   new ControlsBarAutoHide();
-  
+
   loadAllComics();
 });
 
@@ -1073,40 +1069,40 @@ class ControlsBarAutoHide {
     this.controlsBar = document.querySelector('.controls-bar');
     this.container = document.querySelector('.container');
     this.scrollableContent = document.querySelector('.scrollable-content');
-    
+
     if (!this.controlsBar || !this.container) return;
-    
+
     this.lastScrollTop = 0;
     this.isHidden = false;
     this.scrollThreshold = 50;
-    
+
     this.init();
   }
-  
+
   init() {
     this.setupStyles();
     this.bindScrollListeners();
-    
+
     window.addEventListener('resize', () => this.setupStyles());
   }
-  
+
   setupStyles() {
     if (!this.controlsBar || !this.container) return;
-    
+
     this.controlsBar.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
     this.container.style.transition = 'margin-top 0.3s ease';
-    
+
     this.controlsBar.style.transform = 'translateY(0)';
     this.controlsBar.style.opacity = '1';
     this.container.style.marginTop = '';
   }
-  
+
   bindScrollListeners() {
     const handleScroll = (scrollElement) => {
-      const currentScrollTop = scrollElement === window 
+      const currentScrollTop = scrollElement === window
         ? window.pageYOffset || document.documentElement.scrollTop
         : scrollElement.scrollTop;
-      
+
       this.onScroll(currentScrollTop);
     };
 
@@ -1115,14 +1111,14 @@ class ControlsBarAutoHide {
         handleScroll(this.scrollableContent);
       }, { passive: true });
     }
-    
+
     window.addEventListener('scroll', () => {
       if (!this.scrollableContent || this.scrollableContent.scrollHeight <= this.scrollableContent.clientHeight) {
         handleScroll(window);
       }
     }, { passive: true });
   }
-  
+
   onScroll(currentScrollTop) {
     if (currentScrollTop <= 10) {
       if (this.isHidden) {
@@ -1131,65 +1127,65 @@ class ControlsBarAutoHide {
       this.lastScrollTop = currentScrollTop;
       return;
     }
-    
+
     const scrollDifference = Math.abs(currentScrollTop - this.lastScrollTop);
-    
+
     if (scrollDifference < this.scrollThreshold) {
       return;
     }
-    
+
     const scrollDirection = currentScrollTop > this.lastScrollTop ? 'down' : 'up';
-    
+
     if (scrollDirection === 'down' && !this.isHidden) {
       this.hideControls();
     } else if (scrollDirection === 'up' && this.isHidden) {
       this.showControls();
     }
-    
+
     this.lastScrollTop = currentScrollTop;
   }
-  
+
   hideControls() {
     if (!this.controlsBar || this.isHidden) return;
-    
+
     const controlsBarHeight = this.controlsBar.offsetHeight - 16;
 
     this.controlsBar.style.transform = 'translateY(-100%)';
     this.controlsBar.style.opacity = '0';
     this.container.style.marginTop = `-${controlsBarHeight}px`;
-    
+
     this.isHidden = true;
   }
-  
+
   showControls() {
     if (!this.controlsBar || !this.isHidden) return;
-    
+
     this.controlsBar.style.transform = 'translateY(0)';
     this.controlsBar.style.opacity = '1';
     this.container.style.marginTop = '';
-    
+
     this.isHidden = false;
   }
-  
+
   forceShow() {
     this.controlsBar.style.transform = 'translateY(0)';
     this.controlsBar.style.opacity = '1';
     this.container.style.marginTop = '';
     this.isHidden = false;
   }
-  
+
   reset() {
     this.lastScrollTop = 0;
     this.isHidden = false;
     this.forceShow();
   }
-  
+
   destroy() {
     if (this.controlsBar) {
       this.controlsBar.style.transform = '';
       this.controlsBar.style.opacity = '';
     }
-    
+
     if (this.container) {
       this.container.style.marginTop = '';
     }
