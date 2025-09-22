@@ -962,29 +962,23 @@ window.backToHome = function() {
   currentView = 'home';
   searchInput.value = '';
   
-  // Limpar filtros das issues quando voltar para home
   Object.keys(activeIssueFilters).forEach(key => {
     activeIssueFilters[key] = [];
   });
   
-  // Re-extrair filtros dos comics
   if (allComics && allComics.length > 0) {
     extractFiltersFromComics(allComics);
   }
   
   renderComics(allComics);
   updateHeader();
-  
-  // Atualizar o botão de filtro para refletir os filtros corretos
   updateFilterButton();
-  
 };
 
 function enhancedViewComicIssues(comicId) {
   currentView = 'issues';
   searchInput.value = '';
   loadComicIssues(comicId);
-  
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -1158,11 +1152,11 @@ class ControlsBarAutoHide {
   hideControls() {
     if (!this.controlsBar || this.isHidden) return;
     
-    const controlsHeight = this.controlsBar.offsetHeight;
-    
+    const controlsBarHeight = this.controlsBar.offsetHeight - 16;
+
     this.controlsBar.style.transform = 'translateY(-100%)';
     this.controlsBar.style.opacity = '0';
-    this.container.style.marginTop = `-4rem`;
+    this.container.style.marginTop = `-${controlsBarHeight}px`;
     
     this.isHidden = true;
   }
