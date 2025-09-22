@@ -221,8 +221,8 @@ function extractFiltersFromComics(comics) {
     });
     
     availableFilters.publishers = Array.from(publishers).sort();
-    availableFilters.years = Array.from(years).sort((a, b) => b - a); // Anos em ordem decrescente
-    availableFilters.languages = Array.from(languages).sort();
+    availableFilters.years = Array.from(years).sort((a, b) => b - a);
+    availableFilters.languages = Array.from(languages).sort((a, b) => a.localeCompare(b));
     
     populateFilterOptions();
 }
@@ -236,7 +236,7 @@ function extractFiltersFromIssues(issues) {
         }
     });
     
-    availableIssueFilters.years = Array.from(years).sort((a, b) => b - a); // Anos em ordem decrescente
+    availableIssueFilters.years = Array.from(years).sort((a, b) => b - a);
     
     populateIssueFilterOptions();
 }
@@ -250,13 +250,11 @@ function populateFilterOptions() {
     if (title2) title2.textContent = 'Ano de Lançamento';
     if (title3) title3.textContent = 'Idioma';
     
-    // Mostrar todas as seções na homepage
     const sections = document.querySelectorAll('.filter-section');
     sections.forEach(section => {
         section.style.display = 'block';
     });
     
-    // Editoras
     const publisherOptions = document.getElementById('publisher-options');
     if (availableFilters.publishers.length > 0) {
         publisherOptions.innerHTML = availableFilters.publishers.map(publisher => `
@@ -299,14 +297,11 @@ function populateIssueFilterOptions() {
     
     if (title2) title2.textContent = 'Ano de Lançamento';
     
-    // Ocultar as seções que não queremos mostrar na view issues
     const sections = document.querySelectorAll('.filter-section');
     sections.forEach((section, index) => {
-        // Mostrar apenas a segunda seção (índice 1) que contém o ano
         section.style.display = index === 1 ? 'block' : 'none';
     });
     
-    // Para issues, só mostrar o filtro de ano no segundo container (year-options)
     const yearOptions = document.getElementById('year-options');
     if (availableIssueFilters.years.length > 0) {
         yearOptions.innerHTML = availableIssueFilters.years.map(year => `
@@ -384,7 +379,6 @@ function updateAllFilterCheckboxes() {
             updateFilterCheckboxes(type === 'publisher' ? 'publisher' : type);
         });
     } else if (currentView === 'issues') {
-        // Para issues, só limpar o container de ano
         updateFilterCheckboxes('year');
     }
 }
@@ -412,7 +406,6 @@ function applyFilters() {
     const searchTerm = searchInput.value;
     
     if (currentView === 'home') {
-        // Filtros para comics (homepage)
         if (!allComics || allComics.length === 0) return;
         
         let filteredComics = [...allComics];
@@ -447,7 +440,6 @@ function applyFilters() {
         renderComics(filteredComics);
         
     } else if (currentView === 'issues') {
-        // Filtros para issues
         if (!currentIssues || currentIssues.length === 0) return;
         
         let filteredIssues = [...currentIssues];
@@ -578,7 +570,6 @@ async function loadComicIssues(comicId) {
     
     console.log('✅ Dados carregados:', { comic: currentComic, issues: currentIssues.length });
     
-    // Extrair filtros das issues
     extractFiltersFromIssues(currentIssues);
     
     renderIssues(currentIssues);
@@ -644,7 +635,6 @@ function updateHeader() {
     logoContainer.classList.remove('has-navigation');
     logoContainer.style.cursor = 'default';
     
-    // Atualizar filtros para homepage
     populateFilterOptions();
     
   } else if (currentView === 'issues' && currentComic) {
@@ -653,7 +643,6 @@ function updateHeader() {
     logoContainer.classList.add('has-navigation');
     logoContainer.style.cursor = 'pointer';
     
-    // Atualizar filtros para issues
     populateIssueFilterOptions();
   }
   
@@ -672,12 +661,10 @@ window.backToHome = function() {
   currentView = 'home';
   searchInput.value = '';
   
-  // Limpar filtros das issues quando voltar para home
   Object.keys(activeIssueFilters).forEach(key => {
     activeIssueFilters[key] = [];
   });
   
-  // Re-extrair filtros dos comics
   if (allComics && allComics.length > 0) {
     extractFiltersFromComics(allComics);
   }
@@ -685,12 +672,8 @@ window.backToHome = function() {
   renderComics(allComics);
   updateHeader();
   
-  // Atualizar o botão de filtro para refletir os filtros corretos
   updateFilterButton();
   
-  if (controlsAutoHide) {
-    controlsAutoHide.reset();
-  }
 };
 
 window.viewIssueDetails = async function(issueId) {
@@ -963,259 +946,6 @@ function initializeTooltips() {
   }
 }
 
-class ControlsBarAutoHide {
-  constructor() {
-    this.controlsBar = document.querySelector('.controls-bar');
-    this.scrollableContent = document.querySelector('.scrollable-content');
-    
-    if (!this.controlsBar) return;
-    
-    this.lastScrollTop = 0;
-    this.isHidden = false;
-    this.isTransitioning;
-    this.hideDelay = 150;
-    this.showDelay = 80;
-    this.hideTimeout = null;
-    this.showTimeout = null;
-    this.rafId = null;
-    
-    this.init();
-  }
-  
-  init() {
-    this.setupStyles();
-    
-    this.bindScrollListeners();
-    
-    window.addEventListener('resize', () => this.setupStyles());
-  }
-  
-  setupStyles() {
-    if (!this.controlsBar) return;
-
-    this.controlsBar.style.transition = 'transform 0.3s cubic-bezier(0.25, 0.8, 0.25, 1), opacity 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)';
-    this.controlsBar.style.transform = 'translateY(0)';
-    this.controlsBar.style.opacity = '1';
-    this.controlsBar.style.willChange = 'transform, opacity';
-
-    // Remove any forced positioning from CSS conflicts
-    this.controlsBar.style.position = 'sticky';
-    this.controlsBar.style.top = '0';
-    this.controlsBar.style.zIndex = '100';
-
-    const container = document.querySelector('.container');
-    if (container) {
-      container.style.transition = 'margin-top 0.3s cubic-bezier(0.25, 0.8, 0.25, 1)';
-      container.style.willChange = 'margin-top';
-    }
-  }
-  
-  bindScrollListeners() {
-    let ticking = false;
-    let lastTimestamp = 0;
-    
-    const handleScroll = (scrollElement) => {
-      if (!ticking) {
-        this.rafId = requestAnimationFrame((timestamp) => {
-          const currentScrollTop = scrollElement === window 
-            ? window.pageYOffset || document.documentElement.scrollTop
-            : scrollElement.scrollTop;
-          
-          this.onScroll(scrollElement, currentScrollTop);
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    if (this.scrollableContent) {
-      this.scrollableContent.addEventListener('scroll', () => {
-        handleScroll(this.scrollableContent);
-      }, { passive: true });
-    }
-    
-    window.addEventListener('scroll', () => {
-      if (!this.scrollableContent || this.scrollableContent.scrollHeight <= this.scrollableContent.clientHeight) {
-        handleScroll(window);
-      }
-    }, { passive: true });
-  }
-  
-  onScroll(scrollElement, currentScrollTop) {
-    if (!this.controlsBar || this.isTransitioning) return;
-
-    if (currentScrollTop === undefined) {
-      currentScrollTop = scrollElement === window
-        ? window.pageYOffset || document.documentElement.scrollTop
-        : scrollElement.scrollTop;
-    }
-
-    if (currentScrollTop <= 5) {
-      if (this.isHidden) {
-        this.isHidden = true;
-      }
-      this.lastScrollTop = currentScrollTop;
-      return;
-    }
-
-    const scrollDirection = currentScrollTop > this.lastScrollTop ? 'down' : 'up';
-
-    if (scrollDirection === 'down' && !this.isHidden) {
-      this.hideControls();
-    }
-    else if (scrollDirection === 'up' && this.isHidden) {
-      this.showControls();
-    }
-
-    this.lastScrollTop = currentScrollTop;
-  }
-  
-  hideControls() {
-    if (!this.controlsBar || this.isHidden || this.isTransitioning) return;
-    
-    if (this.showTimeout) {
-      clearTimeout(this.showTimeout);
-      this.showTimeout = null;
-    }
-    
-    this.isTransitioning = true;
-    
-    this.hideTimeout = setTimeout(() => {
-      if (!this.controlsBar) {
-        this.isTransitioning = false;
-        return;
-      }
-      
-      const controlsHeight = this.controlsBar.offsetHeight;
-      const container = document.querySelector('.container');
-      
-      this.controlsBar.classList.add('controls-hidden');
-      
-      this.controlsBar.style.transform = 'translateY(-100%)';
-      this.controlsBar.style.opacity = '0.3';
-      
-      if (container) {
-        container.style.marginTop = `calc(-${controlsHeight}px + 10px)`;
-      }
-      
-      setTimeout(() => {
-        this.isHidden = true;
-        this.isTransitioning = false;
-        if (this.controlsBar) {
-          this.controlsBar.style.opacity = '0';
-        }
-      }, 100);
-      
-    }, this.hideDelay);
-  }
-  
-  showControls() {
-    if (!this.controlsBar || !this.isHidden || this.isTransitioning) return;
-    
-    if (this.hideTimeout) {
-      clearTimeout(this.hideTimeout);
-      this.hideTimeout = null;
-    }
-    
-    this.isTransitioning = true;
-    
-    this.showTimeout = setTimeout(() => {
-      if (!this.controlsBar) {
-        this.isTransitioning = false;
-        return;
-      }
-      
-      const container = document.querySelector('.container');
-      
-      this.controlsBar.style.opacity = '0.7';
-      this.controlsBar.style.transform = 'translateY(0)';
-      
-      if (container) {
-        container.style.marginTop = '';
-      }
-      
-      setTimeout(() => {
-        if (this.controlsBar) {
-          this.controlsBar.style.opacity = '1';
-          this.controlsBar.classList.remove('controls-hidden');
-        }
-        this.isHidden = false;
-        this.isTransitioning = false;
-      }, 30);
-      
-    }, this.showDelay);
-  }
-  
-  forceShow() {
-    if (this.hideTimeout) {
-      clearTimeout(this.hideTimeout);
-      this.hideTimeout = null;
-    }
-    if (this.showTimeout) {
-      clearTimeout(this.showTimeout);
-      this.showTimeout = null;
-    }
-    if (this.rafId) {
-      cancelAnimationFrame(this.rafId);
-      this.rafId = null;
-    }
-    
-    this.isTransitioning = false;
-    
-    const container = document.querySelector('.container');
-    if (container) {
-      container.style.marginTop = '';
-    }
-    
-    if (this.controlsBar) {
-      this.controlsBar.style.transform = 'translateY(0)';
-      this.controlsBar.style.opacity = '1';
-      this.controlsBar.classList.remove('controls-hidden');
-    }
-    
-    this.isHidden = false;
-  }
-  
-  reset() {
-    this.lastScrollTop = 0;
-    this.isHidden = false;
-    this.isTransitioning = false;
-    
-    const container = document.querySelector('.container');
-    if (container) {
-      container.style.transition = '';
-      container.style.marginTop = '';
-      setTimeout(() => {
-        if (container) {
-          container.style.transition = 'margin-top 0.4s cubic-bezier(0.25, 0.8, 0.25, 1)';
-        }
-      }, 30);
-    }
-    
-    this.forceShow();
-  }
-  
-  destroy() {
-    if (this.hideTimeout) clearTimeout(this.hideTimeout);
-    if (this.showTimeout) clearTimeout(this.showTimeout);
-    if (this.rafId) cancelAnimationFrame(this.rafId);
-    
-    if (this.controlsBar) {
-      this.controlsBar.style.transform = '';
-      this.controlsBar.style.opacity = '';
-      this.controlsBar.style.willChange = '';
-      this.controlsBar.classList.remove('controls-hidden');
-    }
-    
-    const container = document.querySelector('.container');
-    if (container) {
-      container.style.transition = '';
-      container.style.marginTop = '';
-      container.style.willChange = '';
-    }
-  }
-}
-
 let controlsAutoHide = null;
 
 function initializeControlsAutoHide() {
@@ -1248,9 +978,6 @@ window.backToHome = function() {
   // Atualizar o botão de filtro para refletir os filtros corretos
   updateFilterButton();
   
-  if (controlsAutoHide) {
-    controlsAutoHide.reset();
-  }
 };
 
 function enhancedViewComicIssues(comicId) {
@@ -1258,13 +985,6 @@ function enhancedViewComicIssues(comicId) {
   searchInput.value = '';
   loadComicIssues(comicId);
   
-  if (controlsAutoHide) {
-    setTimeout(() => {
-      if (controlsAutoHide) {
-        controlsAutoHide.reset();
-      }
-    }, 100);
-  }
 }
 
 document.addEventListener('DOMContentLoaded', () => {
@@ -1329,12 +1049,145 @@ document.addEventListener('DOMContentLoaded', () => {
   initializeTooltips();
   loadViewModePreference();
   
-  setTimeout(() => {
-    initializeControlsAutoHide();
-  }, 500);
+  new ControlsBarAutoHide();
   
   loadAllComics();
 });
+
+class ControlsBarAutoHide {
+  constructor() {
+    this.controlsBar = document.querySelector('.controls-bar');
+    this.container = document.querySelector('.container');
+    this.scrollableContent = document.querySelector('.scrollable-content');
+    
+    if (!this.controlsBar || !this.container) return;
+    
+    this.lastScrollTop = 0;
+    this.isHidden = false;
+    this.scrollThreshold = 50; // Pixels mínimos para trigger
+    
+    this.init();
+  }
+  
+  init() {
+    this.setupStyles();
+    this.bindScrollListeners();
+    
+    window.addEventListener('resize', () => this.setupStyles());
+  }
+  
+  setupStyles() {
+    if (!this.controlsBar || !this.container) return;
+    
+    // Configurar transições
+    this.controlsBar.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
+    this.container.style.transition = 'margin-top 0.3s ease';
+    
+    // Estado inicial
+    this.controlsBar.style.transform = 'translateY(0)';
+    this.controlsBar.style.opacity = '1';
+    this.container.style.marginTop = '';
+  }
+  
+  bindScrollListeners() {
+    const handleScroll = (scrollElement) => {
+      const currentScrollTop = scrollElement === window 
+        ? window.pageYOffset || document.documentElement.scrollTop
+        : scrollElement.scrollTop;
+      
+      this.onScroll(currentScrollTop);
+    };
+
+    // Scroll no container interno
+    if (this.scrollableContent) {
+      this.scrollableContent.addEventListener('scroll', () => {
+        handleScroll(this.scrollableContent);
+      }, { passive: true });
+    }
+    
+    // Scroll da janela
+    window.addEventListener('scroll', () => {
+      if (!this.scrollableContent || this.scrollableContent.scrollHeight <= this.scrollableContent.clientHeight) {
+        handleScroll(window);
+      }
+    }, { passive: true });
+  }
+  
+  onScroll(currentScrollTop) {
+    // Se está no topo, sempre mostra
+    if (currentScrollTop <= 10) {
+      if (this.isHidden) {
+        this.showControls();
+      }
+      this.lastScrollTop = currentScrollTop;
+      return;
+    }
+    
+    const scrollDifference = Math.abs(currentScrollTop - this.lastScrollTop);
+    
+    // Só reage se passou do threshold
+    if (scrollDifference < this.scrollThreshold) {
+      return;
+    }
+    
+    const scrollDirection = currentScrollTop > this.lastScrollTop ? 'down' : 'up';
+    
+    // Scroll para baixo = esconde, scroll para cima = mostra
+    if (scrollDirection === 'down' && !this.isHidden) {
+      this.hideControls();
+    } else if (scrollDirection === 'up' && this.isHidden) {
+      this.showControls();
+    }
+    
+    this.lastScrollTop = currentScrollTop;
+  }
+  
+  hideControls() {
+    if (!this.controlsBar || this.isHidden) return;
+    
+    const controlsHeight = this.controlsBar.offsetHeight;
+    
+    this.controlsBar.style.transform = 'translateY(-100%)';
+    this.controlsBar.style.opacity = '0';
+    this.container.style.marginTop = `-4rem`;
+    
+    this.isHidden = true;
+  }
+  
+  showControls() {
+    if (!this.controlsBar || !this.isHidden) return;
+    
+    this.controlsBar.style.transform = 'translateY(0)';
+    this.controlsBar.style.opacity = '1';
+    this.container.style.marginTop = '';
+    
+    this.isHidden = false;
+  }
+  
+  forceShow() {
+    this.controlsBar.style.transform = 'translateY(0)';
+    this.controlsBar.style.opacity = '1';
+    this.container.style.marginTop = '';
+    this.isHidden = false;
+  }
+  
+  reset() {
+    this.lastScrollTop = 0;
+    this.isHidden = false;
+    this.forceShow();
+  }
+  
+  destroy() {
+    if (this.controlsBar) {
+      this.controlsBar.style.transform = '';
+      this.controlsBar.style.opacity = '';
+    }
+    
+    if (this.container) {
+      this.container.style.marginTop = '';
+    }
+  }
+}
 
 window.toggleFilters = toggleFilters;
 window.toggleFilter = toggleFilter;
@@ -1345,4 +1198,3 @@ window.viewComicIssues = enhancedViewComicIssues;
 window.handleImageError = handleImageError;
 window.api = api;
 window.loadAllComics = loadAllComics;
-window.controlsAutoHide = () => controlsAutoHide;
