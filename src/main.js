@@ -1045,6 +1045,12 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  document.getElementById('footer-email').addEventListener('keypress', function(e) {
+    if (e.key === 'Enter') {
+        sendEmailWithBody();
+    }
+  });
+
   initializeControlsBar();
   initializeTooltips();
   loadViewModePreference();
@@ -1053,6 +1059,20 @@ document.addEventListener('DOMContentLoaded', () => {
   
   loadAllComics();
 });
+
+function sendEmailWithBody() {
+  const emailContent = document.getElementById('footer-email').value;
+
+  if (!emailContent.trim()) {
+    alert('Por favor, digite sua solicitação antes de enviar.');
+    return;
+  }
+
+  const encodedContent = encodeURIComponent(emailContent);
+  const mailtoURL = `mailto:comics.pink@gmail.com?subject=Solicitação de quadrinho&body=Olá, eu gostaria que vocês adicionassem o seguinte quadrinho: ${encodedContent}`;
+
+  window.location.href = mailtoURL;
+};
 
 class ControlsBarAutoHide {
   constructor() {
@@ -1064,7 +1084,7 @@ class ControlsBarAutoHide {
     
     this.lastScrollTop = 0;
     this.isHidden = false;
-    this.scrollThreshold = 50; // Pixels mínimos para trigger
+    this.scrollThreshold = 50;
     
     this.init();
   }
@@ -1079,11 +1099,9 @@ class ControlsBarAutoHide {
   setupStyles() {
     if (!this.controlsBar || !this.container) return;
     
-    // Configurar transições
     this.controlsBar.style.transition = 'transform 0.3s ease, opacity 0.3s ease';
     this.container.style.transition = 'margin-top 0.3s ease';
     
-    // Estado inicial
     this.controlsBar.style.transform = 'translateY(0)';
     this.controlsBar.style.opacity = '1';
     this.container.style.marginTop = '';
@@ -1098,14 +1116,12 @@ class ControlsBarAutoHide {
       this.onScroll(currentScrollTop);
     };
 
-    // Scroll no container interno
     if (this.scrollableContent) {
       this.scrollableContent.addEventListener('scroll', () => {
         handleScroll(this.scrollableContent);
       }, { passive: true });
     }
     
-    // Scroll da janela
     window.addEventListener('scroll', () => {
       if (!this.scrollableContent || this.scrollableContent.scrollHeight <= this.scrollableContent.clientHeight) {
         handleScroll(window);
@@ -1114,7 +1130,6 @@ class ControlsBarAutoHide {
   }
   
   onScroll(currentScrollTop) {
-    // Se está no topo, sempre mostra
     if (currentScrollTop <= 10) {
       if (this.isHidden) {
         this.showControls();
@@ -1125,14 +1140,12 @@ class ControlsBarAutoHide {
     
     const scrollDifference = Math.abs(currentScrollTop - this.lastScrollTop);
     
-    // Só reage se passou do threshold
     if (scrollDifference < this.scrollThreshold) {
       return;
     }
     
     const scrollDirection = currentScrollTop > this.lastScrollTop ? 'down' : 'up';
     
-    // Scroll para baixo = esconde, scroll para cima = mostra
     if (scrollDirection === 'down' && !this.isHidden) {
       this.hideControls();
     } else if (scrollDirection === 'up' && this.isHidden) {
@@ -1198,3 +1211,4 @@ window.viewComicIssues = enhancedViewComicIssues;
 window.handleImageError = handleImageError;
 window.api = api;
 window.loadAllComics = loadAllComics;
+window.sendEmailWithBody = sendEmailWithBody;
