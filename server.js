@@ -9,10 +9,6 @@ const { testConnection } = require('./config/database');
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.get('/instrucoes', (req, res) => {
-  res.sendFile(path.join(__dirname, 'pages', 'how-to-use.html'));
-});
-
 app.use(cors());
 app.use(express.json());
 app.get('/health', (req, res) => {
