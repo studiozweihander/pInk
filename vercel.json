@@ -3,6 +3,10 @@
   "name": "pink-catalog",
   "rewrites": [
     {
+      "source": "/pages/(.*)",
+      "destination": "/pages/$1"
+    },
+    {
       "source": "/assets/(.*)",
       "destination": "/public/assets/$1"
     }
