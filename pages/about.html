@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Instruções de Uso - pInk</title>
+    <title>Sobre o pInk - pInk</title>
     <link rel="stylesheet" href="../src/styles/style.css" />
     <style>
       :root {
@@ -197,48 +197,6 @@
         margin: var(--spacing-sm) 0;
       }
 
-      .hover-video {
-        display: none;
-        position: absolute;
-        top: -350px;
-        left: 100px;
-        width: 650px;
-        height: 350px;
-        object-fit: cover;
-        border-radius: var(--border-radius-sm);
-        z-index: 10;
-        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-      }
-
-      .video-overlay {
-        position: absolute;
-        width: 300px;
-        height: 200px;
-        background-color: rgba(0, 0, 0, 0.6);
-        color: #fff;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        border-radius: var(--border-radius-sm);
-        pointer-events: none;
-        font-size: 0.9rem;
-        text-align: center;
-        z-index: 5;
-      }
-
-      .strong-container:hover .hover-video {
-        display: block;
-      }
-
-      .strong-container:hover .video-overlay {
-        display: none;
-      }
-
-      .strong-container {
-        position: relative;
-        display: inline-block;
-      }
-
       @media (max-width: 1024px) {
         .content {
           grid-template-columns: 1fr;
@@ -247,10 +205,6 @@
         }
 
         .toc {
-          display: none;
-        }
-
-        .strong-container:hover .hover-video {
           display: none;
         }
       }
@@ -275,149 +229,63 @@
       <div class="header-title">
         <div class="logo-container" onclick="backToHome()">
           <span class="logo-text">pInk</span>
-          <span class="logo-chevron">&gt;</span>
+          <span class="logo-chevron">></span>
         </div>
-        <span id="breadcrumb">Instruções de Uso</span>
+        <span id="breadcrumb">Sobre o pInk</span>
       </div>
     </header>
 
     <div class="content">
       <main class="main-content">
-        <h1 id="intro">Instruções de Uso</h1>
+        <h1 id="intro">Sobre o pInk</h1>
         <p>
-          Bem-vindo ao pInk, seu catálogo completo de quadrinhos! Esta página
-          contém todas as informações necessárias para aproveitar ao máximo
-          nossa plataforma.
+          O pInk é um catálogo completo de quadrinhos, desenvolvido para trazer uma experiência enriquecedora de descoberta e apreciação de arte. Nossa missão é simplificar o acesso a uma vasta coleção de mangás e quadrinhos do mundo todo.
         </p>
 
-        <h2 id="navegacao">Navegação Básica</h2>
+        <h2 id="navegacao">Recursos Principais</h2>
         <p>
-          O pInk possui uma interface intuitiva projetada para facilitar sua
-          experiência. A navegação principal inclui:
+          O pInk oferece várias funcionalidades para explorar o universo dos quadrinhos:
         </p>
         <ul>
           <li>
-            <strong>Logo pInk:</strong> Clique para retornar à página inicial
+            <strong>Biblioteca Vasta:</strong> Acesso a centenas de títulos de mangás e quadrinhos em diferentes gêneros e idiomas.
           </li>
           <li>
-            <strong>Barra de Pesquisa:</strong> Localizada no header para buscas
-            rápidas. Use a barra de pesquisa para encontrar quadrinhos
-            específicos. A pesquisa funciona em tempo real e busca pelo título
-            dos quadrinhos.
+            <strong>Busca Intuitiva:</strong> Encontre facilmente os títulos que mais procurar utilizando nosso sistema de busca avançada.
           </li>
           <li>
-            <strong>Filtros:</strong> Botão de filtro para refinar sua busca
+            <strong>Filtros Personalizados:</strong> Refina sua busca de acordo com preferências específicas de gênero, ano de publicação e idioma.
           </li>
           <li>
-            <strong>Alternador de Visualização:</strong> Mude entre grade e
-            lista
+            <strong>Design Responsivo:</strong> Nossa interface se adapta a dispositivos móveis, tablets e computadores para uma experiência otimizada.
           </li>
         </ul>
 
-        <h2 id="filtros">Filtros Avançados</h2>
+        <h2 id="filtros">Metodologia de Filtros</h2>
         <p>
-          Os filtros permitem refinar sua busca de forma precisa. Atualmente
-          suportamos filtros por:
+          Nossa abordagem de filtragem foi cuidadosamente pensada para ajudar os usuários a encontrar exatamente o que buscam.
         </p>
-        <ul>
-          <li><strong>Editora:</strong> Selecione uma ou mais editoras</li>
-          <li>
-            <strong>Ano de Lançamento:</strong> Escolha o período desejado
-          </li>
-          <li><strong>Idioma:</strong> Filtre por idioma do quadrinho</li>
-        </ul>
         <p>
-          <em class="note"
-            >Nota: Esta funcionalidade ainda está em desenvolvimento e pode
-            apresentar alguns bugs.</em
-          >
+          <em class="note">
+            Nota: Alguns filtros podem exigir cadastro ou login para aplicação completa.
+          </em>
         </p>
 
-        <h2 id="layout">
-          <div class="strong-container">
-            Alternar Layout
-            <video
-              class="hover-video"
-              src="../src/assets/videos/layouts.mp4"
-              muted
-              loop
-            >
-              Seu navegador não suporta a tag de vídeo.
-            </video>
-          </div>
-        </h2>
+        <h2 id="layout">Design e Usabilidade</h2>
         <p>
-          O pInk oferece duas visualizações diferentes para melhor adequação às
-          suas preferências:
+          O design do pInk prioriza a usabilidade e estética, garantindo que você possa navegar com facilidade através da nossa coleção.
         </p>
         <ul>
           <li>
-            <strong>Visualização em Grade:</strong>
-
-            Ideal para explorar capas e ter uma visão geral
+            <div>
+              <strong>Interface Clara:</strong>
+            </div>
+            Layout limpo e agradável para fácil navegação
           </li>
           <li>
-            <strong>Visualização em Lista:</strong> Melhor para ler títulos e
-            detalhes completos
+            <strong>Responsividade:</strong> Experiência perfeita em qualquer dispositivo
           </li>
         </ul>
-        <p>
-          Use os botões de alternância no canto superior direito para mudar
-          entre os modos.
-        </p>
-
-        <h2 id="detalhes">Visualizar Detalhes</h2>
-        <p>
-          Clique em qualquer quadrinho para ver seus detalhes completos. O modal
-          mostra:
-        </p>
-        <ul>
-          <li>Capa em alta resolução</li>
-          <li>Sinopse completa</li>
-          <li>
-            Metadados do quadrinho (série, gênero, ano, tamanho de download,
-            idioma)
-          </li>
-          <li>Créditos (quando disponível)</li>
-        </ul>
-
-        <h2 id="download">Download de Quadrinhos</h2>
-        <p>Para fazer download de um quadrinho:</p>
-        <ul>
-          <li>Abra os detalhes do quadrinho desejado</li>
-          <li>Clique no botão "Download" no modal</li>
-          <li>Você será redirecionado para o site <a href="https://ranoz.gg" style="color: var(--primary-font);">ranoz.gg</a></li>
-          <li>Clique em download e espere o processamento do próprio</li>
-        </ul>
-        <p>
-          <em class="note">Observação: Você pode ser redirecionado para anúncios através do <a href="https://ranoz.gg" style="color: var(--primary-font);">ranoz.gg</a>, estes anúncios <strong>NÃO</strong> são de minha responsabilidade.</em>
-        </p>
-
-        <h2 id="sugestoes">Solicitar Quadrinhos</h2>
-        <p>
-          Não encontrou o quadrinho que procura? Use nossa ferramenta de
-          sugestões:
-        </p>
-        <ul>
-          <li>Localizada no rodapé da página</li>
-          <li>Basta digitar o nome do quadrinho desejado</li>
-          <li>Clicar em "Solicitar" para enviar sua sugestão</li>
-        </ul>
-        <p>
-          Você será redirecionado para uma página do gmail, onde poderá enviar
-          sua sugestão. Após isso, sua sugestão será analisada e adicionada ao
-          acervo quando possível.
-        </p>
-
-        <h2 id="duvidas">Dúvidas ou Suporte</h2>
-        <p>
-          Para dúvidas, suporte técnico ou algum link está fora do ar? Entre em contato através do email:
-          <a
-            href="mailto:comics.pink@gmail.com"
-            style="color: var(--primary-color)"
-            >comics.pink@gmail.com</a
-          >
-        </p>
       </main>
 
       <aside class="toc">
@@ -425,13 +293,9 @@
         <nav id="toc" role="navigation" aria-label="Índice da página">
           <ul class="toc-list">
             <li><a href="#intro">Introdução</a></li>
-            <li><a href="#navegacao">Navegação Básica</a></li>
-            <li><a href="#filtros">Filtros Avançados</a></li>
-            <li><a href="#layout">Alternar Layout</a></li>
-            <li><a href="#detalhes">Visualizar Detalhes</a></li>
-            <li><a href="#download">Download</a></li>
-            <li><a href="#sugestoes">Solicitar Quadrinhos</a></li>
-            <li><a href="#duvidas">Dúvidas ou Suporte</a></li>
+            <li><a href="#navegacao">Recursos Principais</a></li>
+            <li><a href="#filtros">Metodologia de Filtros</a></li>
+            <li><a href="#layout">Design e Usabilidade</a></li>
           </ul>
         </nav>
       </aside>
@@ -522,7 +386,7 @@
 
           overrideTimeout = setTimeout(() => {
             manualOverride = false;
-            updateActiveSection(); // Atualiza baseado na posição atual
+            updateActiveSection();
           }, 3000);
 
           const target = document.querySelector(this.getAttribute("href"));
@@ -558,24 +422,5 @@
       });
 
       updateActiveSection();
-
-      const videoContainers = document.querySelectorAll(".strong-container");
-      videoContainers.forEach((container) => {
-        const video = container.querySelector(".hover-video");
-
-        container.addEventListener("mouseenter", () => {
-          if (video) {
-            video.play().catch((e) => console.log("Erro ao tocar vídeo:", e));
-          }
-        });
-
-        container.addEventListener("mouseleave", () => {
-          if (video) {
-            video.pause();
-            video.currentTime = 0;
-          }
-        });
-      });
     </script>
   </body>
-</html>
