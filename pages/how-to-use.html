@@ -198,18 +198,18 @@
       margin: var(--spacing-sm) 0;
     }
 
-    .hover-video {
-      display: none;
-      position: absolute;
-      top: -400px;
-      left: 100px;
-      width: 600px;
-      height: 400px;
-      object-fit: cover;
-      border-radius: var(--border-radius-sm);
-      z-index: 10;
-      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
-    }
+      .hover-video {
+        display: none;
+        position: absolute;
+        top: -350px;
+        left: 100px;
+        width: 650px;
+        height: 350px;
+        object-fit: cover;
+        border-radius: var(--border-radius-sm);
+        z-index: 10;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      }
 
     .video-overlay {
       position: absolute;
@@ -320,24 +320,38 @@
       </ul>
       <p style="line-height: 2.3rem;"><em class="note">Nota: Esta funcionalidade ainda está em desenvolvimento e pode apresentar alguns bugs.</em></p>
 
-      <h2 id="layout">Alternar Layout</h2>
-      <p>O pInk oferece duas visualizações diferentes para melhor adequação às suas preferências: </p>
-      <ul>
-        <li>
+        <h2 id="layout">
           <div class="strong-container">
-            <strong>Visualização em Grade:</strong>
-            <video class="hover-video" src="https://media.geeksforgeeks.org/wp-content/uploads/20210810214359/2.mp4"
-              muted loop>
+            Alternar Layout
+            <video
+              class="hover-video"
+              src="../src/assets/videos/layouts.mp4"
+              muted
+              loop
+            >
               Seu navegador não suporta a tag de vídeo.
             </video>
           </div>
-          Ideal para explorar capas e ter uma visão geral
-        </li>
-        <li>
-          <strong>Visualização em Lista:</strong> Melhor para ler títulos e detalhes completos
-        </li>
-      </ul>
-      <p>Use os botões de alternância no canto superior direito para mudar entre os modos.</p>
+        </h2>
+        <p>
+          O pInk oferece duas visualizações diferentes para melhor adequação às
+          suas preferências:
+        </p>
+        <ul>
+          <li>
+            <strong>Visualização em Grade:</strong>
+
+            Ideal para explorar capas e ter uma visão geral
+          </li>
+          <li>
+            <strong>Visualização em Lista:</strong> Melhor para ler títulos e
+            detalhes completos
+          </li>
+        </ul>
+        <p>
+          Use os botões de alternância no canto superior direito para mudar
+          entre os modos.
+        </p>
 
       <h2 id="detalhes">Visualizar Detalhes</h2>
       <p>Clique em qualquer quadrinho para ver seus detalhes completos. O modal mostra:</p>
