@@ -3,12 +3,20 @@
   "name": "pink-catalog",
   "rewrites": [
     {
-      "source": "/pages/(.*)",
-      "destination": "/pages/$1"
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
     },
     {
-      "source": "/assets/(.*)",
-      "destination": "/public/assets/$1"
+      "source": "/about",
+      "destination": "/about.html"
+    },
+    {
+      "source": "/how-to-use",
+      "destination": "/how-to-use.html"
+    },
+    {
+      "source": "/(.*)",
+      "destination": "/index.html"
     }
   ],
   "functions": {
