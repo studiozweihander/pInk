@@ -20,6 +20,7 @@
   "author": "Zweihander",
   "license": "ISC",
   "devDependencies": {
+    "@playwright/test": "^1.56.0",
     "nodemon": "^3.1.10",
     "vite": "^7.1.2"
   },
