@@ -1,7 +1,7 @@
 {
   "name": "pink",
-  "version": "1.0.0",
-  "description": "Catálogo de quadrinhos com Vite + Vanilla JS + Express",
+  "version": "0.6.0",
+  "description": "Catálogo de quadrinhos online.",
   "main": "index.js",
   "scripts": {
     "dev": "vite",

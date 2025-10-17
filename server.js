@@ -12,10 +12,10 @@ const PORT = process.env.PORT || 3000;
 app.use(cors());
 app.use(express.json());
 app.get('/health', (req, res) => {
-  res.json({ 
-    status: 'OK', 
+  res.json({
+    status: 'OK',
     timestamp: new Date().toISOString(),
-    version: '1.0.0'
+    version: '0.6.0'
   });
 });
 
@@ -31,8 +31,8 @@ app.use('/api/*', (req, res) => {
 app.get('/', (req, res) => {
   res.json({
     name: 'pInk API',
-    description: 'Catálogo de quadrinhos - Backend API',
-    version: '1.0.0',
+    description: 'Catálogo de quadrinhos online - API',
+    version: '0.6.0',
     endpoints: {
       health: '/health',
       comics: '/api/comics',
@@ -54,7 +54,7 @@ async function startServer() {
   try {
     console.log('🔧 Starting pInk server...');
     await testConnection();
-    
+
     app.listen(PORT, () => {
       console.log(`🚀 pInk server running on http://localhost:${PORT}`);
       console.log(`\n📋 API endpoints:`);
@@ -65,7 +65,7 @@ async function startServer() {
       console.log(`   🔍 GET  /health                 - Health check`);
       console.log(`\n⚡ Ready for frontend connections!`);
     });
-    
+
   } catch (error) {
     console.error('❌ Failed to start server:', error.message);
     process.exit(1);
