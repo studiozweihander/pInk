@@ -1,9 +1,6 @@
-const API_BASE_URL = (() => {
-  if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-    return '/api';
-  }
-  return '/api';
-})();
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:3000/api'
+  : '/api';
 
 const REQUEST_TIMEOUT = 10000;
 
@@ -14,6 +11,7 @@ class ApiClient {
 
   async request(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
+
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
 
@@ -84,7 +82,9 @@ class ApiClient {
 
   async healthCheck() {
     try {
-      const healthUrl = API_BASE_URL.replace('/api', '/health');
+      const healthUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:3000/health'
+        : '/api/health';
       const response = await fetch(healthUrl);
       return response.ok;
     } catch {
