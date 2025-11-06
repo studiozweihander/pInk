@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Instruções de Uso - pInk</title>
+    <link rel="stylesheet" href="../src/styles/style.css" />
+    <style>
+      :root {
+        --primary-color: #e78fde;
+        --primary-surface: #181818;
+        --secondary-surface: #242424;
+        --primary-font: #e78fde;
+        --secondary-font: #f4c1ed;
+        --font: "Poppins", sans-serif;
+        --font2: "JetBrains Mono", monospace;
+        --spacing-xs: 0.25rem;
+        --spacing-sm: 0.5rem;
+        --spacing-md: 1rem;
+        --spacing-lg: 1.5rem;
+        --border-radius-sm: 8px;
+        --border-radius-md: 12px;
+        --transition-fast: 0.2s ease;
+      }
+
+      body {
+        margin: 0;
+        font-family: var(--font);
+        display: flex;
+        flex-direction: column;
+        background: var(--primary-surface);
+        color: var(--primary-font);
+        min-height: 100vh;
+        line-height: 1.6;
+      }
+
+      .logo-chevron {
+        color: var(--secondary-font);
+        font-size: 1 rem;
+        margin-left: var(--spacing-xs);
+        opacity: 0.7;
+        visibility: visible;
+        transform: translateX(0);
+      }
+
+      .logo-chevron:hover {
+        opacity: 1;
+        transform: translateX(2px);
+      }
+
+      .content {
+        display: grid;
+        grid-template-columns: 1fr 280px;
+        flex: 1;
+        gap: var(--spacing-lg);
+        padding: var(--spacing-lg);
+        max-width: 1400px;
+        margin: 0 auto;
+        width: 100%;
+        box-sizing: border-box;
+      }
+
+      .main-content {
+        background: var(--secondary-surface);
+        border-radius: var(--border-radius-md);
+        padding: var(--spacing-xl);
+        min-height: 600px;
+      }
+
+      .main-content h1 {
+        background: var(--primary-color);
+        background-clip: text;
+        -webkit-background-clip: text;
+        -webkit-text-fill-color: transparent;
+        font-size: 2.5rem;
+        margin-bottom: var(--spacing-lg);
+        font-weight: 700;
+      }
+
+      .main-content h2 {
+        color: var(--primary-color);
+        font-size: 1.8rem;
+        margin-top: var(--spacing-xl);
+        margin-bottom: var(--spacing-md);
+        padding-bottom: var(--spacing-sm);
+        border-bottom: 2px solid rgba(231, 143, 222, 0.3);
+      }
+
+      .main-content h3 {
+        color: var(--secondary-font);
+        font-size: 1.3rem;
+        margin-top: var(--spacing-lg);
+        margin-bottom: var(--spacing-sm);
+      }
+
+      .main-content p {
+        margin-bottom: var(--spacing-md);
+        color: var(--secondary-font);
+        font-size: 1rem;
+      }
+
+      .main-content ul {
+        margin-bottom: var(--spacing-md);
+        padding-left: var(--spacing-lg);
+      }
+
+      .main-content li {
+        margin-bottom: var(--spacing-xs);
+        color: var(--secondary-font);
+      }
+
+      .main-content pre {
+        background: #1a1a1a;
+        padding: var(--spacing-md);
+        border-radius: var(--border-radius-sm);
+        overflow-x: auto;
+        font-size: 0.9rem;
+        font-family: var(--font2);
+        margin: var(--spacing-md) 0;
+        border: 1px solid rgba(231, 143, 222, 0.2);
+      }
+
+      .main-content code {
+        background: rgba(231, 143, 222, 0.1);
+        padding: 0.2rem 0.4rem;
+        border-radius: 3px;
+        font-family: var(--font2);
+        font-size: 0.85rem;
+        color: var(--primary-color);
+      }
+
+      .toc {
+        background: var(--secondary-surface);
+        border-radius: var(--border-radius-md);
+        padding: var(--spacing-lg);
+        height: fit-content;
+        position: sticky;
+        top: var(--spacing-lg);
+      }
+
+      .toc h2 {
+        color: var(--primary-color);
+        font-size: 1.1rem;
+        margin-bottom: var(--spacing-md);
+        font-weight: 600;
+      }
+
+      .toc-list {
+        list-style: none;
+        padding: 0;
+        margin: 0;
+      }
+
+      .toc nav a {
+        display: block;
+        color: var(--secondary-font);
+        text-decoration: none;
+        padding: var(--spacing-xs) var(--spacing-sm);
+        border-radius: var(--border-radius-sm);
+        margin-bottom: var(--spacing-xs);
+        transition: var(--transition-fast);
+        font-size: 0.85rem;
+        border-left: 2px solid transparent;
+      }
+
+      .toc nav a:hover {
+        background: rgba(231, 143, 222, 0.1);
+        color: var(--primary-color);
+        border-left-color: rgba(231, 143, 222, 0.5);
+      }
+
+      .toc nav a.active {
+        background: rgba(231, 143, 222, 0.15);
+        color: var(--primary-color);
+        border-left-color: var(--primary-color);
+        font-weight: 500;
+      }
+
+      .toc nav a.sub {
+        padding-left: calc(var(--spacing-sm) + var(--spacing-xs));
+        font-size: 0.8rem;
+      }
+
+      .toc nav a.sub.active {
+        background: rgba(231, 143, 222, 0.12);
+        border-left-color: var(--secondary-font);
+      }
+
+      .note {
+        background: rgba(231, 143, 222, 0.1);
+        padding: var(--spacing-sm) var(--spacing-md);
+        border-left: 3px solid var(--primary-color);
+        border-radius: var(--border-radius-sm);
+        font-style: italic;
+        color: var(--secondary-font);
+        font-size: 0.9rem;
+        margin: var(--spacing-sm) 0;
+      }
+
+      .hover-video {
+        display: none;
+        position: absolute;
+        top: -350px;
+        left: 100px;
+        width: 650px;
+        height: 350px;
+        object-fit: cover;
+        border-radius: var(--border-radius-sm);
+        z-index: 10;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.3);
+      }
+
+      .video-overlay {
+        position: absolute;
+        width: 300px;
+        height: 200px;
+        background-color: rgba(0, 0, 0, 0.6);
+        color: #fff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-radius: var(--border-radius-sm);
+        pointer-events: none;
+        font-size: 0.9rem;
+        text-align: center;
+        z-index: 5;
+      }
+
+      .strong-container:hover .hover-video {
+        display: block;
+      }
+
+      .strong-container:hover .video-overlay {
+        display: none;
+      }
+
+      .strong-container {
+        position: relative;
+        display: inline-block;
+      }
+
+      @media (max-width: 1024px) {
+        .content {
+          grid-template-columns: 1fr;
+          gap: var(--spacing-md);
+          padding: var(--spacing-md);
+        }
+
+        .toc {
+          display: none;
+        }
+
+        .strong-container:hover .hover-video {
+          display: none;
+        }
+      }
+
+      @media (max-width: 768px) {
+        .main-content {
+          padding: var(--spacing-md);
+        }
+
+        .main-content h1 {
+          font-size: 2rem;
+        }
+
+        .main-content h2 {
+          font-size: 1.5rem;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <header>
+      <div class="header-title">
+        <div class="logo-container" onclick="backToHome()">
+          <span class="logo-text">pInk</span>
+          <span class="logo-chevron">&gt;</span>
+        </div>
+        <span id="breadcrumb">Instruções de Uso (Em construção...)</span>
+      </div>
+    </header>
+
+    <div class="content">
+      <main class="main-content">
+        <h1 id="intro">Instruções de Uso</h1>
+        <p>
+          Bem-vindo ao pInk, seu catálogo completo de quadrinhos! Esta página
+          contém todas as informações necessárias para aproveitar ao máximo
+          nossa plataforma.
+        </p>
+
+        <h2 id="navegacao">Navegação Básica</h2>
+        <p>
+          O pInk possui uma interface intuitiva projetada para facilitar sua
+          experiência. A navegação principal inclui:
+        </p>
+        <ul>
+          <li>
+            <strong>Logo pInk:</strong> Clique para retornar à página inicial
+          </li>
+          <li>
+            <strong>Barra de Pesquisa:</strong> Localizada no header para buscas
+            rápidas. Use a barra de pesquisa para encontrar quadrinhos
+            específicos. A pesquisa funciona em tempo real e busca pelo título
+            dos quadrinhos.
+          </li>
+          <li>
+            <strong>Filtros:</strong> Botão de filtro para refinar sua busca
+          </li>
+          <li>
+            <strong>Alternador de Visualização:</strong> Mude entre grade e
+            lista
+          </li>
+        </ul>
+
+        <h2 id="filtros">Filtros Avançados</h2>
+        <p>
+          Os filtros permitem refinar sua busca de forma precisa. Atualmente
+          suportamos filtros por:
+        </p>
+        <ul>
+          <li><strong>Editora:</strong> Selecione uma ou mais editoras</li>
+          <li>
+            <strong>Ano de Lançamento:</strong> Escolha o período desejado
+          </li>
+          <li><strong>Idioma:</strong> Filtre por idioma do quadrinho</li>
+        </ul>
+        <p style="line-height: 2.3rem">
+          <em class="note"
+            >Nota: Esta funcionalidade ainda está em desenvolvimento e pode
+            apresentar alguns bugs.</em
+          >
+        </p>
+
+        <h2 id="layout">
+          <div class="strong-container">
+            Alternar Layout
+            <video
+              class="hover-video"
+              src="../src/assets/videos/layouts.mp4"
+              muted
+              loop
+            >
+              Seu navegador não suporta a tag de vídeo.
+            </video>
+          </div>
+        </h2>
+        <p>
+          O pInk oferece duas visualizações diferentes para melhor adequação às
+          suas preferências:
+        </p>
+        <ul>
+          <li>
+            <strong>Visualização em Grade:</strong>
+
+            Ideal para explorar capas e ter uma visão geral
+          </li>
+          <li>
+            <strong>Visualização em Lista:</strong> Melhor para ler títulos e
+            detalhes completos
+          </li>
+        </ul>
+        <p>
+          Use os botões de alternância no canto superior direito para mudar
+          entre os modos.
+        </p>
+
+        <h2 id="detalhes">Visualizar Detalhes</h2>
+        <p>
+          Clique em qualquer quadrinho para ver seus detalhes completos. O modal
+          mostra:
+        </p>
+        <ul>
+          <li>Capa em alta resolução</li>
+          <li>Sinopse completa</li>
+          <li>
+            Metadados do quadrinho (série, gênero, ano, tamanho de download,
+            idioma)
+          </li>
+          <li>Créditos (quando disponível)</li>
+        </ul>
+
+        <h2 id="download">Download de Quadrinhos</h2>
+        <p>Para fazer download de um quadrinho:</p>
+        <ul>
+          <li>Abra os detalhes do quadrinho desejado</li>
+          <li>Clique no botão "Download" no modal</li>
+          <li>
+            Você será redirecionado para o site
+            <a href="https://ranoz.gg" style="color: var(--primary-font)"
+              >ranoz.gg</a
+            >
+          </li>
+          <li>Clique em download e espere o processamento do próprio</li>
+        </ul>
+        <p style="line-height: 2.3rem">
+          <em class="note"
+            >Observação: Você pode ser redirecionado para anúncios através do
+            <a href="https://ranoz.gg" style="color: var(--primary-font)"
+              >ranoz.gg</a
+            >, estes anúncios <strong>NÃO</strong> são de minha
+            responsabilidade.</em
+          >
+        </p>
+
+        <h2 id="sugestoes">Solicitar Quadrinhos</h2>
+        <p>
+          Não encontrou o quadrinho que procura? Use nossa ferramenta de
+          sugestões:
+        </p>
+        <ul>
+          <li>Localizada no rodapé da página</li>
+          <li>Basta digitar o nome do quadrinho desejado</li>
+          <li>Clicar em "Solicitar" para enviar sua sugestão</li>
+        </ul>
+        <p>
+          Você será redirecionado para uma página do gmail, onde poderá enviar
+          sua sugestão. Após isso, sua sugestão será analisada e adicionada ao
+          acervo quando possível.
+        </p>
+
+        <h2 id="duvidas">Dúvidas ou Suporte</h2>
+        <p>
+          Para dúvidas, suporte técnico ou algum link está fora do ar? Entre em
+          contato através do email:
+          <a
+            href="mailto:comics.pink@gmail.com"
+            style="color: var(--primary-color)"
+            >comics.pink@gmail.com</a
+          >
+        </p>
+      </main>
+
+      <aside class="toc">
+        <h2>Nesta página</h2>
+        <nav id="toc" role="navigation" aria-label="Índice da página">
+          <ul class="toc-list">
+            <li><a href="#intro">Introdução</a></li>
+            <li><a href="#navegacao">Navegação Básica</a></li>
+            <li><a href="#filtros">Filtros Avançados</a></li>
+            <li><a href="#layout">Alternar Layout</a></li>
+            <li><a href="#detalhes">Visualizar Detalhes</a></li>
+            <li><a href="#download">Download</a></li>
+            <li><a href="#sugestoes">Solicitar Quadrinhos</a></li>
+            <li><a href="#duvidas">Dúvidas ou Suporte</a></li>
+          </ul>
+        </nav>
+      </aside>
+    </div>
+
+    <footer class="site-footer">
+      <div
+        class="footer-bottom"
+        style="
+          border-top: 1px solid rgba(231, 143, 222, 0);
+          padding: var(--spacing-sm) 0 var(--spacing-lg) 0;
+        "
+      >
+        <div class="footer-bottom-content">
+          <div class="footer-brand-name">
+            <span
+              class="footer-logo"
+              onclick="backToHome()"
+              style="
+                background-image: url(/src/assets/images/palestine-flag.jpg);
+                background-repeat: no-repeat;
+                background-size: 93%;
+                background-position: center;
+                color: transparent;
+                background-clip: text;
+                -webkit-background-clip: text;
+                cursor: pointer;
+              "
+              >pInk</span
+            >
+          </div>
+          <div class="footer-copyright">
+            <span>Studio Zweihander © 2025</span>
+          </div>
+        </div>
+      </div>
+    </footer>
+
+    <script>
+      function backToHome() {
+        window.location.href = "/";
+      }
+
+      document.querySelectorAll('a[href^="#"]').forEach((anchor) => {
+        anchor.addEventListener("click", function (e) {
+          e.preventDefault();
+          const target = document.querySelector(this.getAttribute("href"));
+          if (target) {
+            target.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+          }
+        });
+      });
+
+      const sections = Array.from(
+        document.querySelectorAll("main h1, main h2, main h3")
+      );
+      const navLinks = document.querySelectorAll("#toc a");
+      let currentActiveIndex = 0;
+      let manualOverride = false;
+      let overrideTimeout;
+
+      if (navLinks.length > 0) {
+        navLinks[0].classList.add("active");
+      }
+
+      function setActiveLink(index) {
+        navLinks.forEach((link) => link.classList.remove("active"));
+
+        if (sections[index] && navLinks[index]) {
+          const targetId = sections[index].id;
+          const activeLink = document.querySelector(
+            `#toc a[href="#${targetId}"]`
+          );
+          if (activeLink) {
+            activeLink.classList.add("active");
+          }
+        }
+      }
+
+      function updateActiveSection() {
+        if (manualOverride) return;
+
+        const scrollTop =
+          window.pageYOffset || document.documentElement.scrollTop;
+        const offset = 120; // Offset para considerar o header
+
+        let newActiveIndex = 0;
+
+        for (let i = 0; i < sections.length; i++) {
+          const section = sections[i];
+          const sectionTop = section.offsetTop - offset;
+
+          if (scrollTop >= sectionTop) {
+            newActiveIndex = i;
+          } else {
+            break;
+          }
+        }
+
+        if (newActiveIndex !== currentActiveIndex) {
+          currentActiveIndex = newActiveIndex;
+          setActiveLink(currentActiveIndex);
+        }
+      }
+
+      navLinks.forEach((link, index) => {
+        link.addEventListener("click", function (e) {
+          e.preventDefault();
+
+          currentActiveIndex = index;
+          setActiveLink(index);
+
+          manualOverride = true;
+
+          if (overrideTimeout) {
+            clearTimeout(overrideTimeout);
+          }
+
+          overrideTimeout = setTimeout(() => {
+            manualOverride = false;
+            updateActiveSection(); // Atualiza baseado na posição atual
+          }, 3000);
+
+          const target = document.querySelector(this.getAttribute("href"));
+          if (target) {
+            target.scrollIntoView({
+              behavior: "smooth",
+              block: "start",
+            });
+
+            setTimeout(() => {
+              manualOverride = false;
+            }, 1000);
+          }
+        });
+      });
+
+      let scrollTimeout;
+      window.addEventListener("scroll", () => {
+        if (scrollTimeout) {
+          clearTimeout(scrollTimeout);
+        }
+        scrollTimeout = setTimeout(() => {
+          if (manualOverride) {
+            clearTimeout(overrideTimeout);
+            overrideTimeout = setTimeout(() => {
+              manualOverride = false;
+              updateActiveSection();
+            }, 1500);
+          } else {
+            updateActiveSection();
+          }
+        }, 10);
+      });
+
+      updateActiveSection();
+
+      const videoContainers = document.querySelectorAll(".strong-container");
+      videoContainers.forEach((container) => {
+        const video = container.querySelector(".hover-video");
+
+        container.addEventListener("mouseenter", () => {
+          if (video) {
+            video.play().catch((e) => console.log("Erro ao tocar vídeo:", e));
+          }
+        });
+
+        container.addEventListener("mouseleave", () => {
+          if (video) {
+            video.pause();
+            video.currentTime = 0;
+          }
+        });
+      });
+    </script>
+  </body>
+</html>
