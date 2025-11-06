@@ -221,68 +221,70 @@ export class FilterSystem {
   }
 
   applyFilters(searchTerm = '') {
-    const { cardRenderer } = require('./card-renderer.js');
-
     if (appState.currentView === VIEWS.HOME) {
-      this._applyComicFilters(searchTerm, cardRenderer);
+      this._applyComicFilters(searchTerm);
     } else if (appState.currentView === VIEWS.ISSUES) {
-      this._applyIssueFilters(searchTerm, cardRenderer);
+      this._applyIssueFilters(searchTerm);
     }
   }
 
-  _applyComicFilters(searchTerm, cardRenderer) {
+  _applyComicFilters(searchTerm) {
     if (!appState.allComics || appState.allComics.length === 0) return;
 
-    let filteredComics = [...appState.allComics];
+    import('./card-renderer.js').then(({ cardRenderer }) => {
+      let filteredComics = [...appState.allComics];
 
-    if (searchTerm.trim()) {
-      const searchLower = searchTerm.toLowerCase();
-      filteredComics = filteredComics.filter(comic =>
-        comic.title.toLowerCase().includes(searchLower)
-      );
-    }
+      if (searchTerm.trim()) {
+        const searchLower = searchTerm.toLowerCase();
+        filteredComics = filteredComics.filter(comic =>
+          comic.title.toLowerCase().includes(searchLower)
+        );
+      }
 
-    if (appState.activeFilters[FILTER_TYPES.PUBLISHER].length > 0) {
-      filteredComics = filteredComics.filter(comic =>
-        appState.activeFilters[FILTER_TYPES.PUBLISHER].includes(comic.publisher)
-      );
-    }
+      if (appState.activeFilters[FILTER_TYPES.PUBLISHER].length > 0) {
+        filteredComics = filteredComics.filter(comic =>
+          appState.activeFilters[FILTER_TYPES.PUBLISHER].includes(comic.publisher)
+        );
+      }
 
-    if (appState.activeFilters[FILTER_TYPES.YEAR].length > 0) {
-      filteredComics = filteredComics.filter(comic =>
-        appState.activeFilters[FILTER_TYPES.YEAR].includes(comic.year?.toString())
-      );
-    }
+      if (appState.activeFilters[FILTER_TYPES.YEAR].length > 0) {
+        filteredComics = filteredComics.filter(comic =>
+          appState.activeFilters[FILTER_TYPES.YEAR].includes(comic.year?.toString())
+        );
+      }
 
-    if (appState.activeFilters[FILTER_TYPES.LANGUAGE].length > 0) {
-      filteredComics = filteredComics.filter(comic =>
-        appState.activeFilters[FILTER_TYPES.LANGUAGE].includes(comic.language)
-      );
-    }
+      if (appState.activeFilters[FILTER_TYPES.LANGUAGE].length > 0) {
+        filteredComics = filteredComics.filter(comic =>
+          appState.activeFilters[FILTER_TYPES.LANGUAGE].includes(comic.language)
+        );
+      }
 
-    cardRenderer.renderComics(filteredComics);
+      cardRenderer.renderComics(filteredComics);
+    });
   }
 
-  _applyIssueFilters(searchTerm, cardRenderer) {
+  _applyIssueFilters(searchTerm) {
     if (!appState.currentIssues || appState.currentIssues.length === 0) return;
 
-    let filteredIssues = [...appState.currentIssues];
+    import('./card-renderer.js').then(({ cardRenderer }) => {
+      let filteredIssues = [...appState.currentIssues];
 
-    if (searchTerm.trim()) {
-      const searchLower = searchTerm.toLowerCase().trim();
-      filteredIssues = appState.currentIssues.filter(issue => {
-        const titleText = (issue.title || '').toLowerCase();
-        return titleText.includes(searchLower);
-      });
-    }
+      if (searchTerm.trim()) {
+        const searchLower = searchTerm.toLowerCase().trim();
+        filteredIssues = appState.currentIssues.filter(issue => {
+          const titleText = (issue.title || '').toLowerCase();
+          return titleText.includes(searchLower);
+        });
+      }
 
-    if (appState.activeIssueFilters[FILTER_TYPES.YEAR].length > 0) {
-      filteredIssues = filteredIssues.filter(issue =>
-        appState.activeIssueFilters[FILTER_TYPES.YEAR].includes(issue.year?.toString())
-      );
-    }
+      if (appState.activeIssueFilters[FILTER_TYPES.YEAR].length > 0) {
+        filteredIssues = filteredIssues.filter(issue =>
+          appState.activeIssueFilters[FILTER_TYPES.YEAR].includes(issue.year?.toString())
+        );
+      }
 
-    cardRenderer.renderIssues(filteredIssues);
+      cardRenderer.renderIssues(filteredIssues);
+    });
   }
 
   toggleFilters(open) {
@@ -298,15 +300,6 @@ export class FilterSystem {
     }
   }
 
-  openFilters(dropdown, filterButton) {
-    dropdown.classList.add('open');
-    filterButton.classList.add('active');
-    appState.isFilterDropdownOpen = true;
-
-    setTimeout(() => {
-      document.addEventListener('click', this._handleClickOutside.bind(this));
-    }, 10);
-  }
   openFilters(dropdown, filterButton) {
     dropdown.classList.add('open');
     filterButton.classList.add('active');
