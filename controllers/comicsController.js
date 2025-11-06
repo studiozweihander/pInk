@@ -30,50 +30,32 @@ async function findComicBySlugOrId(identifier) {
 
     if (error) return { data: null, error };
     return { data, foundBy: 'id' };
-  } else {
-    const expectedTitle = identifier.replace(/-/g, ' ');
-
-    const { data: exactData, error: exactError } = await supabase
-      .from('Comic')
-      .select('*')
-      .ilike('title', expectedTitle)
-      .single();
-
-    if (!exactError && exactData) {
-      return { data: exactData, foundBy: 'slug' };
-    }
-
-    const words = expectedTitle.split(' ');
-    let foundData = null;
-
-    for (const word of words) {
-      if (word.length > 2) {
-        const { data, error } = await supabase
-          .from('Comic')
-          .select('*')
-          .ilike('title', `%${word}%`)
-          .single();
-
-        if (!error && data) {
-          foundData = data;
-          break;
-        }
-      }
-    }
-
-    if (foundData) {
-      return { data: foundData, foundBy: 'slug' };
-    }
-
-    const { data, error } = await supabase
-      .from('Comic')
-      .select('*')
-      .ilike('title', `%${identifier}%`)
-      .single();
-
-    if (error) return { data: null, error };
-    return { data, foundBy: 'slug' };
   }
+
+  const slugClean = identifier.toLowerCase().replace(/-/g, ' ').trim();
+
+  let { data, error } = await supabase
+    .from('Comic')
+    .select('*')
+    .ilike('title', slugClean)
+    .maybeSingle();
+
+  if (data) return { data, foundBy: 'slug' };
+
+  const keywords = slugClean.split(' ').filter(w => w.length > 2);
+
+  for (const keyword of keywords) {
+    const { data: keywordData } = await supabase
+      .from('Comic')
+      .select('*')
+      .ilike('title', `%${keyword}%`)
+      .limit(1)
+      .maybeSingle();
+
+    if (keywordData) return { data: keywordData, foundBy: 'slug' };
+  }
+
+  return { data: null, error: { code: 'PGRST116' } };
 }
 
 class ComicsController {

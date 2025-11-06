@@ -33,6 +33,11 @@ class ApiClient {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
 
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('Formato de resposta inválido - esperado JSON');
+      }
+
       const data = await response.json();
 
       if (!data.success) {

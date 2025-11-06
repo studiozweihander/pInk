@@ -51,20 +51,23 @@ export class NavigationSystem {
     }
 
     try {
-      const [comicResponse, issuesResponse] = await Promise.all([
-        this.api.getComicById(identifier),
-        this.api.getComicIssues(identifier)
-      ]);
-
+      const comicResponse = await this.api.getComicById(identifier);
       appState.currentComic = comicResponse.data;
-      appState.currentIssues = issuesResponse.data;
+
+      try {
+        const issuesResponse = await this.api.getComicIssues(identifier);
+        appState.currentIssues = issuesResponse.data;
+      } catch (issuesError) {
+        console.warn('Falha ao carregar edições:', issuesError);
+        appState.currentIssues = [];
+      }
 
       filterSystem.extractFiltersFromIssues(appState.currentIssues);
       cardRenderer.renderIssues(appState.currentIssues);
-
       this.updateHeader();
 
     } catch (error) {
+      console.error('Erro ao carregar quadrinho:', error);
       uiUtils.showError(error.message);
       appState.currentComic = null;
       appState.currentIssues = [];
@@ -197,12 +200,10 @@ export class NavigationSystem {
       searchInput.value = '';
     }
 
-    // Reset issue filters
     Object.keys(appState.activeIssueFilters).forEach(key => {
       appState.activeIssueFilters[key] = [];
     });
 
-    // Load comics data if not already loaded
     if (!appState.allComics || appState.allComics.length === 0) {
       this.loadAllComics();
     } else {
@@ -219,7 +220,7 @@ export class NavigationSystem {
     appState.currentView = VIEWS.ISSUES;
     this.loadComicIssues(identifier, isNumericId);
   }
-  
+
   _navigateToAbout() {
     appState.currentView = VIEWS.ABOUT;
     this.loadStaticPage('about');
