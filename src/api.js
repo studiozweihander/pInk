@@ -1,7 +1,6 @@
 const API_BASE_URL = (() => {
   if (typeof window !== 'undefined') {
     const hostname = window.location.hostname;
-    const protocol = window.location.protocol;
     
     if (hostname.includes('vercel.app') || hostname.includes('pInk-')) {
       return '/api';
@@ -11,7 +10,7 @@ const API_BASE_URL = (() => {
       return 'http://localhost:3000/api';
     }
     
-    return `${protocol}//${hostname}/api`;
+    return `${window.location.protocol}//${hostname}/api`;
   }
   return '/api';
 })();
@@ -21,14 +20,47 @@ const REQUEST_TIMEOUT = 15000;
 class ApiClient {
   constructor() {
     this.baseURL = API_BASE_URL;
+    this.requestId = 0;
+    this.init();
+  }
+
+  init() {
+    if (typeof window !== 'undefined') {
+      window.debugAPI = () => {
+        console.log('API Debug - Base URL:', this.baseURL);
+        console.log('API Debug - Environment:', window.location.hostname.includes('vercel.app') || window.location.hostname.includes('pInk-') ? 'Production' : 'Development');
+        console.log('API Debug - Hostname:', window.location.hostname);
+      };
+    }
+  }
+
+  generateRequestId() {
+    return `req_${Date.now()}_${++this.requestId}`;
+  }
+
+  logRequest(id, method, url) {
+    console.log(`Request [${id}]: ${method} ${url}`);
+  }
+
+  logResponse(id, status, duration) {
+    const success = status >= 200 && status < 300;
+    console.log(`Response [${id}]: ${status} ${success ? 'OK' : 'ERROR'}, duration: ${duration}ms`);
+  }
+
+  logError(id, error, context) {
+    console.error(`Error [${id}]: ${error.message} ${context}`);
   }
 
   async request(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
+    const requestId = this.generateRequestId();
+    const startTime = Date.now();
 
     try {
+      this.logRequest(requestId, options.method || 'GET', url);
+
       const response = await fetch(url, {
         ...options,
         signal: controller.signal,
@@ -39,50 +71,61 @@ class ApiClient {
         }
       });
 
+      const duration = Date.now() - startTime;
+      const contentType = response.headers.get('content-type');
+      
+      this.logResponse(requestId, response.status, duration);
+
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        const contentType = response.headers.get('content-type');
         if (!contentType || !contentType.includes('application/json')) {
           const text = await response.text();
-          throw new Error(`Server returned ${response.status}. Expected JSON, got: ${contentType || 'unknown'}`);
+          const errorMsg = `Expected JSON but received ${contentType}. Response: ${text.substring(0, 200)}`;
+          this.logError(requestId, new Error(errorMsg), 'Non-JSON response');
+          throw new Error(`Invalid response format - ${errorMsg}`);
         }
         
         const errorData = await response.json().catch(() => ({}));
         const errorMessage = errorData.message || `HTTP ${response.status}: ${response.statusText}`;
+        this.logError(requestId, new Error(errorMessage), `HTTP ${response.status} error`);
         throw new Error(errorMessage);
       }
 
-      const contentType = response.headers.get('content-type');
       if (!contentType || !contentType.includes('application/json')) {
         const responseText = await response.text();
-        throw new Error(`Expected JSON but received ${contentType}. Response: ${responseText.substring(0, 200)}`);
+        const errorMsg = `Expected JSON but received ${contentType}. Response: ${responseText.substring(0, 200)}`;
+        this.logError(requestId, new Error(errorMsg), 'Invalid content type');
+        throw new Error(`Invalid response format - ${errorMsg}`);
       }
 
       const data = await response.json();
-
+      
       if (!data.success) {
         const errorMessage = data.message || 'API returned error';
+        this.logError(requestId, new Error(errorMessage), 'API error');
         throw new Error(errorMessage);
       }
 
       return data;
 
     } catch (error) {
-      clearTimeout(timeoutId);
-
       if (error.name === 'AbortError') {
+        this.logError(requestId, error, 'Request timeout');
         throw new Error('Request timeout - check your connection');
       }
 
       if (error.message.includes('fetch')) {
+        this.logError(requestId, error, 'Connection error');
         throw new Error('Connection error - check server availability');
       }
 
-      if (error.message.includes('JSON')) {
+      if (error.message.includes('JSON') || error.message.includes('response format')) {
+        this.logError(requestId, error, 'Invalid response format');
         throw new Error(`Invalid response format - ${error.message}`);
       }
 
+      this.logError(requestId, error, 'Unexpected error');
       throw error;
     }
   }
