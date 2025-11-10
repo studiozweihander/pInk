@@ -1,11 +1,22 @@
 const API_BASE_URL = (() => {
-  if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-    return '/api';
+  if (typeof window !== 'undefined') {
+    const hostname = window.location.hostname;
+    const protocol = window.location.protocol;
+    
+    if (hostname.includes('vercel.app') || hostname.includes('pInk-')) {
+      return '/api';
+    }
+    
+    if (hostname === 'localhost' || hostname === '127.0.0.1') {
+      return 'http://localhost:3000/api';
+    }
+    
+    return `${protocol}//${hostname}/api`;
   }
   return '/api';
 })();
 
-const REQUEST_TIMEOUT = 10000;
+const REQUEST_TIMEOUT = 15000;
 
 class ApiClient {
   constructor() {
@@ -23,6 +34,7 @@ class ApiClient {
         signal: controller.signal,
         headers: {
           'Content-Type': 'application/json',
+          'Accept': 'application/json',
           ...options.headers
         }
       });
@@ -30,13 +42,16 @@ class ApiClient {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+        const errorData = await response.json().catch(() => ({}));
+        const errorMessage = errorData.message || `HTTP ${response.status}: ${response.statusText}`;
+        throw new Error(errorMessage);
       }
 
       const data = await response.json();
-
+      
       if (!data.success) {
-        throw new Error(data.message || 'API returned error');
+        const errorMessage = data.message || data.error || 'API returned error';
+        throw new Error(errorMessage);
       }
 
       return data;
@@ -45,11 +60,15 @@ class ApiClient {
       clearTimeout(timeoutId);
 
       if (error.name === 'AbortError') {
-        throw new Error('Request timeout - verifique se o backend está rodando');
+        throw new Error('Timeout - Verifique sua conexão. O servidor pode estar demando para responder.');
       }
 
       if (error.message.includes('fetch')) {
-        throw new Error('Erro de conexão - verifique se o backend está rodando na porta 3000');
+        throw new Error('Erro de conexão - Verifique se o servidor está disponível.');
+      }
+
+      if (error.message.includes('JSON')) {
+        throw new Error(`Erro de formato de dados - ${error.message}`);
       }
 
       throw error;
@@ -61,15 +80,24 @@ class ApiClient {
   }
 
   async getComicById(id) {
-    return this.request(`/comics/${id}`);
+    if (!id) {
+      throw new Error('ID do quadrinho é obrigatório');
+    }
+    return this.request(`/comics/${encodeURIComponent(id)}`);
   }
 
   async getComicIssues(id) {
-    return this.request(`/comics/${id}/issues`);
+    if (!id) {
+      throw new Error('ID do quadrinho é obrigatório');
+    }
+    return this.request(`/comics/${encodeURIComponent(id)}/issues`);
   }
 
   async getIssueById(id) {
-    return this.request(`/issues/${id}`);
+    if (!id) {
+      throw new Error('ID da edição é obrigatório');
+    }
+    return this.request(`/issues/${encodeURIComponent(id)}`);
   }
 
   async searchIssues(query = '', limit = 50, offset = 0) {
@@ -84,13 +112,34 @@ class ApiClient {
 
   async healthCheck() {
     try {
-      const healthUrl = API_BASE_URL.replace('/api', '/health');
-      const response = await fetch(healthUrl);
-      return response.ok;
-    } catch {
+      const healthUrl = this.baseURL.replace('/api', '/health');
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 5000);
+      
+      const response = await fetch(healthUrl, {
+        method: 'GET',
+        signal: controller.signal,
+        headers: {
+          'Accept': 'application/json'
+        }
+      });
+      
+      clearTimeout(timeoutId);
+      
+      if (!response.ok) {
+        return false;
+      }
+      
+      const data = await response.json();
+      return data.success === true;
+    } catch (error) {
       return false;
     }
   }
 }
 
 export const api = new ApiClient();
+
+if (typeof window !== 'undefined') {
+  window.api = api;
+}

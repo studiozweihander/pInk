@@ -42,3 +42,4 @@ coverage/
 tmp/
 temp/
 test-supabase.js
+DEPLOY-TEST.md
