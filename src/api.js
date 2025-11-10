@@ -42,15 +42,27 @@ class ApiClient {
       clearTimeout(timeoutId);
 
       if (!response.ok) {
+        const contentType = response.headers.get('content-type');
+        if (!contentType || !contentType.includes('application/json')) {
+          const text = await response.text();
+          throw new Error(`Server returned ${response.status}. Expected JSON, got: ${contentType || 'unknown'}`);
+        }
+        
         const errorData = await response.json().catch(() => ({}));
         const errorMessage = errorData.message || `HTTP ${response.status}: ${response.statusText}`;
         throw new Error(errorMessage);
       }
 
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        const responseText = await response.text();
+        throw new Error(`Expected JSON but received ${contentType}. Response: ${responseText.substring(0, 200)}`);
+      }
+
       const data = await response.json();
-      
+
       if (!data.success) {
-        const errorMessage = data.message || data.error || 'API returned error';
+        const errorMessage = data.message || 'API returned error';
         throw new Error(errorMessage);
       }
 
@@ -60,15 +72,15 @@ class ApiClient {
       clearTimeout(timeoutId);
 
       if (error.name === 'AbortError') {
-        throw new Error('Timeout - Verifique sua conexão. O servidor pode estar demando para responder.');
+        throw new Error('Request timeout - check your connection');
       }
 
       if (error.message.includes('fetch')) {
-        throw new Error('Erro de conexão - Verifique se o servidor está disponível.');
+        throw new Error('Connection error - check server availability');
       }
 
       if (error.message.includes('JSON')) {
-        throw new Error(`Erro de formato de dados - ${error.message}`);
+        throw new Error(`Invalid response format - ${error.message}`);
       }
 
       throw error;
@@ -81,21 +93,21 @@ class ApiClient {
 
   async getComicById(id) {
     if (!id) {
-      throw new Error('ID do quadrinho é obrigatório');
+      throw new Error('Comic ID is required');
     }
     return this.request(`/comics/${encodeURIComponent(id)}`);
   }
 
   async getComicIssues(id) {
     if (!id) {
-      throw new Error('ID do quadrinho é obrigatório');
+      throw new Error('Comic ID is required');
     }
     return this.request(`/comics/${encodeURIComponent(id)}/issues`);
   }
 
   async getIssueById(id) {
     if (!id) {
-      throw new Error('ID da edição é obrigatório');
+      throw new Error('Issue ID is required');
     }
     return this.request(`/issues/${encodeURIComponent(id)}`);
   }
@@ -125,14 +137,8 @@ class ApiClient {
       });
       
       clearTimeout(timeoutId);
-      
-      if (!response.ok) {
-        return false;
-      }
-      
-      const data = await response.json();
-      return data.success === true;
-    } catch (error) {
+      return response.ok;
+    } catch {
       return false;
     }
   }

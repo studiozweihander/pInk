@@ -3,16 +3,12 @@
   "name": "pink",
   "rewrites": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/$1"
+      "source": "/pages/(.*)",
+      "destination": "/pages/$1"
     },
     {
-      "source": "/about",
-      "destination": "/about.html"
-    },
-    {
-      "source": "/how-to-use",
-      "destination": "/how-to-use.html"
+      "source": "/comics/:id",
+      "destination": "/index.html"
     },
     {
       "source": "/(.*)",
@@ -23,5 +19,16 @@
     "api/**/*.js": {
       "maxDuration": 30
     }
-  }
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "s-maxage=60, stale-while-revalidate"
+        }
+      ]
+    }
+  ]
 }
