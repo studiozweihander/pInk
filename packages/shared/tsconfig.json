@@ -12,6 +12,7 @@
     "isolatedModules": true,
     "outDir": "dist",
     "baseUrl": "src",
+    "composite": true,
     "paths": {
       "@shared/*": ["./*"]
     }
