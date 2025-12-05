@@ -8,7 +8,7 @@ export interface ComicAuthor {
 }
 
 export interface ComicDetail extends Comic {
-  idiom?: Idiom | null
-  publisher?: Publisher | null
+  idiom?: Idiom
+  publisher?: Publisher
   authors?: Author[]
 }

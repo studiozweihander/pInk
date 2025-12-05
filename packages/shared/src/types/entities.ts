@@ -17,8 +17,8 @@ export interface ComicBase {
   id: number
   title: string
   year: number
-  cover: string | null
-  idiomId: number | null
-  publisherId: number | null
+  cover: string
+  idiomId: number
+  publisherId: number
   issuesCount: number
 }
