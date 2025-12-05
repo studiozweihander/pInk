@@ -1,7 +1,7 @@
 {
   "name": "pink",
-  "version": "0.6.0",
-  "description": "Catálogo de quadrinhos online.",
+  "version": "1.0.0",
+  "description": "Catálogo de quadrinhos com Vite + Vanilla JS + Express",
   "main": "index.js",
   "scripts": {
     "dev": "vite",
@@ -20,8 +20,6 @@
   "author": "Zweihander",
   "license": "ISC",
   "devDependencies": {
-    "@playwright/test": "^1.56.0",
-    "jest": "^30.2.0",
     "nodemon": "^3.1.10",
     "vite": "^7.1.2"
   },

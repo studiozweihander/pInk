@@ -1,10 +1,7 @@
-const API_BASE_URL = (() => {
-  if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-    return '/api';
-  }
-  return '/api';
-})();
-
+const API_BASE_URL = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  ? 'http://localhost:3000/api'
+  : '/api';
+  
 const REQUEST_TIMEOUT = 10000;
 
 class ApiClient {
@@ -14,9 +11,10 @@ class ApiClient {
 
   async request(endpoint, options = {}) {
     const url = `${this.baseURL}${endpoint}`;
+    
     const controller = new AbortController();
     const timeoutId = setTimeout(() => controller.abort(), REQUEST_TIMEOUT);
-
+    
     try {
       const response = await fetch(url, {
         ...options,
@@ -26,37 +24,32 @@ class ApiClient {
           ...options.headers
         }
       });
-
+      
       clearTimeout(timeoutId);
-
+      
       if (!response.ok) {
         throw new Error(`HTTP ${response.status}: ${response.statusText}`);
       }
-
-      const contentType = response.headers.get('content-type');
-      if (!contentType || !contentType.includes('application/json')) {
-        throw new Error('Formato de resposta inválido - esperado JSON');
-      }
-
+      
       const data = await response.json();
-
+      
       if (!data.success) {
         throw new Error(data.message || 'API returned error');
       }
-
+      
       return data;
-
+      
     } catch (error) {
       clearTimeout(timeoutId);
-
+      
       if (error.name === 'AbortError') {
         throw new Error('Request timeout - verifique se o backend está rodando');
       }
-
+      
       if (error.message.includes('fetch')) {
         throw new Error('Erro de conexão - verifique se o backend está rodando na porta 3000');
       }
-
+      
       throw error;
     }
   }
@@ -83,13 +76,15 @@ class ApiClient {
       limit: limit.toString(),
       offset: offset.toString()
     });
-
+    
     return this.request(`/issues?${params}`);
   }
 
   async healthCheck() {
     try {
-      const healthUrl = API_BASE_URL.replace('/api', '/health');
+      const healthUrl = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+        ? 'http://localhost:3000/health'
+        : '/api/health';
       const response = await fetch(healthUrl);
       return response.ok;
     } catch {
