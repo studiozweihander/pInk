@@ -1,5 +1,5 @@
 import { Elysia } from "elysia";
-import { env } from "@config/env"
+import { env } from "@/config/env";
 import { time } from "node:console";
 
 export const logger = new Elysia({ name: "logger" })
