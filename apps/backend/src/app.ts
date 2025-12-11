@@ -1,10 +1,14 @@
 import { Elysia, t } from "elysia";
 import { cors } from "@elysiajs/cors";
 import { logger } from "@/shared/middlewares/logger";
+import { errorHandler } from "@/shared/middlewares/errorHandler";
 import { env } from "@/config/env";
+import { createComicsController } from "@/modules/comics/comics.controller";
+
 export const createApp = () => {
   const app = new Elysia()
     .use(logger)
+    .use(errorHandler)
     .use(
       cors({
         origin: env.cors.origin,
@@ -75,35 +79,7 @@ export const createApp = () => {
         },
       }
     )
-    .onError(({ code, error, set }) => {
-      console.error("❌ Global error handler:", { code, error });
-      if (code === "NOT_FOUND") {
-        set.status = 404;
-        return { success: false, message: "Endpoint not found" };
-      }
-      if (code === "VALIDATION") {
-        set.status = 400;
-        return {
-          success: false,
-          message: "Validation error",
-          error: error.message,
-        };
-      }
-      if (code === "PARSE") {
-        set.status = 400;
-        return {
-          success: false,
-          message: "Invalid request body",
-        };
-      }
-      set.status = 500;
-      return {
-        success: false,
-        message:
-          env.server.nodeEnv === "development"
-            ? error
-            : "Internal server error",
-      };
-    });
+    .use(createComicsController());
+
   return app;
 };

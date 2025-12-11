@@ -1,8 +1,7 @@
 import { supabase, handleSupabaseError } from "@/config/database";
 import { NotFoundError } from "@/shared/errors/AppError";
 import type { Idiom, Publisher, Author } from '@pink/shared';
-import type { ComicDB, ComicFilters, PaginationOptions, PaginatedComics } from '@comics.types';
-import { off } from "node:process";
+import type { ComicDB, ComicFilters, PaginationOptions, PaginatedComics } from './comics.types';
 
 export class ComicsRepository {
   async findAll(options?: PaginationOptions): Promise<PaginatedComics> {
@@ -69,7 +68,7 @@ export class ComicsRepository {
       if (filters.publisherId) { query = query.eq("publisherId", filters.publisherId) };
       if (filters.idiomId) { query = query.eq("idiomId", filters.idiomId) };
       if (filters.year) { query = query.eq("year", filters.year) };
-      if (filters.search) { query = query.eq("title", `%${filters.search}%`) };
+      if (filters.search) { query = query.ilike("title", `%${filters.search}%`) };
 
       const { data, error, count } = await query.range(offset, offset + limit - 1);
 
