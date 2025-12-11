@@ -1,0 +1,19 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "rootDir": "./src",
+    "outDir": "./dist",
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["./src/*"],
+      "@pink/shared": ["../../packages/shared/src/index.ts"],
+      "@shared/*": ["./src/shared/*"],
+      "@config/*": ["./src/config/*"],
+      "@comics.*": ["./src/modules/comics/comics.*"]
+    }
+  },
+  "include": ["src/**/*", "src/tests/**/*"],
+  "references": [
+    { "path": "../../packages/shared" }
+  ]
+}
