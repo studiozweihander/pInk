@@ -1,15 +1,17 @@
-import { Elysia, t } from 'elysia';
-import { ComicsService } from './comics.service';
-import type { Comic, ComicDetail } from '@pink/shared';
+import { Elysia, t } from "elysia";
+import { ComicsService } from "./comics.service";
+import type { Comic, ComicDetail } from "@pink/shared";
 
 export const createComicsController = () => {
   const service = new ComicsService();
 
-  return new Elysia({ prefix: '/api/comics', name: 'comics' })
+  return new Elysia({ prefix: "/api/comics", name: "comics" })
     .get(
-      '/',
+      "/",
       async ({ query }) => {
-        const limit = query.limit ? Math.min(Math.max(query.limit, 1), 100) : 100;
+        const limit = query.limit
+          ? Math.min(Math.max(query.limit, 1), 100)
+          : 100;
         const offset = query.offset ? Math.max(query.offset, 0) : 0;
 
         const result = await service.getAllComics({ limit, offset });
@@ -20,7 +22,7 @@ export const createComicsController = () => {
           count: result.comics.length,
           total: result.total,
           hasMore: result.hasMore,
-          message: 'Comics retrieved successfully',
+          message: "Comics retrieved successfully",
         };
       },
       {
@@ -47,35 +49,35 @@ export const createComicsController = () => {
           message: t.String(),
         }),
         detail: {
-          tags: ['Comics'],
-          summary: 'List all comics',
-          description: 'Returns a paginated list of all comics in the database',
+          tags: ["Comics"],
+          summary: "List all comics",
+          description: "Returns a paginated list of all comics in the database",
           parameters: [
             {
-              name: 'limit',
-              in: 'query',
-              description: 'Number of items to return (1-100)',
-              schema: { type: 'integer', default: 100 },
+              name: "limit",
+              in: "query",
+              description: "Number of items to return (1-100)",
+              schema: { type: "integer", default: 100 },
             },
             {
-              name: 'offset',
-              in: 'query',
-              description: 'Number of items to skip',
-              schema: { type: 'integer', default: 0 },
+              name: "offset",
+              in: "query",
+              description: "Number of items to skip",
+              schema: { type: "integer", default: 0 },
             },
           ],
         },
       }
     )
     .get(
-      '/:id',
+      "/:id",
       async ({ params }) => {
         const comic = await service.getComicById(params.id);
 
         return {
           success: true,
           data: comic,
-          message: 'Comic retrieved successfully',
+          message: "Comic retrieved successfully",
         };
       },
       {
@@ -107,25 +109,27 @@ export const createComicsController = () => {
           message: t.String(),
         }),
         detail: {
-          tags: ['Comics'],
-          summary: 'Get comic by ID',
-          description: 'Returns a specific comic with its details',
+          tags: ["Comics"],
+          summary: "Get comic by ID",
+          description: "Returns a specific comic with its details",
           parameters: [
             {
-              name: 'id',
-              in: 'path',
+              name: "id",
+              in: "path",
               required: true,
-              description: 'Comic ID',
-              schema: { type: 'integer' },
+              description: "Comic ID",
+              schema: { type: "integer" },
             },
           ],
         },
       }
     )
     .get(
-      '/search',
+      "/search",
       async ({ query }) => {
-        const limit = query.limit ? Math.min(Math.max(query.limit, 1), 100) : 100;
+        const limit = query.limit
+          ? Math.min(Math.max(query.limit, 1), 100)
+          : 100;
         const offset = query.offset ? Math.max(query.offset, 0) : 0;
 
         const result = await service.searchComics(
@@ -144,7 +148,7 @@ export const createComicsController = () => {
           count: result.comics.length,
           total: result.total,
           hasMore: result.hasMore,
-          message: 'Comics search completed',
+          message: "Comics search completed",
         };
       },
       {
@@ -165,45 +169,45 @@ export const createComicsController = () => {
           message: t.String(),
         }),
         detail: {
-          tags: ['Comics'],
-          summary: 'Search comics',
-          description: 'Search comics by title, publisher, language, or year',
+          tags: ["Comics"],
+          summary: "Search comics",
+          description: "Search comics by title, publisher, language, or year",
           parameters: [
             {
-              name: 'search',
-              in: 'query',
-              description: 'Search term for comic title',
-              schema: { type: 'string' },
+              name: "search",
+              in: "query",
+              description: "Search term for comic title",
+              schema: { type: "string" },
             },
             {
-              name: 'publisherId',
-              in: 'query',
-              description: 'Filter by publisher ID',
-              schema: { type: 'integer' },
+              name: "publisherId",
+              in: "query",
+              description: "Filter by publisher ID",
+              schema: { type: "integer" },
             },
             {
-              name: 'idiomId',
-              in: 'query',
-              description: 'Filter by language/idiom ID',
-              schema: { type: 'integer' },
+              name: "idiomId",
+              in: "query",
+              description: "Filter by language/idiom ID",
+              schema: { type: "integer" },
             },
             {
-              name: 'year',
-              in: 'query',
-              description: 'Filter by publication year',
-              schema: { type: 'integer' },
+              name: "year",
+              in: "query",
+              description: "Filter by publication year",
+              schema: { type: "integer" },
             },
             {
-              name: 'limit',
-              in: 'query',
-              description: 'Number of items to return (1-100)',
-              schema: { type: 'integer', default: 100 },
+              name: "limit",
+              in: "query",
+              description: "Number of items to return (1-100)",
+              schema: { type: "integer", default: 100 },
             },
             {
-              name: 'offset',
-              in: 'query',
-              description: 'Number of items to skip',
-              schema: { type: 'integer', default: 0 },
+              name: "offset",
+              in: "query",
+              description: "Number of items to skip",
+              schema: { type: "integer", default: 0 },
             },
           ],
         },

@@ -1,7 +1,7 @@
-import { ComicsRepository } from './comics.repository';
-import { ComicsMapper } from './comics.mapper';
-import type { Comic, ComicDetail } from '@pink/shared';
-import type { ComicFilters, PaginationOptions } from './comics.types';
+import { ComicsRepository } from "./comics.repository";
+import { ComicsMapper } from "./comics.mapper";
+import type { Comic, ComicDetail } from "@pink/shared";
+import type { ComicFilters, PaginationOptions } from "./comics.types";
 
 export class ComicsService {
   private repository: ComicsRepository;
@@ -17,11 +17,13 @@ export class ComicsService {
   }> {
     const result = await this.repository.findAll(options);
 
-    const idiomsIds = result.comics.map(c => c.idiomId);
-    const publishersIds = result.comics.map(c => c.publisherId);
+    const idiomsIds = result.comics.map((c) => c.idiomId);
+    const publishersIds = result.comics.map((c) => c.publisherId);
 
     const idiomsMap = await this.repository.getIdiomsByIds(idiomsIds);
-    const publishersMap = await this.repository.getPublishersByIds(publishersIds);
+    const publishersMap = await this.repository.getPublishersByIds(
+      publishersIds
+    );
 
     return {
       comics: ComicsMapper.toComics(result.comics, idiomsMap, publishersMap),
@@ -34,7 +36,9 @@ export class ComicsService {
     const comic = await this.repository.findById(id);
 
     const idiomsMap = await this.repository.getIdiomsByIds([comic.idiomId]);
-    const publishersMap = await this.repository.getPublishersByIds([comic.publisherId]);
+    const publishersMap = await this.repository.getPublishersByIds([
+      comic.publisherId,
+    ]);
 
     const idiom = idiomsMap.get(comic.idiomId);
     const publisher = publishersMap.get(comic.publisherId);
@@ -52,11 +56,13 @@ export class ComicsService {
   }> {
     const result = await this.repository.findWithFilters(filters, options);
 
-    const idiomsIds = result.comics.map(c => c.idiomId);
-    const publishersIds = result.comics.map(c => c.publisherId);
+    const idiomsIds = result.comics.map((c) => c.idiomId);
+    const publishersIds = result.comics.map((c) => c.publisherId);
 
     const idiomsMap = await this.repository.getIdiomsByIds(idiomsIds);
-    const publishersMap = await this.repository.getPublishersByIds(publishersIds);
+    const publishersMap = await this.repository.getPublishersByIds(
+      publishersIds
+    );
 
     return {
       comics: ComicsMapper.toComics(result.comics, idiomsMap, publishersMap),

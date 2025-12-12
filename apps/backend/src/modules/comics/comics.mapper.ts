@@ -1,6 +1,6 @@
-import type { Comic, ComicDetail } from '@pink/shared';
-import type { ComicDB } from './comics.types';
-import type { Idiom, Publisher, Author } from '@pink/shared';
+import type { Comic, ComicDetail } from "@pink/shared";
+import type { ComicDB } from "./comics.types";
+import type { Idiom, Publisher, Author } from "@pink/shared";
 
 export class ComicsMapper {
   static toComic(
@@ -44,10 +44,14 @@ export class ComicsMapper {
     idiomsMap?: Map<number, Idiom>,
     publishersMap?: Map<number, Publisher>
   ): Comic[] {
-    return comicsDB.map(comic => {
-      const idiom = comic.idiomId && idiomsMap ? idiomsMap.get(comic.idiomId) : undefined;
-      const publisher = comic.publisherId && publishersMap ? publishersMap.get(comic.publisherId) : undefined;
-      
+    return comicsDB.map((comic) => {
+      const idiom =
+        comic.idiomId && idiomsMap ? idiomsMap.get(comic.idiomId) : undefined;
+      const publisher =
+        comic.publisherId && publishersMap
+          ? publishersMap.get(comic.publisherId)
+          : undefined;
+
       return this.toComic(comic, idiom, publisher);
     });
   }
@@ -58,11 +62,15 @@ export class ComicsMapper {
     publishersMap?: Map<number, Publisher>,
     authorsMap?: Map<number, Author[]>
   ): ComicDetail[] {
-    return comicsDB.map(comic => {
-      const idiom = comic.idiomId && idiomsMap ? idiomsMap.get(comic.idiomId) : undefined;
-      const publisher = comic.publisherId && publishersMap ? publishersMap.get(comic.publisherId) : undefined;
+    return comicsDB.map((comic) => {
+      const idiom =
+        comic.idiomId && idiomsMap ? idiomsMap.get(comic.idiomId) : undefined;
+      const publisher =
+        comic.publisherId && publishersMap
+          ? publishersMap.get(comic.publisherId)
+          : undefined;
       const authors = authorsMap ? authorsMap.get(comic.id) : undefined;
-      
+
       return this.toComicDetail(comic, idiom, publisher, authors);
     });
   }

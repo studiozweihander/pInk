@@ -1,12 +1,26 @@
-import { config } from 'dotenv';
-import { resolve } from 'node:path';
+import { config, type DotenvConfigOutput } from "dotenv";
+import { resolve } from "node:path";
+import { existsSync } from "node:fs";
 
-const envFile = process.env.NODE_ENV === 'production' ? '.env.production' : '.env';
-const envPath = resolve(process.cwd(), envFile);
+const envFile = process.env.NODE_ENV === "production" ? ".env.production" : ".env";
 
-const result = config({ path: envPath });
+const candidatePaths = [
+  resolve(process.cwd(), envFile),
+  resolve(__dirname, "../../../../", envFile),
+  resolve(__dirname, "../../../", envFile),
+];
 
-if (result.error && process.env.NODE_ENV !== 'test') {
+let result: DotenvConfigOutput | undefined;
+
+const foundPath = candidatePaths.find((p) => existsSync(p));
+
+if (foundPath) {
+  result = config({ path: foundPath });
+} else {
+  result = config();
+}
+
+if (result && result.error && process.env.NODE_ENV !== "test") {
   console.warn(`⚠️ Could not load ${envFile}: ${result.error.message}`);
 }
 
@@ -17,7 +31,7 @@ interface EnvConfig {
   };
   server: {
     port: number;
-    nodeEnv: 'development' | 'production' | 'test';
+    nodeEnv: "development" | "production" | "test";
   };
   cors: {
     origin: string;
@@ -25,60 +39,66 @@ interface EnvConfig {
 }
 
 const getEnv = (key: string, defaultValue?: string): string => {
-  const value = process.env[key] || defaultValue;
+  const value = process.env[key] ?? defaultValue;
 
   if (!value) {
     const message = `Missing required environment variable: ${key}`;
     console.error(`❌ ${message}`);
-    
-    if (process.env.NODE_ENV === 'production') {
+
+    if (process.env.NODE_ENV === "production") {
       throw new Error(message);
     }
-    
+
     if (defaultValue) {
       console.warn(`⚠️ Using default value for ${key}`);
       return defaultValue;
     }
-    
+
     throw new Error(message);
   }
 
   return value;
 };
 
-const validateNodeEnv = (env: string): 'development' | 'production' | 'test' => {
-  const validEnvs = ['development', 'production', 'test'];
+const validateNodeEnv = (
+  env: string
+): "development" | "production" | "test" => {
+  const validEnvs = ["development", "production", "test"];
 
   if (!validEnvs.includes(env)) {
     console.warn(`⚠️ Invalid NODE_ENV: ${env}. Defaulting to 'development'`);
-    return 'development';
+    return "development";
   }
 
-  return env as 'development' | 'production' | 'test';
+  return env as "development" | "production" | "test";
 };
 
-const nodeEnv = validateNodeEnv(process.env.NODE_ENV || 'development');
+const nodeEnv = validateNodeEnv(process.env.NODE_ENV || "development");
 
 export const env = {
   supabase: {
-    url: getEnv('SUPABASE_URL'),
-    anonKey: getEnv('SUPABASE_ANON_KEY'),
+    url: getEnv("SUPABASE_URL"),
+    anonKey: getEnv("SUPABASE_ANON_KEY"),
   },
   server: {
-    port: parseInt(getEnv('PORT', '3000'), 10),
+    port: parseInt(getEnv("PORT", "3000"), 10),
     nodeEnv,
   },
   cors: {
-    origin: getEnv('FRONTEND_URL', 'http://localhost:5173'),
+    origin: getEnv("FRONTEND_URL", "http://localhost:5173"),
   },
 } as const;
 
-if (nodeEnv === 'production') {
-  const requiredKeys = ['SUPABASE_URL', 'SUPABASE_ANON_KEY'];
-  const missing = requiredKeys.filter(key => !process.env[key]);
-  
+if (nodeEnv === "production") {
+  const requiredKeys = ["SUPABASE_URL", "SUPABASE_ANON_KEY"];
+  const missing = requiredKeys.filter((key) => !process.env[key]);
+
   if (missing.length > 0) {
-    throw new Error(`❌ Missing required environment variables in production: ${missing.join(', ')}`);
+    throw new Error(
+      `❌ Missing required environment variables in production: ${missing.join(
+        ", "
+      )}`
+    );
   }
 }
 
