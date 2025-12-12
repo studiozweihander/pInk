@@ -1,6 +1,5 @@
 import { Elysia, t } from "elysia";
 import { ComicsService } from "./comics.service";
-import type { Comic, ComicDetail } from "@pink/shared";
 
 export const createComicsController = () => {
   const service = new ComicsService();
@@ -40,7 +39,7 @@ export const createComicsController = () => {
               cover: t.String(),
               idiomId: t.Number(),
               publisherId: t.Number(),
-              issuesCount: t.Number(),
+              issues: t.Number(),
             })
           ),
           count: t.Number(),
@@ -91,7 +90,7 @@ export const createComicsController = () => {
             cover: t.String(),
             idiomId: t.Number(),
             publisherId: t.Number(),
-            issuesCount: t.Number(),
+            issues: t.Number(),
             idiom: t.Optional(
               t.Object({
                 id: t.Number(),

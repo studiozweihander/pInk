@@ -1,13 +1,20 @@
 import type { ComicBase, Idiom } from './entities'
 
 export interface Issue {
-  id: string
-  comicId: string
-  number: number
+  id: number
   title: string
-  description?: string | null
-  publishedAt?: string | null
-  cover?: string | null
+  issueNumber: number
+  year: number
+  size: string
+  series: string
+  genres?: string | null
+  link: string
+  cover: string
+  synopsis?: string | null
+  comicId: number
+  idiomId: number
+  credito?: string | null
+  creditoLink?: string | null
 }
 
 export interface IssueDetail extends Issue {

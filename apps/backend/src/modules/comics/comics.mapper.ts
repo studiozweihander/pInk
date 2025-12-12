@@ -15,7 +15,7 @@ export class ComicsMapper {
       cover: comicDB.cover,
       idiomId: comicDB.idiomId,
       publisherId: comicDB.publisherId,
-      issuesCount: comicDB.issuesCount,
+      issues: comicDB.issues,
     };
   }
 
@@ -32,7 +32,7 @@ export class ComicsMapper {
       cover: comicDB.cover,
       idiomId: comicDB.idiomId,
       publisherId: comicDB.publisherId,
-      issuesCount: comicDB.issuesCount,
+      issues: comicDB.issues,
       idiom: idiom || undefined,
       publisher: publisher || undefined,
       authors: authors || [],

@@ -1,9 +1,8 @@
 import { supabase, handleSupabaseError } from "@/config/database";
 import type { IssueDB } from "./issues.types";
-import type { Issue } from "./issues.types";
 
 export class IssuesRepository {
-  async findById(id: string): Promise<IssueDB | null> {
+  async findById(id: number): Promise<IssueDB | null> {
     const { data, error } = await supabase
       .from("Issue")
       .select("*")
@@ -14,12 +13,12 @@ export class IssuesRepository {
     return data ?? null;
   }
 
-  async findByComic(comicId: string): Promise<IssueDB[]> {
+  async findByComic(comicId: number): Promise<IssueDB[]> {
     const { data, error } = await supabase
       .from("Issue")
       .select("*")
-      .eq("comic_id", comicId)
-      .order("number", { ascending: true });
+      .eq("comicId", comicId)
+      .order("issueNumber", { ascending: true });
 
     if (error) handleSupabaseError(error, "issues.findByComic");
     return data ?? [];
@@ -28,7 +27,6 @@ export class IssuesRepository {
   async create(payload: Partial<IssueDB>): Promise<IssueDB> {
     const { data, error } = await supabase
       .from("Issue")
-      .insert([payload])
       .select()
       .single();
 

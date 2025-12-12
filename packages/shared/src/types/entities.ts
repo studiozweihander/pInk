@@ -20,5 +20,5 @@ export interface ComicBase {
   cover: string
   idiomId: number
   publisherId: number
-  issuesCount: number
+  issues: number
 }

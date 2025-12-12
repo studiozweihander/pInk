@@ -1,7 +1,6 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
 import { env } from './env';
-import type { ComicBase, Idiom, Publisher, Author } from '@pink/shared';
-import type { IssueDB } from '@/modules/issues/issues.types';
+import type { ComicBase, Idiom, Publisher, Author, Issue } from '@pink/shared';
 
 export interface Database {
   public: {
@@ -12,9 +11,13 @@ export interface Database {
         Update: Partial<Omit<ComicBase, 'id'>>;
       };
       Issue: {
-        Row: IssueDB;
-        Insert: Omit<IssueDB, 'id' | 'created_at' | 'updated_at'>;
-        Update: Partial<Omit<IssueDB, 'id' | 'created_at' | 'updated_at'>>;
+        Row: Issue;
+        Insert: Omit<Issue, 'id' | 'genres' | 'credito' | 'creditoLink'> & {
+          genres?: string | null;
+          credito?: string | null;
+          creditoLink?: string | null;
+        };
+        Update: Partial<Omit<Issue, 'id'>>;
       };
       Idiom: {
         Row: Idiom;
