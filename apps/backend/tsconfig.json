@@ -9,7 +9,10 @@
       "@pink/shared": ["../../packages/shared/src/index.ts"],
       "@shared/*": ["./src/shared/*"],
       "@config/*": ["./src/config/*"],
-      "@comics.*": ["./src/modules/comics/comics.*"]
+      "@modules/*": ["./src/modules/*"],
+      "@comics/*": ["./src/modules/comics/*"],
+      "@issues/*": ["./src/modules/issues/*"],
+      "@authors/*": ["./src/modules/authors/*"]
     }
   },
   "include": ["src/**/*", "src/tests/**/*"],

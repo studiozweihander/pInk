@@ -25,7 +25,9 @@
     "types": ["bun-types"],
     "paths": {
       "@pink/shared": ["./packages/shared/src/index.ts"],
-      "@/*": ["./src/*"]
+      "@config/*": ["./apps/backend/src/config/*"],
+      "@backend/*": ["./apps/backend/src/*"],
+      "@/*": ["./src/*"],
     }
   }
 }
