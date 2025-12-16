@@ -1,13 +1,19 @@
-import { ComicsRepository } from "./comics.repository";
-import { ComicsMapper } from "./comics.mapper";
+import { ComicsRepository } from "@comics/comics.repository";
+import { ComicsMapper } from "@comics/comics.mapper";
+import { AuthorsRepository } from "@authors/authors.repository";
 import type { Comic, ComicDetail } from "@pink/shared";
-import type { ComicFilters, PaginationOptions } from "./comics.types";
+import type { ComicFilters, PaginationOptions } from "@comics/comics.types";
 
 export class ComicsService {
   private repository: ComicsRepository;
+  private authorsRepository: AuthorsRepository;
 
-  constructor(repository: ComicsRepository = new ComicsRepository()) {
+  constructor(
+    repository: ComicsRepository = new ComicsRepository(),
+    authorsRepository: AuthorsRepository = new AuthorsRepository()
+  ) {
     this.repository = repository;
+    this.authorsRepository = authorsRepository;
   }
 
   async getAllComics(options?: PaginationOptions): Promise<{
@@ -40,10 +46,12 @@ export class ComicsService {
       comic.publisherId,
     ]);
 
+    const authors = await this.authorsRepository.getAuthorsByComicId(id);
+
     const idiom = idiomsMap.get(comic.idiomId);
     const publisher = publishersMap.get(comic.publisherId);
 
-    return ComicsMapper.toComicDetail(comic, idiom, publisher, []);
+    return ComicsMapper.toComicDetail(comic, idiom, publisher, authors);
   }
 
   async searchComics(
