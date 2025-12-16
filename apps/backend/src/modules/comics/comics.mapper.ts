@@ -1,5 +1,5 @@
 import type { Comic, ComicDetail } from "@pink/shared";
-import type { ComicDB } from "./comics.types";
+import type { ComicDB } from "@comics/comics.types";
 import type { Idiom, Publisher, Author } from "@pink/shared";
 
 export class ComicsMapper {

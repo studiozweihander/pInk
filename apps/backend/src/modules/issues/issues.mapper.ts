@@ -23,7 +23,7 @@ export class IssuesMapper {
 
   static toDB(issue: Partial<SharedIssue>): Partial<IssueDB> {
     const db: Partial<IssueDB> = {};
-    
+
     if (issue.id !== undefined) db.id = issue.id;
     if (issue.title !== undefined) db.title = issue.title;
     if (issue.issueNumber !== undefined) db.issueNumber = issue.issueNumber;
@@ -38,7 +38,7 @@ export class IssuesMapper {
     if (issue.idiomId !== undefined) db.idiomId = issue.idiomId;
     if (issue.credito !== undefined) db.credito = issue.credito;
     if (issue.creditoLink !== undefined) db.creditoLink = issue.creditoLink;
-    
+
     return db;
   }
 }

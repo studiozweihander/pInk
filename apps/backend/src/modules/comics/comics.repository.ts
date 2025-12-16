@@ -1,5 +1,5 @@
-import { supabase, handleSupabaseError } from "@/config/database";
-import { NotFoundError } from "@/shared/errors/AppError";
+import { supabase, handleSupabaseError } from "@config/database";
+import { NotFoundError } from "@shared/errors/AppError";
 import type { Idiom, Publisher, Author } from "@pink/shared";
 import type {
   ComicDB,
@@ -119,10 +119,10 @@ export class ComicsRepository {
         return new Map();
       }
 
-      const { data, error } = await supabase
+      const { data, error } = (await supabase
         .from("Idiom")
         .select("*")
-        .in("id", validIds) as { data: Idiom[] | null, error: any };
+        .in("id", validIds)) as { data: Idiom[] | null; error: any };
 
       if (error) {
         handleSupabaseError(error, "getIdiomsByIds");
@@ -147,10 +147,10 @@ export class ComicsRepository {
         return new Map();
       }
 
-      const { data, error } = await supabase
+      const { data, error } = (await supabase
         .from("Publisher")
         .select("*")
-        .in("id", validIds) as { data: Publisher[] | null, error: any };
+        .in("id", validIds)) as { data: Publisher[] | null; error: any };
 
       if (error) {
         handleSupabaseError(error, "getPublishersByIds");
