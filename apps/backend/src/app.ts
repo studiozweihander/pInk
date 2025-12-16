@@ -1,9 +1,10 @@
 import { Elysia, t } from "elysia";
 import { cors } from "@elysiajs/cors";
-import { logger } from "@/shared/middlewares/logger";
-import { errorHandler } from "@/shared/middlewares/errorHandler";
-import { env } from "@/config/env";
-import { createComicsController } from "@/modules/comics/comics.controller";
+import { logger } from "@shared/middlewares/logger";
+import { errorHandler } from "@shared/middlewares/errorHandler";
+import { env } from "@config/env";
+import { createComicsController } from "@modules/comics/comics.controller";
+import { createIssuesController } from "@modules/issues/issues.controller";
 
 export const createApp = () => {
   const app = new Elysia()
@@ -43,8 +44,7 @@ export const createApp = () => {
         detail: {
           tags: ["Health"],
           summary: "Health check endpoint",
-          description:
-            "Returns server status and basic metrics",
+          description: "Returns server status and basic metrics",
         },
       }
     )
@@ -53,7 +53,7 @@ export const createApp = () => {
       () => ({
         name: "pInk API",
         version: "0.1.0",
-        description: "pInk Backend API",
+        description: "pInk Backend API - Comic Book Catalog",
         health: "/health",
         endpoints: {
           comics: "/api/comics",
@@ -74,12 +74,12 @@ export const createApp = () => {
         detail: {
           tags: ["Info"],
           summary: "API information",
-          description:
-            "Returns basic API information and available endpoints",
+          description: "Returns basic API information and available endpoints",
         },
       }
     )
-    .use(createComicsController());
+    .use(createComicsController())
+    .use(createIssuesController());
 
   return app;
 };
