@@ -23,6 +23,7 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onClick }) => {
                 <img
                     src={issue.cover || PLACEHOLDER_IMAGE}
                     alt={issue.title}
+                    referrerPolicy="no-referrer"
                     onError={(e: any) => {
                         e.target.src = PLACEHOLDER_IMAGE;
                     }}

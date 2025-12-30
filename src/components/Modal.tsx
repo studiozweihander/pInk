@@ -36,7 +36,7 @@ const Modal: React.FC<ModalProps> = ({ issueId, onClose }) => {
                 </button>
                 <div className="modal-body">
                     <div className="modal-image">
-                        <img src={issue?.cover} alt={issue?.title} />
+                        <img src={issue?.cover} alt={issue?.title} referrerPolicy="no-referrer" />
                     </div>
                     <div className="modal-info">
                         <div className="modal-header">
