@@ -332,6 +332,8 @@ header {
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.4);
   width: var(--card-width-mobile);
   height: fit-content;
+  text-decoration: none;
+  display: block;
 }
 
 .card:hover {
@@ -1848,7 +1850,8 @@ header {
   gap: var(--spacing-md);
 }
 
-.footer-link {
+.footer-link,
+.social-link {
   color: var(--secondary-font);
   text-decoration: none;
   font-family: var(--font);
@@ -1859,10 +1862,24 @@ header {
   gap: 10px;
 }
 
-.footer-link:hover {
-  opacity: 1;
+.footer-link svg,
+.social-link svg {
+  width: 18px;
+  height: 18px;
+  flex-shrink: 0;
+  color: var(--primary-color);
+  transition: all var(--transition-fast);
+}
+
+.footer-link:hover,
+.social-link:hover {
   color: var(--primary-color);
   transform: translateX(4px);
+}
+
+.footer-link:hover svg,
+.social-link:hover svg {
+  transform: scale(1.1);
 }
 
 .footer-bottom {
@@ -1939,4 +1956,10 @@ header {
     width: 100%;
     justify-content: center;
   }
+}
+
+.footer-social {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-sm);
 }
