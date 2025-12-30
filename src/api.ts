@@ -36,7 +36,7 @@ export interface ApiResponse<T> {
   total?: number;
 }
 
-const API_BASE_URL = ""; // Vite proxy will handle this
+const API_BASE_URL = "";
 
 export const api = {
   async healthCheck(): Promise<boolean> {

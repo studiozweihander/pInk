@@ -1,7 +1,7 @@
 {
   "name": "pink",
-  "version": "1.0.0",
-  "description": "Catálogo de quadrinhos com Bun + Elysia + React",
+  "version": "2.2.0",
+  "description": "Catálogo de quadrinhos",
   "main": "src/server/index.ts",
   "scripts": {
     "dev": "vite",
