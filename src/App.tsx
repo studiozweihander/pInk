@@ -56,7 +56,13 @@ const App: React.FC = () => {
     const [allComics, setAllComics] = useState<Comic[]>([]);
     const [currentIssues, setCurrentIssues] = useState<Issue[]>([]);
     const [currentComic, setCurrentComic] = useState<Comic | null>(null);
-    const [isLoading, setIsLoading] = useState(false);
+    const [loadingCount, setLoadingCount] = useState(0);
+    const isLoading = loadingCount > 0;
+
+    const setIsLoading = (loading: boolean) => {
+        setLoadingCount(prev => loading ? prev + 1 : Math.max(0, prev - 1));
+    };
+
     const [view, setView] = useState<"home" | "issues">("home");
     const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
     const [searchTerm, setSearchTerm] = useState("");
