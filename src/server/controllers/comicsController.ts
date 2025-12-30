@@ -1,5 +1,6 @@
 import { supabase } from "../config/database";
 import type { Comic, Issue } from "../types";
+import { slugify } from "../utils/slugify";
 
 export const comicsController = {
   async getAllComics() {
@@ -45,8 +46,43 @@ export const comicsController = {
   },
 
   async getComicById({ params }: { params: Record<string, string> }) {
-    const { id } = params;
+    const { id: paramId } = params;
     try {
+      let numericId: number | null = parseInt(paramId);
+
+      if (isNaN(numericId)) {
+        const yearMatch = paramId.match(/^(.*)-(\d{4})$/);
+        const idMatch = paramId.match(/^(.*)-(\d+)$/);
+
+        const { data: allComics, error: allComicsError } = await supabase
+          .from("Comic")
+          .select("id, title, year");
+
+        if (allComicsError) throw allComicsError;
+
+        let matchingComic;
+
+        if (yearMatch) {
+          const titleSlug = yearMatch[1];
+          const year = parseInt(yearMatch[2]);
+          matchingComic = allComics.find(
+            (c) => slugify(c.title) === titleSlug && c.year === year
+          );
+        }
+
+        if (!matchingComic && idMatch) {
+          const id = parseInt(idMatch[2]);
+          matchingComic = allComics.find((c) => c.id === id);
+        }
+
+        if (!matchingComic) {
+          matchingComic = allComics.find((c) => slugify(c.title) === paramId);
+        }
+
+        if (!matchingComic) throw new Error("NOT_FOUND: Comic not found");
+        numericId = matchingComic.id;
+      }
+
       const { data, error } = await supabase
         .from("Comic")
         .select(
@@ -56,12 +92,12 @@ export const comicsController = {
           Publisher(name)
         `
         )
-        .eq("id", id)
+        .eq("id", numericId)
         .single();
 
       if (error) {
         if (error.code === "PGRST116") {
-          throw new Error("Comic not found");
+          throw new Error("NOT_FOUND: Comic not found");
         }
         throw error;
       }
@@ -69,7 +105,7 @@ export const comicsController = {
       const { data: authorsData } = await supabase
         .from("ComicAuthor")
         .select("Author(*)")
-        .eq("comicId", id);
+        .eq("comicId", numericId);
 
       const authors = (authorsData as any[])?.map((ca) => ca.Author) || [];
 
@@ -89,26 +125,61 @@ export const comicsController = {
         data: comic,
       };
     } catch (error: any) {
-      console.error("Error fetching comic by ID:", error);
-      throw new Error(error.message || "Error fetching comic details");
+      console.error("Error fetching comic by ID/Slug:", error);
+      throw error;
     }
   },
 
   async getComicIssues({ params }: { params: Record<string, string> }) {
-    const { id } = params;
+    const { id: paramId } = params;
     try {
+      let numericId: number | null = parseInt(paramId);
+
+      if (isNaN(numericId)) {
+        const yearMatch = paramId.match(/^(.*)-(\d{4})$/);
+        const idMatch = paramId.match(/^(.*)-(\d+)$/);
+
+        const { data: allComics, error: allComicsError } = await supabase
+          .from("Comic")
+          .select("id, title, year");
+
+        if (allComicsError) throw allComicsError;
+
+        let matchingComic;
+
+        if (yearMatch) {
+          const titleSlug = yearMatch[1];
+          const year = parseInt(yearMatch[2]);
+          matchingComic = allComics.find(
+            (c) => slugify(c.title) === titleSlug && c.year === year
+          );
+        }
+
+        if (!matchingComic && idMatch) {
+          const id = parseInt(idMatch[2]);
+          matchingComic = allComics.find((c) => c.id === id);
+        }
+
+        if (!matchingComic) {
+          matchingComic = allComics.find((c) => slugify(c.title) === paramId);
+        }
+
+        if (!matchingComic) throw new Error("NOT_FOUND: Comic not found");
+        numericId = matchingComic.id;
+      }
+
       const [comicCheck, issuesData] = await Promise.all([
-        supabase.from("Comic").select("id").eq("id", id).single(),
+        supabase.from("Comic").select("id").eq("id", numericId).single(),
         supabase
           .from("Issue")
           .select("*, Idiom(name)")
-          .eq("comicId", id)
+          .eq("comicId", numericId)
           .order("issueNumber", { ascending: true }),
       ]);
 
       if (comicCheck.error) {
         if (comicCheck.error.code === "PGRST116") {
-          throw new Error("Comic not found");
+          throw new Error("NOT_FOUND: Comic not found");
         }
         throw comicCheck.error;
       }
@@ -131,13 +202,13 @@ export const comicsController = {
 
       return {
         success: true,
-        comic_id: parseInt(id),
+        comic_id: numericId,
         count: issues.length,
         data: issues,
       };
     } catch (error: any) {
-      console.error("Error fetching comic issues:", error);
-      throw new Error(error.message || "Error fetching comic issues");
+      console.error("Error fetching comic issues by ID/Slug:", error);
+      throw error;
     }
   },
 };
