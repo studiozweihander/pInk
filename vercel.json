@@ -1,6 +1,7 @@
 {
   "version": 2,
   "framework": "vite",
+  "bunVersion": "1.x",
   "installCommand": "bun install",
   "buildCommand": "bun run build",
   "devCommand": "bun run dev",

@@ -9,7 +9,9 @@ const PORT = process.env.PORT || 3000;
 
 const app = new Elysia()
   .use(cors())
-  .use(swagger())
+  .use((app) =>
+    process.env.NODE_ENV === "development" ? app.use(swagger()) : app
+  )
   .get("/health", () => ({
     status: "OK",
     timestamp: new Date().toISOString(),
