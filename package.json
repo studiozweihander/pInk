@@ -1,6 +1,6 @@
 {
   "name": "pink",
-  "version": "2.2.0",
+  "version": "2.3.0",
   "description": "Catálogo de quadrinhos",
   "main": "src/server/index.ts",
   "scripts": {
@@ -33,7 +33,8 @@
     "@supabase/supabase-js": "^2.55.0",
     "elysia": "^1.4.19",
     "react": "^19.2.3",
-    "react-dom": "^19.2.3"
+    "react-dom": "^19.2.3",
+    "react-router-dom": "^7.11.0"
   },
   "private": true,
   "peerDependencies": {

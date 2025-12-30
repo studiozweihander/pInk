@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import { Comic } from "../api";
 
 interface HeaderProps {
@@ -6,7 +7,6 @@ interface HeaderProps {
     currentComic: Comic | null;
     searchTerm: string;
     onSearchChange: (val: string) => void;
-    onLogoClick: () => void;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -14,17 +14,17 @@ const Header: React.FC<HeaderProps> = ({
     currentComic,
     searchTerm,
     onSearchChange,
-    onLogoClick,
 }) => {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const navigate = useNavigate();
 
     return (
         <header>
             <div className="header-title">
                 <div
                     className={`logo-container ${view === "issues" ? "has-navigation" : ""}`}
-                    onClick={onLogoClick}
-                    style={{ cursor: view === "issues" ? "pointer" : "default" }}
+                    onClick={() => navigate("/")}
+                    style={{ cursor: "pointer" }}
                 >
                     <span className="logo-text">pInk</span>
                     <span className="logo-chevron">&gt;</span>

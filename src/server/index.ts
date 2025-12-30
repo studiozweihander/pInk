@@ -15,7 +15,7 @@ const app = new Elysia()
   .get("/health", () => ({
     status: "OK",
     timestamp: new Date().toISOString(),
-    version: "2.2.0",
+    version: "2.3.0",
   }))
   .group("/api", (app) =>
     app
@@ -34,7 +34,7 @@ const app = new Elysia()
   .get("/", () => ({
     name: "pInk API",
     description: "Catálogo de quadrinhos",
-    version: "2.2.0",
+    version: "2.3.0",
     endpoints: {
       health: "/health",
       comics: "/api/comics",
@@ -44,18 +44,21 @@ const app = new Elysia()
   .onError(({ code, error, set }) => {
     console.error(`❌ Error (${code}):`, error);
 
-    if (code === "NOT_FOUND") {
+    const message = error instanceof Error ? error.message : String(error);
+    const isNotFound = code === "NOT_FOUND" || message.startsWith("NOT_FOUND:");
+
+    if (isNotFound) {
       set.status = 404;
       return {
         success: false,
-        message: "Not Found",
+        message: message.replace("NOT_FOUND: ", ""),
       };
     }
 
     set.status = 500;
     return {
       success: false,
-      message: (error as any).message || "Internal server error",
+      message: message || "Internal server error",
     };
   });
 
