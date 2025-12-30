@@ -6,6 +6,8 @@ import ComicCard from "./components/ComicCard";
 import IssueCard from "./components/IssueCard";
 import Modal from "./components/Modal";
 import Footer from "./components/Footer";
+import StatusMessage from "./components/StatusMessage";
+import ASCIIArt from "./components/ASCIIArt";
 import "./styles/style.css";
 
 const App: React.FC = () => {
@@ -26,6 +28,9 @@ const App: React.FC = () => {
         year: [],
         language: [],
     });
+
+    const [error, setError] = useState<string | null>(null);
+    const [lastComicId, setLastComicId] = useState<number | null>(null);
 
     const [isControlsHidden, setIsControlsHidden] = useState(false);
     const lastScrollTop = useRef(0);
@@ -55,11 +60,13 @@ const App: React.FC = () => {
 
     const loadComics = async () => {
         setIsLoading(true);
+        setError(null);
         try {
             const response = await api.getAllComics();
             setAllComics(response.data);
         } catch (error) {
             console.error(error);
+            setError("Não foi possível carregar a lista de quadrinhos.");
         } finally {
             setIsLoading(false);
         }
@@ -67,6 +74,8 @@ const App: React.FC = () => {
 
     const loadIssues = async (comicId: number) => {
         setIsLoading(true);
+        setError(null);
+        setLastComicId(comicId);
         setView("issues");
         setActiveFilters({ publisher: [], year: [], language: [] });
         try {
@@ -78,6 +87,7 @@ const App: React.FC = () => {
             setCurrentIssues(issuesRes.data);
         } catch (error) {
             console.error(error);
+            setError("Não foi possível carregar as edições deste quadrinho.");
         } finally {
             setIsLoading(false);
         }
@@ -122,6 +132,7 @@ const App: React.FC = () => {
 
     return (
         <div className="main-wrapper">
+            <ASCIIArt />
             <div className="landing-section">
                 <Header
                     view={view}
@@ -145,15 +156,19 @@ const App: React.FC = () => {
                 </div>
 
                 <main className={`container ${isControlsHidden ? "controls-hidden" : ""}`} id="main-container">
-                    <div className="scrollable-content" ref={scrollableContentRef}>
-                        <div className={`cards has-content ${viewMode === "list" ? "list-view" : ""}`}>
-                            {isLoading ? (
-                                <div className="loading">
-                                    <div className="loading-spinner"></div>
-                                    <p>Carregando...</p>
-                                </div>
-                            ) : filteredItems.length > 0 ? (
-                                filteredItems.map((item) =>
+                    <div className={`scrollable-content ${isLoading || error || filteredItems.length === 0 ? "has-status-message" : ""}`} ref={scrollableContentRef}>
+                        {isLoading ? (
+                            <StatusMessage type="loading" />
+                        ) : error ? (
+                            <StatusMessage
+                                type="error"
+                                message="Erro ao carregar dados"
+                                description={error}
+                                onRetry={view === "home" ? loadComics : () => lastComicId && loadIssues(lastComicId)}
+                            />
+                        ) : filteredItems.length > 0 ? (
+                            <div className={`cards has-content ${viewMode === "list" ? "list-view" : ""}`}>
+                                {filteredItems.map((item) =>
                                     view === "home" ? (
                                         <ComicCard
                                             key={item.id}
@@ -167,14 +182,15 @@ const App: React.FC = () => {
                                             onClick={() => setSelectedIssueId(item.id)}
                                         />
                                     )
-                                )
-                            ) : (
-                                <div className="empty-state">
-                                    <h3>📚 Nenhum item encontrado</h3>
-                                    <p>Tente ajustar sua busca ou filtros.</p>
-                                </div>
-                            )}
-                        </div>
+                                )}
+                            </div>
+                        ) : (
+                            <StatusMessage
+                                type={searchTerm || activeFilters.year.length > 0 || (view === "home" && (activeFilters.publisher.length > 0 || activeFilters.language.length > 0)) ? "empty_search" : "empty_content"}
+                                message={view === "issues" && currentComic?.total_issues === 0 ? "Quadrinho sem edições" : undefined}
+                                description={view === "issues" && currentComic?.total_issues === 0 ? `O quadrinho "${currentComic?.title}" ainda não tem edições disponíveis.` : undefined}
+                            />
+                        )}
                     </div>
                 </main>
             </div>

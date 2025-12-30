@@ -274,6 +274,12 @@ header {
   padding: var(--spacing-sm);
   padding-bottom: var(--spacing-lg);
   min-height: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.scrollable-content:not(.has-status-message) {
+  display: block;
 }
 
 .scrollable-content::-webkit-scrollbar {
@@ -308,8 +314,7 @@ header {
   justify-content: center;
   align-content: center;
   display: flex;
-  flex-direction: column;
-  align-items: center;
+  flex: 1;
 }
 
 .cards.has-content {
@@ -391,23 +396,79 @@ header {
   border-radius: var(--border-radius-sm);
   border: 1px solid rgba(231, 143, 222, 0.3);
 }
-.loading {
+/* Centralized Status Message Styles */
+.status-message-container {
   display: flex;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  min-height: 200px;
-  gap: var(--spacing-md);
-  color: var(--secondary-font);
+  width: 100%;
+  height: 100%;
+  min-height: 300px;
+  animation: fadeIn 0.4s ease-out;
 }
 
-.loading-spinner {
-  width: 40px;
-  height: 40px;
-  border: 3px solid var(--secondary-surface);
-  border-top: 3px solid var(--primary-color);
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
+.status-message-content {
+  text-align: center;
+  max-width: 400px;
+  padding: var(--spacing-xl);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.status-message-icon {
+  margin-bottom: var(--spacing-sm);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.status-message-title {
+  font-size: 1.5rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #e78fde, #f4c1ed, #c77dd1);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  margin: 0;
+}
+
+.status-message-description {
+  color: var(--secondary-font);
+  font-size: 1rem;
+  opacity: 0.8;
+  margin: 0;
+}
+
+.status-message-container .retry-btn {
+  background: var(--primary-color);
+  color: var(--primary-surface);
+  border: none;
+  padding: var(--spacing-sm) var(--spacing-lg);
+  border-radius: var(--border-radius-sm);
+  cursor: pointer;
+  font-family: var(--font);
+  font-weight: 500;
+  transition: var(--transition-fast);
+  margin-top: var(--spacing-sm);
+}
+
+.status-message-container .retry-btn:hover {
+  background: var(--secondary-font);
+  transform: translateY(-2px);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 @keyframes spin {
@@ -419,55 +480,15 @@ header {
   }
 }
 
-.error {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 200px;
-  gap: var(--spacing-md);
-  text-align: center;
-  color: var(--secondary-font);
-  padding: var(--spacing-lg);
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 4px solid rgba(231, 143, 222, 0.1);
+  border-top: 4px solid var(--primary-color);
+  border-radius: 50%;
+  animation: spin 1s cubic-bezier(0.4, 0, 0.2, 1) infinite;
 }
 
-.error h3 {
-  color: #ff6b6b;
-  margin-bottom: var(--spacing-sm);
-}
-
-.retry-btn {
-  background: var(--primary-color);
-  color: var(--primary-surface);
-  border: none;
-  padding: var(--spacing-sm) var(--spacing-lg);
-  border-radius: var(--border-radius-sm);
-  cursor: pointer;
-  font-family: var(--font);
-  font-weight: 500;
-  transition: var(--transition-fast);
-}
-
-.retry-btn:hover {
-  background: var(--secondary-font);
-  transform: translateY(-2px);
-}
-
-.empty-state {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  min-height: 200px;
-  gap: var(--spacing-md);
-  text-align: center;
-  color: var(--secondary-font);
-  padding: var(--spacing-lg);
-}
-
-.empty-state h3 {
-  color: var(--primary-color);
-}
 .back-button {
   background: rgba(231, 143, 222, 0.1);
   border: 1px solid rgba(231, 143, 222, 0.3);
@@ -1244,7 +1265,9 @@ header {
   .modal-info {
     padding-bottom: calc(var(--spacing-lg) + env(safe-area-inset-bottom, 16px));
   }
+
   .controls-bar {
+    margin: var(--spacing-sm);
     padding: var(--spacing-xs);
     transition-duration: 0.25s;
   }
@@ -1355,7 +1378,7 @@ header {
   }
 
   .controls-bar {
-    margin: 0 var(--spacing-md) 20px var(--spacing-md);
+    margin: var(--spacing-md);
   }
 
   .controls-bar.controls-hidden {
