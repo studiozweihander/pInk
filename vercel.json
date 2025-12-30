@@ -8,6 +8,6 @@
   "rewrites": [
     { "source": "/api/(.*)", "destination": "/api/index.ts" },
     { "source": "/health", "destination": "/api/index.ts" },
-    { "source": "/((?!api/|health).*).*", "destination": "/index.html" }
+    { "source": "/(.*)", "destination": "/index.html" }
   ]
 }
