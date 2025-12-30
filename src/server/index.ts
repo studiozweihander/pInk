@@ -15,7 +15,7 @@ const app = new Elysia()
   .get("/health", () => ({
     status: "OK",
     timestamp: new Date().toISOString(),
-    version: "1.1.0 (Bun + Elysia)",
+    version: "2.2.0",
   }))
   .group("/api", (app) =>
     app
@@ -33,8 +33,8 @@ const app = new Elysia()
   )
   .get("/", () => ({
     name: "pInk API",
-    description: "Catálogo de quadrinhos - Bun + Elysia Backend",
-    version: "1.1.0",
+    description: "Catálogo de quadrinhos",
+    version: "2.2.0",
     endpoints: {
       health: "/health",
       comics: "/api/comics",

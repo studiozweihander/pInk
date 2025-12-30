@@ -23,6 +23,7 @@ const ComicCard: React.FC<ComicCardProps> = ({ comic, onClick }) => {
                 <img
                     src={comic.cover || PLACEHOLDER_IMAGE}
                     alt={comic.title}
+                    referrerPolicy="no-referrer"
                     onError={(e: any) => {
                         e.target.src = PLACEHOLDER_IMAGE;
                     }}
