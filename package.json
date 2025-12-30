@@ -1,31 +1,42 @@
 {
   "name": "pink",
-  "version": "0.1.0",
-  "private": true,
-  "workspaces": [
-    "apps/*",
-    "packages/*"
-  ],
+  "version": "1.0.0",
+  "description": "Catálogo de quadrinhos com Bun + Elysia + React",
+  "main": "src/server/index.ts",
   "scripts": {
-    "dev": "bun run --filter='*' dev",
-    "dev:backend": "bun --watch index.ts",
-    "dev:frontend": "bun --cwd apps/frontend run dev",
-    "build": "bun run --filter='*' build",
-    "build:backend": "bun build index.ts --outdir dist/backend --target bun",
-    "build:frontend": "bun --cwd apps/frontend run build",
-    "test": "bun test",
-    "test:backend": "bun --cwd apps/backend test",
-    "clean": "rm -rf node_modules apps/*/node_modules packages/*/node_modules dist"
+    "dev": "vite",
+    "server": "bun run --watch src/server/index.ts",
+    "start": "bun run src/server/index.ts",
+    "build": "vite build",
+    "preview": "vite preview"
   },
+  "keywords": [
+    "comics",
+    "catalog",
+    "bun",
+    "elysia",
+    "react",
+    "typescript"
+  ],
+  "author": "Zweihander",
+  "license": "ISC",
   "devDependencies": {
-    "@types/bun": "^1.3.4"
-  },
-  "peerDependencies": {
-    "typescript": "^5.9.3"
+    "vite": "^7.1.2",
+    "@types/bun": "latest",
+    "@types/react": "^19.2.7",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^5.1.2"
   },
   "dependencies": {
-    "dotenv": "^17.2.3",
-    "pino": "^10.1.0",
-    "zod": "^4.1.13"
+    "@elysiajs/cors": "^1.4.0",
+    "@elysiajs/swagger": "^1.3.1",
+    "@supabase/supabase-js": "^2.55.0",
+    "elysia": "^1.4.19",
+    "react": "^19.2.3",
+    "react-dom": "^19.2.3"
+  },
+  "private": true,
+  "peerDependencies": {
+    "typescript": "^5.9.3"
   }
 }
