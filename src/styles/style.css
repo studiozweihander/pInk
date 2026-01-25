@@ -1246,8 +1246,9 @@ header {
 
 @media screen and (max-width: 479px) {
   .scrollable-content {
+    padding: var(--spacing-md);
     padding-bottom: calc(
-      var(--spacing-xxl, 3rem) + env(safe-area-inset-bottom, 0px)
+      var(--spacing-lg, 3rem) + env(safe-area-inset-bottom, 0px)
     );
   }
 
@@ -1940,12 +1941,25 @@ header {
     gap: var(--spacing-md);
   }
 
+  .email-input-group:focus-within {
+    border-color: transparent;
+    box-shadow: none;
+    background: transparent;
+  }
+
   #footer-email {
     background: rgba(24, 24, 24, 0.6);
     border: 1px solid rgba(231, 143, 222, 0.3);
     border-radius: 8px;
     width: 100%;
     font-size: 0.8rem;
+    transition: all var(--transition-normal);
+  }
+
+  #footer-email:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 15px rgba(231, 143, 222, 0.15);
+    background: rgba(24, 24, 24, 0.8);
   }
 
   #footer-email::placeholder {
@@ -1955,6 +1969,7 @@ header {
   .email-submit-btn {
     width: 100%;
     justify-content: center;
+    border-radius: 8px;
   }
 }
 
