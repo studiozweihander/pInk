@@ -1883,6 +1883,25 @@ header {
   transform: scale(1.1);
 }
 
+.footer-link.disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+  pointer-events: auto;
+}
+
+.footer-link.disabled:hover {
+  transform: none;
+  color: var(--secondary-font);
+}
+
+.footer-link.disabled svg {
+  color: var(--primary-color);
+}
+
+.footer-link.disabled:hover svg {
+  transform: none;
+}
+
 .footer-bottom {
   background: var(--primary-surface);
   border-top: 1px solid rgba(231, 143, 222, 0.2);
@@ -1899,7 +1918,14 @@ header {
 }
 
 .footer-logo {
-  color: var(--primary-color);
+  background-image: url("../assets/palestine-flag.jpg");
+  background-size: 90%;
+  background-position: center;
+  background-clip: text;
+  background-repeat: no-repeat;
+  -webkit-background-clip: text;
+  color: transparent;
+  display: inline-block;
   font-size: 1.5rem;
   font-weight: 700;
   font-family: var(--font2);
@@ -1977,4 +2003,71 @@ header {
   display: flex;
   flex-direction: column;
   gap: var(--spacing-sm);
+}
+
+[data-tooltip] {
+  position: relative;
+}
+
+[data-tooltip]::after {
+  content: attr(data-tooltip);
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  transform: translateX(-50%) translateY(5px);
+  background: rgba(24, 24, 24, 0.8);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: var(--secondary-font);
+  padding: 6px 12px;
+  border-radius: var(--border-radius-sm);
+  font-size: 0.75rem;
+  font-weight: 500;
+  font-family: var(--font2);
+  white-space: nowrap;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(231, 143, 222, 0.2);
+  pointer-events: none;
+  z-index: 3000;
+}
+
+[data-tooltip]:hover::after {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+  transition-delay: 0.4s;
+}
+
+.tooltips-warm [data-tooltip]:hover::after {
+  transition-delay: 0s;
+}
+
+[data-tooltip]::before {
+  content: "";
+  position: absolute;
+  bottom: calc(100% + 4px);
+  left: 50%;
+  transform: translateX(-50%) translateY(5px);
+  border-width: 6px 6px 0 6px;
+  border-style: solid;
+  border-color: rgba(231, 143, 222, 0.2) transparent transparent transparent;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 3000;
+  pointer-events: none;
+}
+
+[data-tooltip]:hover::before {
+  opacity: 1;
+  visibility: visible;
+  transform: translateX(-50%) translateY(0);
+  transition-delay: 0.4s;
+}
+
+.tooltips-warm [data-tooltip]:hover::before {
+  transition-delay: 0s;
 }
