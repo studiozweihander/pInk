@@ -109,9 +109,12 @@ const App: React.FC = () => {
             setCurrentComic(null);
             setCurrentIssues([]);
             setSearchTerm("");
-            setActiveFilters({ publisher: [], year: [], language: [] });
         }
     }, [location.pathname]);
+
+    useEffect(() => {
+        setActiveFilters({ publisher: [], year: [], language: [] });
+    }, [view]);
 
     const loadComics = async () => {
         setIsLoading(true);
