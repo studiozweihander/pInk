@@ -10,12 +10,12 @@ const PORT = process.env.PORT || 3000;
 const app = new Elysia()
   .use(cors())
   .use((app) =>
-    process.env.NODE_ENV === "development" ? app.use(swagger()) : app
+    process.env.NODE_ENV === "development" ? app.use(swagger()) : app,
   )
   .get("/health", () => ({
     status: "OK",
     timestamp: new Date().toISOString(),
-    version: "2.3.0",
+    version: "2.3.2",
   }))
   .group("/api", (app) =>
     app
@@ -23,18 +23,18 @@ const app = new Elysia()
         app
           .get("/", () => comicsController.getAllComics())
           .get("/:id", comicsController.getComicById)
-          .get("/:id/issues", comicsController.getComicIssues)
+          .get("/:id/issues", comicsController.getComicIssues),
       )
       .group("/issues", (app) =>
         app
           .get("/", issuesController.getAllIssues)
-          .get("/:id", issuesController.getIssueById)
-      )
+          .get("/:id", issuesController.getIssueById),
+      ),
   )
   .get("/", () => ({
     name: "pInk API",
     description: "Catálogo de quadrinhos",
-    version: "2.3.0",
+    version: "2.3.2",
     endpoints: {
       health: "/health",
       comics: "/api/comics",

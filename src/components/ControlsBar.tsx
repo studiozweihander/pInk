@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useRef, useEffect } from "react";
 import { Comic, Issue } from "../api";
 
 interface ControlsBarProps {
@@ -29,6 +29,26 @@ const ControlsBar: React.FC<ControlsBarProps> = ({
     items,
 }) => {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
+    const filterContainerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (
+                filterContainerRef.current &&
+                !filterContainerRef.current.contains(event.target as Node)
+            ) {
+                setIsFilterOpen(false);
+            }
+        };
+
+        if (isFilterOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isFilterOpen]);
 
     const filters = useMemo(() => {
         const publishers = new Set<string>();
@@ -79,7 +99,7 @@ const ControlsBar: React.FC<ControlsBarProps> = ({
             </div>
 
             <div className="controls-right">
-                <div className="filter-container">
+                <div className="filter-container" ref={filterContainerRef}>
                     <button
                         className={`toggle-button filter-toggle ${isFilterOpen ? "active" : ""} ${totalActive > 0 ? "has-filters" : ""}`}
                         onClick={() => setIsFilterOpen(!isFilterOpen)}
