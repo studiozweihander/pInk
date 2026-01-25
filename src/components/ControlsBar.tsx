@@ -79,6 +79,32 @@ const ControlsBar: React.FC<ControlsBarProps> = ({
 
     const totalActive = Object.values(activeFilters).flat().length;
 
+    const [isWarm, setIsWarm] = useState(false);
+    const warmTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const coolDownTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const handlePointerEnter = () => {
+        if (coolDownTimerRef.current) {
+            clearTimeout(coolDownTimerRef.current);
+            coolDownTimerRef.current = null;
+        }
+        if (!isWarm) {
+            warmTimerRef.current = setTimeout(() => {
+                setIsWarm(true);
+            }, 400);
+        }
+    };
+
+    const handlePointerLeave = () => {
+        if (warmTimerRef.current) {
+            clearTimeout(warmTimerRef.current);
+            warmTimerRef.current = null;
+        }
+        coolDownTimerRef.current = setTimeout(() => {
+            setIsWarm(false);
+        }, 500);
+    };
+
     return (
         <div className="controls-bar">
             <div className="controls-left">
@@ -98,12 +124,16 @@ const ControlsBar: React.FC<ControlsBarProps> = ({
                 )}
             </div>
 
-            <div className="controls-right">
+            <div className={`controls-right ${isWarm ? "tooltips-warm" : ""}`}>
                 <div className="filter-container" ref={filterContainerRef}>
                     <button
                         className={`toggle-button filter-toggle ${isFilterOpen ? "active" : ""} ${totalActive > 0 ? "has-filters" : ""}`}
                         onClick={() => setIsFilterOpen(!isFilterOpen)}
                         data-count={totalActive > 0 ? totalActive : undefined}
+                        data-tooltip="Filtros"
+                        aria-label="Filtros"
+                        onPointerEnter={handlePointerEnter}
+                        onPointerLeave={handlePointerLeave}
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -170,6 +200,10 @@ const ControlsBar: React.FC<ControlsBarProps> = ({
                     <button
                         className={`toggle-button ${viewMode === "grid" ? "active" : ""}`}
                         onClick={() => onViewModeChange("grid")}
+                        data-tooltip="Grade"
+                        aria-label="Grade"
+                        onPointerEnter={handlePointerEnter}
+                        onPointerLeave={handlePointerLeave}
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
@@ -184,6 +218,10 @@ const ControlsBar: React.FC<ControlsBarProps> = ({
                     <button
                         className={`toggle-button ${viewMode === "list" ? "active" : ""}`}
                         onClick={() => onViewModeChange("list")}
+                        data-tooltip="Lista"
+                        aria-label="Lista"
+                        onPointerEnter={handlePointerEnter}
+                        onPointerLeave={handlePointerLeave}
                     >
                         <svg
                             xmlns="http://www.w3.org/2000/svg"
