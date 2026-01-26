@@ -1,9 +1,20 @@
 .controls-container {
   margin: 0 var(--spacing-xs);
   position: relative;
-  z-index: 100;
-  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+  z-index: 10;
+  transition:
+    max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    transform 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    margin 0.4s cubic-bezier(0.4, 0, 0.2, 1);
   opacity: 1;
+  max-height: 100px;
+  overflow: visible;
+  transform: translateY(0) scale(1);
+}
+
+.controls-container.is-active {
+  z-index: 1001 !important;
 }
 
 .controls-container.controls-hidden {
@@ -11,17 +22,18 @@
   opacity: 0;
   margin-top: 0;
   margin-bottom: 0;
+  transform: translateY(20px) scale(0.98);
+  pointer-events: none;
 }
 
 .controls-bar {
-  background: var(--primary-surface);
+  background: transparent;
   margin: 0 var(--spacing-xs) 24px var(--spacing-xs);
   border-radius: var(--border-radius-md);
   display: flex;
   justify-content: space-between;
   align-items: center;
   min-height: 40px;
-  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
   flex-shrink: 0;
 }
 
@@ -30,18 +42,18 @@
   transform: translateZ(0);
 }
 
-.controls-bar:not(.controls-hidden) {
+.controls-container:not(.controls-hidden) .controls-bar {
   pointer-events: auto;
 }
 
-.controls-bar:not(.controls-hidden) .control-button:hover,
-.controls-bar:not(.controls-hidden) .toggle-button:hover {
+.controls-container:not(.controls-hidden) .control-button:hover,
+.controls-container:not(.controls-hidden) .toggle-button:hover {
   transform: translateY(-1px) scale(1.02) translateZ(0);
   transition: transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1);
 }
 
-.controls-bar:not(.controls-hidden) .control-button:focus,
-.controls-bar:not(.controls-hidden) .toggle-button:focus {
+.controls-container:not(.controls-hidden) .control-button:focus,
+.controls-container:not(.controls-hidden) .toggle-button:focus {
   transform: translateY(-1px) translateZ(0);
   box-shadow: 0 0 0 2px rgba(231, 143, 222, 0.3);
   transition: all 0.2s ease;
@@ -139,13 +151,6 @@
   position: relative;
   display: flex;
   align-items: center;
-}
-
-#filter-button:hover {
-  background: rgba(231, 143, 222, 0.1);
-  color: var(--primary-color);
-  opacity: 1;
-  transform: scale(1.05);
 }
 
 .toggle-button.filter-toggle.active {
@@ -377,8 +382,8 @@
     margin: var(--spacing-md);
   }
 
-  .controls-bar.controls-hidden {
-    transform: translateY(-48px);
+  .controls-container.controls-hidden {
+    transform: translateY(20px) scale(0.98);
   }
 }
 
@@ -389,8 +394,8 @@
     border-radius: var(--border-radius-xxl);
   }
 
-  .controls-bar.controls-hidden {
-    transform: translateY(-5rem);
+  .controls-container.controls-hidden {
+    transform: translateY(20px) scale(0.98);
   }
 
   .control-button {
@@ -434,8 +439,8 @@
 }
 
 @media screen and (max-width: 767px) {
-  .controls-bar.controls-hidden {
-    transform: translateY(-42px);
+  .controls-container.controls-hidden {
+    transform: translateY(20px) scale(0.98);
   }
 
   .controls-bar {
