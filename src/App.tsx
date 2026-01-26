@@ -9,7 +9,7 @@ import Modal from "./components/Modal";
 import Footer from "./components/Footer";
 import StatusMessage from "./components/StatusMessage";
 import ASCIIArt from "./components/ASCIIArt";
-import "./styles/style.css";
+import "./styles/main.css";
 
 const ComicDetails: React.FC<{
     allComics: Comic[];
