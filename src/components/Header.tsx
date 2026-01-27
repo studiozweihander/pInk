@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { Comic } from "../api";
 
@@ -17,6 +17,22 @@ const Header: React.FC<HeaderProps> = ({
 }) => {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const navigate = useNavigate();
+    const searchRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        const handleClickOutside = (event: MouseEvent) => {
+            if (searchRef.current && !searchRef.current.contains(event.target as Node)) {
+                setIsSearchOpen(false);
+            }
+        };
+
+        if (isSearchOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+        return () => {
+            document.removeEventListener("mousedown", handleClickOutside);
+        };
+    }, [isSearchOpen]);
 
     return (
         <header>
@@ -36,7 +52,7 @@ const Header: React.FC<HeaderProps> = ({
                 </span>
             </div>
 
-            <div className="search-container">
+            <div className="search-container" ref={searchRef}>
                 <button
                     className="search-toggle"
                     onClick={() => setIsSearchOpen(true)}

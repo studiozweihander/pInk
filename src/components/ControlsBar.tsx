@@ -17,6 +17,7 @@ interface ControlsBarProps {
         language: string[];
     }) => void;
     items: (Comic | Issue)[];
+    isControlsHidden: boolean;
 }
 
 const ControlsBar: React.FC<ControlsBarProps> = ({
@@ -27,9 +28,14 @@ const ControlsBar: React.FC<ControlsBarProps> = ({
     activeFilters,
     setActiveFilters,
     items,
+    isControlsHidden,
 }) => {
     const [isFilterOpen, setIsFilterOpen] = useState(false);
     const filterContainerRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+        setIsFilterOpen(false);
+    }, [view]);
 
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
@@ -79,122 +85,172 @@ const ControlsBar: React.FC<ControlsBarProps> = ({
 
     const totalActive = Object.values(activeFilters).flat().length;
 
+    const [isWarm, setIsWarm] = useState(false);
+    const [isHovered, setIsHovered] = useState(false);
+    const warmTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+    const coolDownTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const handlePointerEnter = () => {
+        setIsHovered(true);
+        if (coolDownTimerRef.current) {
+            clearTimeout(coolDownTimerRef.current);
+            coolDownTimerRef.current = null;
+        }
+        if (!isWarm) {
+            warmTimerRef.current = setTimeout(() => {
+                setIsWarm(true);
+            }, 500);
+        }
+    };
+
+    const handlePointerLeave = () => {
+        setIsHovered(false);
+        if (warmTimerRef.current) {
+            clearTimeout(warmTimerRef.current);
+            warmTimerRef.current = null;
+        }
+        coolDownTimerRef.current = setTimeout(() => {
+            setIsWarm(false);
+        }, 500);
+    };
+
+    const isActive = isFilterOpen || isHovered || isWarm;
+
     return (
-        <div className="controls-bar">
-            <div className="controls-left">
-                {view === "issues" && (
-                    <button className="control-button back-btn" onClick={onBackClick}>
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            height="16px"
-                            viewBox="0 -960 960 960"
-                            width="16px"
-                            fill="currentColor"
-                        >
-                            <path d="m313-440 196 196q12 12 11.5 28T508-188q-12 11-28 11.5T452-188L188-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l264-264q11-11 27.5-11t28.5 11q12 12 12 28.5T508-715L313-520h447q17 0 28.5 11.5T800-480q0 17-11.5 28.5T760-440H313Z" />
-                        </svg>
-                        <span className="control-text">Voltar</span>
-                    </button>
-                )}
-            </div>
+        <div className={`controls-container ${isControlsHidden ? "controls-hidden" : ""} ${isActive ? "is-active" : ""}`}>
+            <div className="controls-bar">
+                <div className="controls-left">
+                    {view === "issues" && (
+                        <button className="control-button back-btn" onClick={onBackClick}>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                height="16px"
+                                viewBox="0 -960 960 960"
+                                width="16px"
+                                fill="currentColor"
+                            >
+                                <path d="m313-440 196 196q12 12 11.5 28T508-188q-12 11-28 11.5T452-188L188-452q-6-6-8.5-13t-2.5-15q0-8 2.5-15t8.5-13l264-264q11-11 27.5-11t28.5 11q12 12 12 28.5T508-715L313-520h447q17 0 28.5 11.5T800-480q0 17-11.5 28.5T760-440H313Z" />
+                            </svg>
+                            <span className="control-text">Voltar</span>
+                        </button>
+                    )}
+                </div>
 
-            <div className="controls-right">
-                <div className="filter-container" ref={filterContainerRef}>
-                    <button
-                        className={`toggle-button filter-toggle ${isFilterOpen ? "active" : ""} ${totalActive > 0 ? "has-filters" : ""}`}
-                        onClick={() => setIsFilterOpen(!isFilterOpen)}
-                        data-count={totalActive > 0 ? totalActive : undefined}
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            height="16px"
-                            viewBox="0 -960 960 960"
-                            width="16px"
-                            fill="currentColor"
+                <div className={`controls-right ${isWarm ? "tooltips-warm" : ""}`}>
+                    <div className="filter-container" ref={filterContainerRef}>
+                        <button
+                            className={`toggle-button filter-toggle ${isFilterOpen ? "active" : ""}`}
+                            onClick={() => setIsFilterOpen(!isFilterOpen)}
+                            style={{ position: "relative" }}
+                            data-tooltip="Filtros"
+                            aria-label="Filtros"
+                            onPointerEnter={handlePointerEnter}
+                            onPointerLeave={handlePointerLeave}
                         >
-                            <path d="M440-120v-240h80v80h320v80H520v80h-80Zm-320-80v-80h240v80H120Zm160-160v-80H120v-80h160v-80h80v240h-80Zm160-80v-80h400v80H440Zm160-160v-240h80v80h160v80H680v80h-80Zm-480-80v-80h400v80H120Z" />
-                        </svg>
-                    </button>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                height="16px"
+                                viewBox="0 -960 960 960"
+                                width="16px"
+                                fill="currentColor"
+                            >
+                                <path d="M440-120v-240h80v80h320v80H520v80h-80Zm-320-80v-80h240v80H120Zm160-160v-80H120v-80h160v-80h80v240h-80Zm160-80v-80h400v80H440Zm160-160v-240h80v80h160v80H680v80h-80Zm-480-80v-80h400v80H120Z" />
+                            </svg>
+                            {totalActive > 0 && (
+                                <span className="filter-badge">
+                                    {totalActive}
+                                </span>
+                            )}
+                        </button>
 
-                    {isFilterOpen && (
-                        <div className="filter-dropdown open">
-                            {view === "home" && (
+                        {isFilterOpen && (
+                            <div className="filter-dropdown open">
+                                {view === "home" && (
+                                    <div className="filter-section">
+                                        <h4 className="filter-title">Editora</h4>
+                                        <div className="filter-options">
+                                            {filters.publishers.map((p) => (
+                                                <label key={p} className="filter-option">
+                                                    <input
+                                                        type="checkbox"
+                                                        checked={activeFilters.publisher.includes(p)}
+                                                        onChange={() => toggleFilter("publisher", p)}
+                                                    />
+                                                    <span className="filter-label">{p}</span>
+                                                </label>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
+
                                 <div className="filter-section">
-                                    <h4 className="filter-title">Editora</h4>
+                                    <h4 className="filter-title">Ano</h4>
                                     <div className="filter-options">
-                                        {filters.publishers.map((p) => (
-                                            <label key={p} className="filter-option">
+                                        {filters.years.map((y) => (
+                                            <label key={y} className="filter-option">
                                                 <input
                                                     type="checkbox"
-                                                    checked={activeFilters.publisher.includes(p)}
-                                                    onChange={() => toggleFilter("publisher", p)}
+                                                    checked={activeFilters.year.includes(y)}
+                                                    onChange={() => toggleFilter("year", y)}
                                                 />
-                                                <span className="filter-label">{p}</span>
+                                                <span className="filter-label">{y}</span>
                                             </label>
                                         ))}
                                     </div>
                                 </div>
-                            )}
 
-                            <div className="filter-section">
-                                <h4 className="filter-title">Ano</h4>
-                                <div className="filter-options">
-                                    {filters.years.map((y) => (
-                                        <label key={y} className="filter-option">
-                                            <input
-                                                type="checkbox"
-                                                checked={activeFilters.year.includes(y)}
-                                                onChange={() => toggleFilter("year", y)}
-                                            />
-                                            <span className="filter-label">{y}</span>
-                                        </label>
-                                    ))}
+                                <div className="filter-actions">
+                                    <button
+                                        className="filter-clear-all"
+                                        onClick={() =>
+                                            setActiveFilters({ publisher: [], year: [], language: [] })
+                                        }
+                                    >
+                                        Limpar Todos
+                                    </button>
                                 </div>
                             </div>
+                        )}
+                    </div>
 
-                            <div className="filter-actions">
-                                <button
-                                    className="filter-clear-all"
-                                    onClick={() =>
-                                        setActiveFilters({ publisher: [], year: [], language: [] })
-                                    }
-                                >
-                                    Limpar Todos
-                                </button>
-                            </div>
-                        </div>
-                    )}
-                </div>
-
-                <div className="view-toggle">
-                    <button
-                        className={`toggle-button ${viewMode === "grid" ? "active" : ""}`}
-                        onClick={() => onViewModeChange("grid")}
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            height="16px"
-                            viewBox="0 -960 960 960"
-                            width="16px"
-                            fill="currentColor"
+                    <div className="view-toggle">
+                        <button
+                            className={`toggle-button ${viewMode === "grid" ? "active" : ""}`}
+                            onClick={() => onViewModeChange("grid")}
+                            data-tooltip="Grade"
+                            aria-label="Grade"
+                            onPointerEnter={handlePointerEnter}
+                            onPointerLeave={handlePointerLeave}
                         >
-                            <path d="M120-520v-320q0-33 23.5-56.5T200-920h160q33 0 56.5 23.5T440-840v320q0 33-23.5 56.5T360-440H200q-33 0-56.5-23.5T120-520Zm400 0v-320q0-33 23.5-56.5T600-920h160q33 0 56.5 23.5T840-840v320q0 33-23.5 56.5T760-440H600q-33 0-56.5-23.5T520-520ZM120-120v-320q0-33 23.5-56.5T200-520h160q33 0 56.5 23.5T440-440v320q0 33-23.5 56.5T360-40H200q-33 0-56.5-23.5T120-120Zm400 0v-320q0-33 23.5-56.5T600-520h160q33 0 56.5 23.5T840-440v320q0 33-23.5 56.5T760-40H600q-33 0-56.5-23.5T520-120Z" />
-                        </svg>
-                    </button>
-                    <button
-                        className={`toggle-button ${viewMode === "list" ? "active" : ""}`}
-                        onClick={() => onViewModeChange("list")}
-                    >
-                        <svg
-                            xmlns="http://www.w3.org/2000/svg"
-                            height="16px"
-                            viewBox="0 -960 960 960"
-                            width="16px"
-                            fill="currentColor"
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                height="16px"
+                                viewBox="0 -960 960 960"
+                                width="16px"
+                                fill="currentColor"
+                            >
+                                <path d="M120-520v-320q0-33 23.5-56.5T200-920h160q33 0 56.5 23.5T440-840v320q0 33-23.5 56.5T360-440H200q-33 0-56.5-23.5T120-520Zm400 0v-320q0-33 23.5-56.5T600-920h160q33 0 56.5 23.5T840-840v320q0 33-23.5 56.5T760-440H600q-33 0-56.5-23.5T520-520ZM120-120v-320q0-33 23.5-56.5T200-520h160q33 0 56.5 23.5T440-440v320q0 33-23.5 56.5T360-40H200q-33 0-56.5-23.5T120-120Zm400 0v-320q0-33 23.5-56.5T600-520h160q33 0 56.5 23.5T840-440v320q0 33-23.5 56.5T760-40H600q-33 0-56.5-23.5T520-120Z" />
+                            </svg>
+                        </button>
+                        <button
+                            className={`toggle-button ${viewMode === "list" ? "active" : ""}`}
+                            onClick={() => onViewModeChange("list")}
+                            data-tooltip="Lista"
+                            aria-label="Lista"
+                            onPointerEnter={handlePointerEnter}
+                            onPointerLeave={handlePointerLeave}
                         >
-                            <path d="M280-600v-80h560v80H280Zm0 160v-80h560v80H280Zm0 160v-80h560v80H280ZM160-600q-17 0-28.5-11.5T120-640q0-17 11.5-28.5T160-680q17 0 28.5 11.5T200-640q0 17-11.5 28.5T160-600Zm0 160q-17 0-28.5-11.5T120-480q0-17 11.5-28.5T160-520q17 0 28.5 11.5T200-480q0 17-11.5 28.5T160-440Zm0 160q-17 0-28.5-11.5T120-320q0-17 11.5-28.5T160-360q17 0 28.5 11.5T200-320q0 17-11.5 28.5T160-280Z" />
-                        </svg>
-                    </button>
+                            <svg
+                                xmlns="http://www.w3.org/2000/svg"
+                                height="16px"
+                                viewBox="0 -960 960 960"
+                                width="16px"
+                                fill="currentColor"
+                            >
+                                <path d="M280-600v-80h560v80H280Zm0 160v-80h560v80H280Zm0 160v-80h560v80H280ZM160-600q-17 0-28.5-11.5T120-640q0-17 11.5-28.5T160-680q17 0 28.5 11.5T200-640q0 17-11.5 28.5T160-600Zm0 160q-17 0-28.5-11.5T120-480q0-17 11.5-28.5T160-520q17 0 28.5 11.5T200-480q0 17-11.5 28.5T160-440Zm0 160q-17 0-28.5-11.5T120-320q0-17 11.5-28.5T160-360q17 0 28.5 11.5T200-320q0 17-11.5 28.5T160-280Z" />
+                            </svg>
+                        </button>
+                    </div>
                 </div>
             </div>
         </div>

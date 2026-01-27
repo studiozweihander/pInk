@@ -9,7 +9,7 @@ import Modal from "./components/Modal";
 import Footer from "./components/Footer";
 import StatusMessage from "./components/StatusMessage";
 import ASCIIArt from "./components/ASCIIArt";
-import "./styles/style.css";
+import "./styles/main.css";
 
 const ComicDetails: React.FC<{
     allComics: Comic[];
@@ -191,18 +191,16 @@ const App: React.FC = () => {
                     } />
                 </Routes>
 
-                <div className={`controls-container ${isControlsHidden ? "controls-hidden" : ""}`}>
-                    <ControlsBar
-                        key={view}
-                        view={view}
-                        viewMode={viewMode}
-                        onViewModeChange={setViewMode}
-                        onBackClick={() => navigate("/")}
-                        activeFilters={activeFilters}
-                        setActiveFilters={setActiveFilters}
-                        items={view === "home" ? allComics : currentIssues}
-                    />
-                </div>
+                <ControlsBar
+                    isControlsHidden={isControlsHidden}
+                    view={view}
+                    viewMode={viewMode}
+                    onViewModeChange={setViewMode}
+                    onBackClick={() => navigate("/")}
+                    activeFilters={activeFilters}
+                    setActiveFilters={setActiveFilters}
+                    items={view === "home" ? allComics : currentIssues}
+                />
 
                 <main className={`container ${isControlsHidden ? "controls-hidden" : ""}`} id="main-container">
                     <div className={`scrollable-content ${isLoading || error || filteredItems.length === 0 ? "has-status-message" : ""}`} ref={scrollableContentRef}>
