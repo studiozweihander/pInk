@@ -1,6 +1,32 @@
 import React from "react";
+import { CONTACT_EMAIL, SOCIAL_LINKS } from "../constants";
 
 const Footer: React.FC = () => {
+    const [requestTitle, setRequestTitle] = React.useState("");
+    const [notification, setNotification] = React.useState<{ message: string; type: "success" | "error" | null }>({
+        message: "",
+        type: null,
+    });
+
+    const showNotification = (message: string, type: "success" | "error" = "success") => {
+        setNotification({ message, type });
+        setTimeout(() => setNotification({ message: "", type: null }), 3000);
+    };
+
+    const handleRequest = () => {
+        if (!requestTitle.trim()) {
+            showNotification("Por favor, digite sua solicitação antes de enviar.", "error");
+            return;
+        }
+
+        const encodedContent = encodeURIComponent(requestTitle);
+        const mailtoURL = `mailto:${CONTACT_EMAIL}?subject=Solicitação de quadrinho&body=Olá, eu gostaria que vocês adicionassem o seguinte quadrinho: ${encodedContent}`;
+
+        window.location.href = mailtoURL;
+        setRequestTitle("");
+        showNotification("Solicitação preparada! Por favor, não altere o assunto do email.");
+    };
+
     return (
         <footer className="site-footer">
             <div className="footer-content">
@@ -20,12 +46,16 @@ const Footer: React.FC = () => {
                                 id="footer-email"
                                 placeholder="Digite apenas o nome do quadrinho"
                                 aria-label="Solicite um quadrinho"
+                                value={requestTitle}
+                                onChange={(e) => setRequestTitle(e.target.value)}
+                                onKeyDown={(e) => e.key === "Enter" && handleRequest()}
                             />
                             <button
                                 type="button"
                                 id="submit-request"
                                 className="email-submit-btn"
                                 aria-label="Enviar solicitação"
+                                onClick={handleRequest}
                             >
                                 <span>Solicitar</span>
                                 <svg
@@ -47,7 +77,7 @@ const Footer: React.FC = () => {
                         <h3 className="footer-section-title">Contato</h3>
                         <div className="footer-links">
                             <a
-                                href="mailto:comics.pink@gmail.com"
+                                href={`mailto:${CONTACT_EMAIL}`}
                                 className="footer-link"
                                 target="_blank"
                                 rel="noopener noreferrer"
@@ -62,7 +92,7 @@ const Footer: React.FC = () => {
                                 >
                                     <path d="M160-160q-33 0-56.5-23.5T80-240v-480q0-33 23.5-56.5T160-800h640q33 0 56.5 23.5T880-720v480q0 33-23.5 56.5T800-160H160Zm320-280L160-640v400h640v-400L480-440Zm0-80 320-200H160l320 200ZM160-640v-80 480-400Z"></path>
                                 </svg>
-                                comics.pink@gmail.com
+                                {CONTACT_EMAIL}
                             </a>
                         </div>
                     </div>
@@ -82,7 +112,7 @@ const Footer: React.FC = () => {
                     <div className="footer-section">
                         <h3 className="footer-section-title">Redes Sociais</h3>
                         <div className="footer-social">
-                            <a href="https://x.com/pinkcomics" className="social-link" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
+                            <a href={SOCIAL_LINKS.twitter} className="social-link" target="_blank" rel="noopener noreferrer" aria-label="Twitter">
                                 <svg viewBox="0 0 1200 1227" fill="currentColor">
                                     <path d="M714.163 519.284 1160.89 0h-105.86L667.137 450.887 357.328 0H0l468.492 681.821L0 1226.37h105.866l409.625-476.152 327.181 476.152H1200L714.137 519.284h.026ZM569.165 687.828l-47.468-67.894-377.686-540.24h162.604l304.797 435.991 47.468 67.894 396.2 566.721H892.476L569.165 687.854v-.026Z" />
                                 </svg>
@@ -103,6 +133,12 @@ const Footer: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {notification.type && (
+                <div className={`notification-toast ${notification.type}`}>
+                    <span>{notification.message}</span>
+                </div>
+            )}
         </footer>
     );
 };

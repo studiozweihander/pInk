@@ -1,6 +1,6 @@
 {
   "name": "pink",
-  "version": "2.3.3",
+  "version": "2.4.0",
   "description": "Catálogo de quadrinhos",
   "main": "src/server/index.ts",
   "scripts": {
@@ -34,7 +34,8 @@
     "elysia": "^1.4.19",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",
-    "react-router-dom": "^7.11.0"
+    "react-helmet-async": "^2.0.5",
+    "react-router-dom": "^7.13.0"
   },
   "private": true,
   "peerDependencies": {

@@ -4,6 +4,7 @@ import { swagger } from "@elysiajs/swagger";
 import { testConnection } from "./config/database";
 import { comicsController } from "./controllers/comicsController";
 import { issuesController } from "./controllers/issuesController";
+import { APP_VERSION } from "../constants";
 
 const PORT = process.env.PORT || 3000;
 
@@ -15,7 +16,7 @@ const app = new Elysia()
   .get("/health", () => ({
     status: "OK",
     timestamp: new Date().toISOString(),
-    version: "2.3.3",
+    version: APP_VERSION,
   }))
   .group("/api", (app) =>
     app
@@ -32,9 +33,9 @@ const app = new Elysia()
       ),
   )
   .get("/", () => ({
-    name: "pInk API",
+    name: `pInk API`,
     description: "Catálogo de quadrinhos",
-    version: "2.3.3",
+    version: APP_VERSION,
     endpoints: {
       health: "/health",
       comics: "/api/comics",

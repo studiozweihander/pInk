@@ -1,8 +1,6 @@
 import React from "react";
 import { Issue } from "../api";
-
-const PLACEHOLDER_IMAGE =
-    "https://placehold.co/300x450/242424/e78fde?text=Imagem+Não+Disponível&font=source-sans-pro";
+import { PLACEHOLDER_IMAGE } from "../constants";
 
 interface IssueCardProps {
     issue: Issue;
@@ -22,7 +20,7 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onClick }) => {
             <div className="card-image">
                 <img
                     src={issue.cover || PLACEHOLDER_IMAGE}
-                    alt={issue.title}
+                    alt={`Capa do quadrinho ${issue.title} de ${issue.year}`}
                     referrerPolicy="no-referrer"
                     onError={(e: any) => {
                         e.target.src = PLACEHOLDER_IMAGE;

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { api, Issue } from "../api";
+import { PLACEHOLDER_IMAGE } from "../constants";
 
 interface ModalProps {
     issueId: number;
@@ -36,7 +37,15 @@ const Modal: React.FC<ModalProps> = ({ issueId, onClose }) => {
                 </button>
                 <div className="modal-body">
                     <div className="modal-image">
-                        <img src={issue?.cover} alt={issue?.title} referrerPolicy="no-referrer" />
+                        <img
+                            src={issue?.cover || PLACEHOLDER_IMAGE}
+                            alt={`Capa do quadrinho ${issue?.title} de ${issue?.year}`}
+                            referrerPolicy="no-referrer"
+                            onError={(e: any) => {
+                                e.target.src = PLACEHOLDER_IMAGE;
+                            }}
+                        />
+
                     </div>
                     <div className="modal-info">
                         <div className="modal-header">
