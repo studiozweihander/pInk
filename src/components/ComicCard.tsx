@@ -2,9 +2,7 @@ import React from "react";
 import { Link } from "react-router-dom";
 import { Comic } from "../api";
 import { slugify } from "../utils/slugify";
-
-const PLACEHOLDER_IMAGE =
-    "https://placehold.co/300x450/242424/e78fde?text=Imagem+Não+Disponível&font=source-sans-pro";
+import { PLACEHOLDER_IMAGE } from "../constants";
 
 interface ComicCardProps {
     comic: Comic;
@@ -25,7 +23,7 @@ const ComicCard: React.FC<ComicCardProps> = ({ comic }) => {
             <div className="card-image">
                 <img
                     src={comic.cover || PLACEHOLDER_IMAGE}
-                    alt={comic.title}
+                    alt={`Capa do quadrinho ${comic.title} de ${comic.year}`}
                     referrerPolicy="no-referrer"
                     onError={(e: any) => {
                         e.target.src = PLACEHOLDER_IMAGE;
