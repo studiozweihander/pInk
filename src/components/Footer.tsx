@@ -2,6 +2,31 @@ import React from "react";
 import { CONTACT_EMAIL, SOCIAL_LINKS } from "../constants";
 
 const Footer: React.FC = () => {
+    const [requestTitle, setRequestTitle] = React.useState("");
+    const [notification, setNotification] = React.useState<{ message: string; type: "success" | "error" | null }>({
+        message: "",
+        type: null,
+    });
+
+    const showNotification = (message: string, type: "success" | "error" = "success") => {
+        setNotification({ message, type });
+        setTimeout(() => setNotification({ message: "", type: null }), 3000);
+    };
+
+    const handleRequest = () => {
+        if (!requestTitle.trim()) {
+            showNotification("Por favor, digite sua solicitação antes de enviar.", "error");
+            return;
+        }
+
+        const encodedContent = encodeURIComponent(requestTitle);
+        const mailtoURL = `mailto:${CONTACT_EMAIL}?subject=Solicitação de quadrinho&body=Olá, eu gostaria que vocês adicionassem o seguinte quadrinho: ${encodedContent}`;
+
+        window.location.href = mailtoURL;
+        setRequestTitle("");
+        showNotification("Solicitação preparada! Por favor, não altere o assunto do email.");
+    };
+
     return (
         <footer className="site-footer">
             <div className="footer-content">
@@ -21,12 +46,16 @@ const Footer: React.FC = () => {
                                 id="footer-email"
                                 placeholder="Digite apenas o nome do quadrinho"
                                 aria-label="Solicite um quadrinho"
+                                value={requestTitle}
+                                onChange={(e) => setRequestTitle(e.target.value)}
+                                onKeyDown={(e) => e.key === "Enter" && handleRequest()}
                             />
                             <button
                                 type="button"
                                 id="submit-request"
                                 className="email-submit-btn"
                                 aria-label="Enviar solicitação"
+                                onClick={handleRequest}
                             >
                                 <span>Solicitar</span>
                                 <svg
@@ -104,6 +133,12 @@ const Footer: React.FC = () => {
                     </div>
                 </div>
             </div>
+
+            {notification.type && (
+                <div className={`notification-toast ${notification.type}`}>
+                    <span>{notification.message}</span>
+                </div>
+            )}
         </footer>
     );
 };
