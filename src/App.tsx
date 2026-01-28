@@ -13,6 +13,7 @@ import "./styles/main.css";
 
 const ComicDetails: React.FC<{
     allComics: Comic[];
+    currentComic: Comic | null;
     setView: (view: "home" | "issues") => void;
     setCurrentComic: (comic: Comic | null) => void;
     setCurrentIssues: (issues: Issue[]) => void;
@@ -115,6 +116,7 @@ const App: React.FC = () => {
             setCurrentComic(null);
             setCurrentIssues([]);
             setSearchTerm("");
+            setSelectedIssueId(null);
         }
     }, [location.pathname]);
 
@@ -181,6 +183,7 @@ const App: React.FC = () => {
                     <Route path="/:slug" element={
                         <ComicDetails
                             allComics={allComics}
+                            currentComic={currentComic}
                             setView={setView}
                             setCurrentComic={setCurrentComic}
                             setCurrentIssues={setCurrentIssues}
@@ -203,6 +206,9 @@ const App: React.FC = () => {
                 />
 
                 <main className={`container ${isControlsHidden ? "controls-hidden" : ""}`} id="main-container">
+                    <h2 className="sr-only">
+                        {view === "home" ? "Todos os Quadrinhos" : `Edições de ${currentComic?.title}`}
+                    </h2>
                     <div className={`scrollable-content ${isLoading || error || filteredItems.length === 0 ? "has-status-message" : ""}`} ref={scrollableContentRef}>
                         {isLoading ? (
                             <StatusMessage type="loading" />

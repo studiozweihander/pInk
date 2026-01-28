@@ -34,11 +34,14 @@ header {
   transform: scale(1.02);
 }
 
+h1.logo-text,
 .logo-text {
   color: var(--primary-color);
   font-size: 1.2rem;
   font-weight: 600;
   font-family: var(--font2);
+  margin: 0;
+  padding: 0;
 }
 
 .logo-chevron {
@@ -62,6 +65,7 @@ header {
   transform: translateX(2px);
 }
 
+h1#breadcrumb,
 #breadcrumb {
   color: var(--secondary-font);
   font-size: 1rem;
@@ -71,6 +75,8 @@ header {
   overflow: hidden;
   text-overflow: ellipsis;
   margin-left: var(--spacing-sm);
+  margin-top: 0;
+  margin-bottom: 0;
 }
 
 .search-container {
@@ -165,6 +171,7 @@ header {
     justify-content: flex-start;
   }
 
+  h1.logo-text,
   .logo-text {
     font-size: 2rem;
   }
@@ -173,6 +180,7 @@ header {
     font-size: 1.5rem;
   }
 
+  h1#breadcrumb,
   #breadcrumb {
     font-size: 1.5rem;
     font-weight: 600;

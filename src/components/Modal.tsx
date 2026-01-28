@@ -2,7 +2,6 @@ import React, { useEffect, useState } from "react";
 import { api, Issue } from "../api";
 import { PLACEHOLDER_IMAGE } from "../constants";
 
-
 interface ModalProps {
     issueId: number;
     onClose: () => void;

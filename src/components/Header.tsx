@@ -42,14 +42,20 @@ const Header: React.FC<HeaderProps> = ({
                     onClick={() => navigate("/")}
                     style={{ cursor: "pointer" }}
                 >
-                    <span className="logo-text">pInk</span>
+                    {view === "home" ? (
+                        <h1 className="logo-text">pInk</h1>
+                    ) : (
+                        <span className="logo-text">pInk</span>
+                    )}
                     <span className="logo-chevron">&gt;</span>
                 </div>
-                <span id="breadcrumb">
-                    {view === "issues" && currentComic
-                        ? `${currentComic.title} (${currentComic.year || "N/A"})`
-                        : ""}
-                </span>
+                {view === "issues" && currentComic ? (
+                    <h1 id="breadcrumb">
+                        {`${currentComic.title} (${currentComic.year || "N/A"})`}
+                    </h1>
+                ) : (
+                    <span id="breadcrumb"></span>
+                )}
             </div>
 
             <div className="search-container" ref={searchRef}>
