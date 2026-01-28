@@ -5,6 +5,8 @@ import IssueCard from "../components/IssueCard";
 import ControlsBar from "../components/ControlsBar";
 import StatusMessage from "../components/StatusMessage";
 import Modal from "../components/Modal";
+import { updateMetaTags } from "../utils/seoUtils";
+import { getDynamicOGImage } from "../constants";
 
 interface ComicContext {
     searchTerm: string;
@@ -95,9 +97,17 @@ const ComicPage: React.FC = () => {
 
     useEffect(() => {
         if (currentComic) {
-            document.title = `pInk | ${currentComic.title} (${currentComic.year})`;
+            updateMetaTags({
+                title: `pInk | ${currentComic.title} (${currentComic.year})`,
+                description: `Baixe e leia ${currentComic.title} (${currentComic.year}) gratuitamente no pInk. Acesse todas as edições disponíveis deste quadrinho da ${currentComic.publisher} em alta qualidade.`,
+                image: getDynamicOGImage(currentComic.title, currentComic.year),
+                keywords: `${currentComic.title}, ${currentComic.publisher}, quadrinhos ${currentComic.year}, baixar ${currentComic.title}, hq gratuita`,
+            });
         } else {
-            document.title = "pInk | Carregando...";
+            updateMetaTags({
+                title: "pInk | Carregando...",
+                description: "Carregando detalhes do quadrinho no pInk. Aguarde enquanto preparamos a sua leitura.",
+            });
         }
     }, [currentComic]);
 
