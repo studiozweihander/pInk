@@ -1,6 +1,5 @@
 import { supabase } from "../config/database";
-import type { Comic, Issue } from "../types";
-import { slugify } from "../utils/slugify";
+import { slugify } from "../../utils/slugify";
 
 export const comicsController = {
   async getAllComics() {
@@ -18,9 +17,10 @@ export const comicsController = {
           publisherId,
           Idiom(name),
           Publisher(name)
-        `
+        `,
         )
-        .order("title", { ascending: true });
+        .order("title", { ascending: true })
+        .order("year", { ascending: true });
 
       if (error) throw error;
 
@@ -66,7 +66,7 @@ export const comicsController = {
           const titleSlug = yearMatch[1];
           const year = parseInt(yearMatch[2]);
           matchingComic = allComics.find(
-            (c) => slugify(c.title) === titleSlug && c.year === year
+            (c) => slugify(c.title) === titleSlug && c.year === year,
           );
         }
 
@@ -90,7 +90,7 @@ export const comicsController = {
           *,
           Idiom(name),
           Publisher(name)
-        `
+        `,
         )
         .eq("id", numericId)
         .single();
@@ -151,7 +151,7 @@ export const comicsController = {
           const titleSlug = yearMatch[1];
           const year = parseInt(yearMatch[2]);
           matchingComic = allComics.find(
-            (c) => slugify(c.title) === titleSlug && c.year === year
+            (c) => slugify(c.title) === titleSlug && c.year === year,
           );
         }
 
