@@ -4,6 +4,7 @@ import { api, Comic } from "../api";
 import ComicCard from "../components/ComicCard";
 import ControlsBar from "../components/ControlsBar";
 import StatusMessage from "../components/StatusMessage";
+import { updateMetaTags } from "../utils/seoUtils";
 
 interface HomeContext {
     searchTerm: string;
@@ -87,7 +88,11 @@ const Home: React.FC = () => {
     }, [isLoading]);
 
     useEffect(() => {
-        document.title = "pInk | Catálogo de Quadrinhos Gratuitos";
+        updateMetaTags({
+            title: "pInk | Catálogo de Quadrinhos Gratuitos",
+            description: "Explore o pInk, o melhor catálogo de quadrinhos gratuitos da web! Encontre edições da Marvel, DC, Image e muito mais. Nossa biblioteca é atualizada constantemente com as melhores HQs em alta qualidade para download.",
+            keywords: "catálogo de quadrinhos, hqs gratuitas, baixar hqs, ler quadrinhos online, marvel comics, dc comics, image comics, pInk comics",
+        });
     }, []);
 
     return (
