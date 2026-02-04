@@ -12,6 +12,11 @@
   flex-shrink: 0;
 }
 
+.landing-section.auto-height {
+  height: auto;
+  min-height: 100vh;
+}
+
 .container {
   background: var(--secondary-surface);
   padding-top: 1rem;

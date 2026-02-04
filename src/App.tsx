@@ -5,6 +5,7 @@ import Footer from "./components/Footer";
 import ASCIIArt from "./components/ASCIIArt";
 import Home from "./pages/Home";
 import ComicPage from "./pages/Comic";
+import Indice from "./pages/Indice";
 import "./styles/main.css";
 
 const Layout: React.FC = () => {
@@ -14,11 +15,12 @@ const Layout: React.FC = () => {
     const navigate = useNavigate();
 
     const isHome = location.pathname === "/" || location.pathname === "" || location.pathname === "/index.html";
-    const view = isHome ? "home" : "issues";
+    const isIndice = location.pathname === "/indice";
+    const view = isHome ? "home" : isIndice ? "indice" : "issues";
 
     return (
         <div className="main-wrapper">
-            <div className="landing-section">
+            <div className={`landing-section ${view === "indice" ? "auto-height" : ""}`}>
                 <Header
                     view={view}
                     currentComic={headerComic}
@@ -39,6 +41,7 @@ const App: React.FC = () => {
         <Routes>
             <Route path="/" element={<Layout />}>
                 <Route index element={<Home />} />
+                <Route path="indice" element={<Indice />} />
                 <Route path=":slug" element={<ComicPage />} />
             </Route>
         </Routes>
