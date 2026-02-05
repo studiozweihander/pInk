@@ -27,8 +27,8 @@ interface ComicSection {
     title: string;
     link?: {
         text: string;
-        url: string;
-    };
+        url?: string | null;
+    } | null;
     issues: Issue[];
 }
 
@@ -3024,16 +3024,308 @@ const HELLBLAZER_ISSUES: Issue[] = [
     }
 ];
 
+const HITGIRL_2012_ISSUES: Issue[] = [
+    {
+        title: "Hit-Girl #1",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/KCDX3GA43W#xkviEoM4LGIU" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/5wz330.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Hit-Girl #2",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/71K2B4HSKM#iZUZPN2scXQK" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/ipx7cs.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Hit-Girl #3",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/57G2AA29HG#k65LZKsdUIcx" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/z00iqp.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Hit-Girl #4",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/WERD1065TC#lqxyYTe0laSe" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/n2c0a2.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Hit-Girl #5",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/M62EKQ8HAR#iLR2toxCkEKz" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/o2lrxv.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+];
+
+const HITGIRL_2018_ISSUES: Issue[] = [
+    {
+        title: "Hit-Girl #1",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/3QXD8ETMA8#J2f1zCnqp9D2" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/ehjyd8.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Hit-Girl #2",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/4Y74R119ZM#qkc9lTofEQmP" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/g8mmkw.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Hit-Girl #3",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/JQ8Y9YSDBR#Ye1JlIIRE8uG" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/6mfxde.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Hit-Girl #4",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/WT3XSQ2CKC#OYrpbfgIVqUs" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/in0qj9.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Hit-Girl #5",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/77HWR9NJRM#dK8rNqnmtjJN" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/2865h3.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Hit-Girl #6",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/048MRSB144#wAPzjfyP866W" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/yndx6f.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Hit-Girl #7",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/DGHATNNHCC#nbMtLwGQvibs" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/n83g7r.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Hit-Girl #8",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/R4B1H1YKP4#vEWfXznC25Xt" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/nd1muq.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Hit-Girl #9",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/2EPVZ10QAM#8tvnkrul5hdx" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/n4b2xh.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Hit-Girl #10",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/1RAAPGGJNM#cEsOIMqfNlrR" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/g3378o.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Hit-Girl #11",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/7NJDQY7YV0#DwSJ2SXB5ceR" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/mxygr0.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Hit-Girl #12",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/5WVMEJ3E54#oraIyynH0xgW" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/64idyd.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+];
+
+const HITGIRL_2019_ISSUES: Issue[] = [
+    {
+        title: "Hit-Girl #1",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/WH3TT51T20#DVuTtuQ3Yus0" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/tqudgf.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Hit-Girl #2",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/1V9GCFTFAG#oxvdtAqYosn4" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/5gchxr.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Hit-Girl #3",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/R5PBHT9XKW#LPoZyxQ7rVKD" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/tggv1q.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Hit-Girl #4",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/AWB4PWK60M#ULD6LiQxKftB" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/lmk7mr.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Hit-Girl #5",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/VBG9ACZXJ4#ffmDxlkXmtPu" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/9k48s8.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Hit-Girl #6",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/4GM6ME0G4M#ptxWQnBQHMxt" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/9eu2nj.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Hit-Girl #7",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/3F3D0AW588#1n09d2jevIat" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/33ekpm.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Hit-Girl #8",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/8H2EZ003MC#epyVoutGl98W" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/b1u9ac.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Hit-Girl #9",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/NKE44KJXMM#SMQsSD7XpVSz" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/9p7vw8.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Hit-Girl #10",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/F43SQ3ABC8#mwpFxdq3fBEa" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/hadfnl.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Hit-Girl #11",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/194A1EZWNC#Bp7hRwwiU9Yd" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/0zcbst.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Hit-Girl #12",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/QA6Q44VMV4#mSZ3py28QM6M" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/pjd0aa.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+];
+
+const INCOGNITO_ISSUES: Issue[] = [
+    {
+        title: "Incognito #1",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/ND7N3EK98M#iBj5OKUsExm9" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/32arv9.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Incognito #2",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/EV22JHC2EC#8pjCbYXhCZOt" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/tdn2pb.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Incognito #3",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/6W46RFXBGW#k6HBy2iZWZPA" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/p2j9i3.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Incognito #4",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/BJYHJNS3P8#VMabipluiAXo" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/o8px4y.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Incognito #5",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/NKPQVEVAK0#z2uD5XaRufni" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/whp6je.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+    {
+        title: "Incognito #6",
+        providers: [
+            { type: "proton", label: "Proton Drive", url: "https://drive.proton.me/urls/J06P1K7R3G#qGEH1mJl1Kut" },
+            { type: "catbox", label: "Catbox", url: "https://files.catbox.moe/qbytmu.cbz" },
+            { type: "archive", label: "Archive" }
+        ]
+    },
+];
+
 const COMIC_DATA_BY_LETTER: Record<string, ComicSection[]> = {
     A: [
         {
-            id: "h3-absolute-batman",
+            id: "h3-absolute-batman-2024",
             title: "Absolute Batman [2024]",
             link: { text: "Darkseid Club", url: "https://site.ds-club.net/" },
             issues: ABSOLUTE_BATMAN_ISSUES
         },
         // {
-        //     id: "h3-absolute-wonder-woman",
+        //     id: "h3-absolute-wonder-woman-2024",
         //     title: "Absolute Wonder Woman [2024]",
         //     link: { text: "Darkseid Club", url: "https://site.ds-club.net/" },
         //     issues: ABSOLUTE_WONDER_WOMAN_ISSUES
@@ -3041,7 +3333,7 @@ const COMIC_DATA_BY_LETTER: Record<string, ComicSection[]> = {
     ],
     B: [
         {
-            id: "h3-bite-club",
+            id: "h3-bite-club-2004",
             title: "Bite Club [2004]",
             link: { text: "Quadrinhos Nerds", url: "https://t.me/QuadrinhosNerds" },
             issues: BITE_CLUB_ISSUES
@@ -3049,7 +3341,7 @@ const COMIC_DATA_BY_LETTER: Record<string, ComicSection[]> = {
     ],
     F: [
         {
-            id: "h3-fatale",
+            id: "h3-fatale-2012",
             title: "Fatale [2012]",
             link: { text: "Quadrinhos Nerds", url: "https://t.me/QuadrinhosNerds" },
             issues: FATALE_ISSUES
@@ -3057,16 +3349,42 @@ const COMIC_DATA_BY_LETTER: Record<string, ComicSection[]> = {
     ],
     H: [
         {
-            id: "h3-happy",
+            id: "h3-happy-2012",
             title: "Happy! [2012]",
             link: { text: "QuadrinhosBr", url: "https://t.me/QuadrinhosBrasilOFC" },
             issues: HAPPY_ISSUES
         },
         {
-            id: "h3-hellblazer",
+            id: "h3-hellblazer-1988",
             title: "Hellblazer [1988]",
-            link: { text: "Diversos", url: "" },
+            link: { text: "Diversos" },
             issues: HELLBLAZER_ISSUES
+        },
+        {
+            id: "h3-hit-girl-2012",
+            title: "Hit-Girl [2012]",
+            link: { text: "Quadrinhos Nerds", url: "https://t.me/QuadrinhosNerds" },
+            issues: HITGIRL_2012_ISSUES
+        },
+        {
+            id: "h3-hit-girl-2018",
+            title: "Hit-Girl [2018]",
+            link: { text: "Quadrinhos Nerds", url: "https://t.me/QuadrinhosNerds" },
+            issues: HITGIRL_2018_ISSUES
+        },
+        {
+            id: "h3-hit-girl-2019",
+            title: "Hit-Girl [2019]",
+            link: { text: "Quadrinhos Nerds", url: "https://t.me/QuadrinhosNerds" },
+            issues: HITGIRL_2019_ISSUES
+        }
+    ],
+    I: [
+        {
+            id: "h3-incognito-2008",
+            title: "Incognito [2008]",
+            link: { text: "Quadrinhos Nerds", url: "https://t.me/QuadrinhosNerds" },
+            issues: INCOGNITO_ISSUES
         }
     ]
 };
@@ -3098,7 +3416,13 @@ const Indice: React.FC = () => {
                 <h3>
                     {section.title}
                     {section.link && (
-                        <> by <a href={section.link.url} rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>{section.link.text}</a></>
+                        <> by {section.link.url ? (
+                            <a href={section.link.url} rel="noopener noreferrer" onClick={(e) => e.stopPropagation()}>
+                                {section.link.text}
+                            </a>
+                        ) : (
+                            <span>{section.link.text}</span>
+                        )}</>
                     )}
                 </h3>
                 <svg className="section-chevron" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
