@@ -1,0 +1,51 @@
+.seeder-block {
+  background: #2a2a2a;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #333333;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.seeder-block h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #e48fde;
+}
+
+.seeder-output-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.seeder-output-controls button {
+  background: var(--primary-color);
+  color: var(--primary-surface);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  padding: 10px 16px;
+  cursor: pointer;
+  font-family: var(--font2);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: var(--transition-fast);
+}
+
+.seeder-output-controls button.is-secondary {
+  background: rgba(231, 143, 222, 0.2);
+  color: var(--secondary-font);
+  border: 1px solid rgba(231, 143, 222, 0.35);
+}
+
+.seeder-output-controls button:hover {
+  transform: translateY(-1px);
+}
+
+.seeder-output {
+  resize: vertical;
+  width: 100%;
+  font-family: "JetBrains Mono", monospace;
+}

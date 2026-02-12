@@ -1,0 +1,142 @@
+.seeder-block {
+  background: #2a2a2a;
+  border-radius: 12px;
+  padding: 20px;
+  border: 1px solid #333333;
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.seeder-block h4 {
+  margin: 0;
+  font-size: 1.1rem;
+  color: #e48fde;
+}
+
+.seeder-table-wrapper {
+  overflow-x: auto;
+  background: #2a2a2a;
+  border: 1px solid #333333;
+  border-radius: 12px;
+}
+
+.seeder-table {
+  width: 100%;
+  border-collapse: collapse;
+  background: #2a2a2a;
+  border-radius: 12px;
+  overflow: hidden;
+  table-layout: fixed;
+}
+
+.seeder-table th {
+  text-align: left;
+  padding: 15px 12px;
+  background: #e48fde;
+  color: #181818;
+  text-transform: uppercase;
+  font-weight: 500;
+  font-size: 0.85rem;
+  letter-spacing: 0.5px;
+}
+
+.seeder-table th:nth-child(1) {
+  width: 50px;
+}
+
+.seeder-table th:nth-child(2) {
+  width: 80px;
+}
+
+.seeder-table th:nth-child(3) {
+  width: 95px;
+}
+
+.seeder-table th:nth-child(4) {
+  width: 120px;
+}
+
+.seeder-table th:nth-child(5) {
+  width: 200px;
+}
+
+.seeder-table th:nth-child(6) {
+  width: auto;
+  min-width: 300px;
+}
+
+.seeder-table td {
+  padding: 12px;
+  border-bottom: 1px solid #333333;
+}
+
+.seeder-table td:first-child {
+  text-align: center;
+  padding: 8px;
+}
+
+.seeder-table tbody tr:hover {
+  background: #2e2e2e;
+}
+
+.seeder-table tbody tr.is-selected {
+  background: #2e2e2e;
+}
+
+.seeder-table input[type="checkbox"] {
+  cursor: pointer;
+  width: 16px;
+  height: 16px;
+  accent-color: var(--primary-color);
+}
+
+.seeder-table input,
+.seeder-table textarea {
+  background: #333333;
+  border: 1px solid #444444;
+  padding: 7px;
+  width: 100%;
+  color: #ffffff;
+  min-width: 2rem;
+  box-sizing: border-box;
+}
+
+.seeder-table textarea {
+  resize: vertical;
+}
+
+.seeder-table input:focus,
+.seeder-table textarea:focus {
+  border-color: #e48fde;
+}
+
+.seeder-table-controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--spacing-sm);
+}
+
+.seeder-table-controls button {
+  background: var(--primary-color);
+  color: var(--primary-surface);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  padding: 10px 16px;
+  cursor: pointer;
+  font-family: var(--font2);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: var(--transition-fast);
+}
+
+.seeder-table-controls button.is-secondary {
+  background: rgba(231, 143, 222, 0.2);
+  color: var(--secondary-font);
+  border: 1px solid rgba(231, 143, 222, 0.35);
+}
+
+.seeder-table-controls button:hover {
+  transform: translateY(-1px);
+}

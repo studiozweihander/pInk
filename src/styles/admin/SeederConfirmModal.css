@@ -1,0 +1,132 @@
+.modal-admin {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2500;
+}
+
+.modal-admin-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.8);
+  backdrop-filter: blur(6px);
+}
+
+.modal-admin-content {
+  position: relative;
+  background: var(--secondary-surface);
+  border-radius: var(--border-radius-lg);
+  padding: var(--spacing-xl);
+  width: min(420px, 90vw);
+  border: 1px solid rgba(231, 143, 222, 0.2);
+  box-shadow: 0 24px 50px rgba(0, 0, 0, 0.45);
+  z-index: 2;
+}
+
+.modal-admin-close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: none;
+  background: transparent;
+  color: var(--secondary-font);
+  font-size: 22px;
+  cursor: pointer;
+  transition: var(--transition-fast);
+}
+
+.modal-admin-close:hover {
+  color: var(--primary-color);
+  background: rgba(231, 143, 222, 0.1);
+}
+
+.modal-admin-header h2 {
+  margin: 0 0 var(--spacing-xs) 0;
+  color: var(--secondary-font);
+}
+
+.modal-admin-header p {
+  margin: 0 0 var(--spacing-md) 0;
+  color: var(--secondary-font);
+  opacity: 0.8;
+}
+
+.modal-admin-confirm-summary {
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-md);
+}
+
+.modal-admin-confirm-message {
+  margin: 0;
+  color: var(--secondary-font);
+  font-size: 0.95rem;
+}
+
+.modal-admin-confirm-details {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: var(--spacing-sm);
+}
+
+.modal-admin-confirm-details div {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: var(--spacing-sm);
+  padding: 8px 12px;
+  border-radius: var(--border-radius-sm);
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(231, 143, 222, 0.12);
+}
+
+.modal-admin-confirm-details span {
+  color: var(--secondary-font);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+  font-family: var(--font2);
+}
+
+.modal-admin-confirm-details strong {
+  color: #ffffff;
+  font-weight: 600;
+  font-family: var(--font2);
+}
+
+.modal-admin-confirm-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--spacing-sm);
+  margin-top: var(--spacing-md);
+}
+
+.modal-admin-confirm-actions button {
+  background: var(--primary-color);
+  color: var(--primary-surface);
+  border: none;
+  border-radius: var(--border-radius-sm);
+  padding: 10px 16px;
+  cursor: pointer;
+  font-family: var(--font2);
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: var(--transition-fast);
+}
+
+.modal-admin-confirm-actions button.is-secondary {
+  background: rgba(231, 143, 222, 0.2);
+  color: var(--secondary-font);
+  border: 1px solid rgba(231, 143, 222, 0.35);
+}
+
+.modal-admin-confirm-actions button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}

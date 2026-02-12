@@ -1,0 +1,30 @@
+.seeder-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
+}
+
+.seeder-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.seeder-actions button {
+  background: #e48fde;
+  color: #181818;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  cursor: pointer;
+  font-family: var(--font2);
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: var(--transition-fast);
+}
+
+.seeder-actions button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
