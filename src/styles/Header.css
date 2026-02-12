@@ -88,6 +88,12 @@ h1#breadcrumb,
     height: 40px;
 }
 
+.header-action-slot {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-sm);
+}
+
 .search-toggle,
 .search-close {
     background: none;

@@ -113,6 +113,13 @@ const Footer: React.FC = () => {
                                 </svg>
                                 Índice
                             </Link>
+                            <Link to="/admin" className="footer-link">
+                                <svg viewBox="0 0 24 24" fill="none" height="18px" width="18px" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M12 3L4 6.5V12.5C4 17.1944 7.05556 21.5 12 21.5C16.9444 21.5 20 17.1944 20 12.5V6.5L12 3Z" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                    <path d="M9.5 12.5L11 14L14.5 10.5" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                                </svg>
+                                Área Administrativa
+                            </Link>
                         </div>
                     </div>
 

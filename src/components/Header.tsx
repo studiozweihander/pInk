@@ -3,10 +3,11 @@ import { Link, useNavigate } from "react-router-dom";
 import { Comic } from "../api";
 
 interface HeaderProps {
-    view: "home" | "issues" | "indice";
+    view: "home" | "issues" | "indice" | "admin";
     currentComic: Comic | null;
     searchTerm: string;
     onSearchChange: (val: string) => void;
+    actionSlot?: React.ReactNode | null;
 }
 
 const Header: React.FC<HeaderProps> = ({
@@ -14,6 +15,7 @@ const Header: React.FC<HeaderProps> = ({
     currentComic,
     searchTerm,
     onSearchChange,
+    actionSlot,
 }) => {
     const [isSearchOpen, setIsSearchOpen] = useState(false);
     const navigate = useNavigate();
@@ -55,13 +57,18 @@ const Header: React.FC<HeaderProps> = ({
                     </h1>
                 ) : view === "indice" ? (
                     <h1 id="breadcrumb">Índice</h1>
+                ) : view === "admin" ? (
+                    <h1 id="breadcrumb">Área Administrativa</h1>
                 ) : (
                     <span id="breadcrumb"></span>
                 )}
             </div>
 
             <div className="search-container" ref={searchRef}>
-                {view !== "indice" && (
+                {view === "admin" && actionSlot ? (
+                    <div className="header-action-slot">{actionSlot}</div>
+                ) : null}
+                {view !== "indice" && view !== "admin" && (
                     <>
                         <button
                             className="search-toggle"

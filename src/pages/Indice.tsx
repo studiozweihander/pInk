@@ -7,6 +7,7 @@ import archiveIcon from "../assets/archive-icon.png";
 
 interface IndiceContext {
     setHeaderComic: (comic: any | null) => void;
+    setHeaderAction: (action: React.ReactNode | null) => void;
 }
 
 type ProviderType = "proton" | "catbox" | "archive";

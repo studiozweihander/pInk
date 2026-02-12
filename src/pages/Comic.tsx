@@ -11,6 +11,7 @@ import { getDynamicOGImage } from "../constants";
 interface ComicContext {
     searchTerm: string;
     setHeaderComic: (comic: ComicType | null) => void;
+    setHeaderAction: (action: React.ReactNode | null) => void;
 }
 
 const ComicPage: React.FC = () => {

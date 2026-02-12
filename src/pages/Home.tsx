@@ -8,6 +8,7 @@ import { updateMetaTags } from "../utils/seoUtils";
 
 interface HomeContext {
     searchTerm: string;
+    setHeaderAction: (action: React.ReactNode | null) => void;
 }
 
 const Home: React.FC = () => {
