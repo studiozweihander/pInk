@@ -2,4 +2,4 @@ User-agent: *
 Allow: /
 
 # Sitemaps
-Sitemap: https://pink-comics.vercel.app/sitemap.xml
+Sitemap: https://pInk.zwei-han-der.com/sitemap.xml
