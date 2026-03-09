@@ -9,8 +9,8 @@
     "start": "bun run src/server/index.ts",
     "build": "vite build",
     "preview": "vite preview",
-    "worker:dev": "wrangler dev src/worker/index.ts",
-    "worker:deploy": "wrangler deploy",
+    "worker:dev": "wrangler dev --config wrangler.worker.toml",
+    "worker:deploy": "wrangler deploy --config wrangler.worker.toml",
     "cf:pages:deploy": "wrangler pages deploy dist --project-name pink",
     "cf:pages:deploy:prod": "wrangler pages deploy dist --project-name pink --branch main"
   },
