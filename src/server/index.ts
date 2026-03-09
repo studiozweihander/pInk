@@ -72,7 +72,7 @@ async function start() {
   console.log(`🚀 pInk server running on http://localhost:${PORT}`);
 }
 
-if (process.env.NODE_ENV !== "production" && !process.env.VERCEL) {
+if (process.env.NODE_ENV !== "production") {
   start().catch((err) => {
     console.error("❌ Failed to start server:", err);
     process.exit(1);

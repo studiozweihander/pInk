@@ -8,7 +8,11 @@
     "server": "bun run --watch src/server/index.ts",
     "start": "bun run src/server/index.ts",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "cf:pages:deploy": "wrangler pages deploy dist --project-name pink",
+    "cf:pages:deploy:prod": "wrangler pages deploy dist --project-name pink --branch main",
+    "cf:container:build": "docker build -t pink-api:latest .",
+    "cf:container:run": "docker run --rm -p 3000:3000 --env-file .env pink-api:latest"
   },
   "keywords": [
     "comics",
@@ -22,6 +26,7 @@
   "license": "ISC",
   "devDependencies": {
     "vite": "^7.1.2",
+    "wrangler": "^4.33.1",
     "@types/bun": "latest",
     "@types/react": "^19.2.7",
     "@types/react-dom": "^19.2.3",
