@@ -1,12 +1,21 @@
-name = "pink"
+name = "pink-api"
 compatibility_date = "2026-03-09"
+main = "src/worker/index.ts"
+workers_dev = true
 
 # Frontend deployment target (Cloudflare Pages)
 pages_build_output_dir = "dist"
 
 [vars]
 APP_ENV = "production"
+NODE_ENV = "production"
 
-# Map these in Cloudflare dashboard/secrets for backend container runtime.
-# SUPABASE_URL = ""
-# SUPABASE_ANON_KEY = ""
+# Route API paths from the custom domain to this Worker.
+routes = [
+	{ pattern = "pink.zwei-han-der.com/api/*", zone_name = "zwei-han-der.com" },
+	{ pattern = "pink.zwei-han-der.com/health", zone_name = "zwei-han-der.com" }
+]
+
+# Configure as Worker secrets (not plain vars):
+# bunx wrangler secret put SUPABASE_URL
+# bunx wrangler secret put SUPABASE_ANON_KEY
