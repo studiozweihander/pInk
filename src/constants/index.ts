@@ -12,3 +12,20 @@ export const getDynamicOGImage = (title: string, year: string | number) => {
 export const SOCIAL_LINKS = {
   twitter: "https://x.com/pinkcomics",
 } as const;
+
+export const VIEW_MODES = {
+  GRID: "grid",
+  LIST: "list",
+} as const;
+
+export type ViewMode = (typeof VIEW_MODES)[keyof typeof VIEW_MODES];
+
+export const FILTER_KEYS = {
+  PUBLISHER: "publisher",
+  YEAR: "year",
+  LANGUAGE: "language",
+} as const;
+
+export type FilterKey = (typeof FILTER_KEYS)[keyof typeof FILTER_KEYS];
+
+export type ActiveFilters = Record<FilterKey, string[]>;

@@ -1,21 +1,14 @@
 import React, { useState, useMemo, useRef, useEffect } from "react";
 import { Comic, Issue } from "../api";
+import { ActiveFilters, FILTER_KEYS, FilterKey, VIEW_MODES, ViewMode } from "../constants";
 
 interface ControlsBarProps {
     view: "home" | "issues";
-    viewMode: "grid" | "list";
-    onViewModeChange: (mode: "grid" | "list") => void;
+    viewMode: ViewMode;
+    onViewModeChange: (mode: ViewMode) => void;
     onBackClick: () => void;
-    activeFilters: {
-        publisher: string[];
-        year: string[];
-        language: string[];
-    };
-    setActiveFilters: (filters: {
-        publisher: string[];
-        year: string[];
-        language: string[];
-    }) => void;
+    activeFilters: ActiveFilters;
+    setActiveFilters: (filters: ActiveFilters) => void;
     items: (Comic | Issue)[];
     isControlsHidden: boolean;
 }
@@ -74,10 +67,10 @@ const ControlsBar: React.FC<ControlsBarProps> = ({
         };
     }, [items]);
 
-    const toggleFilter = (type: "publisher" | "year" | "language", value: string) => {
+    const toggleFilter = (type: FilterKey, value: string) => {
         const current = activeFilters[type] || [];
         const updated = current.includes(value)
-            ? current.filter((v: string) => v !== value)
+            ? current.filter((filterValue: string) => filterValue !== value)
             : [...current, value];
 
         setActiveFilters({ ...activeFilters, [type]: updated });
@@ -173,8 +166,8 @@ const ControlsBar: React.FC<ControlsBarProps> = ({
                                                 <label key={p} className="filter-option">
                                                     <input
                                                         type="checkbox"
-                                                        checked={activeFilters.publisher.includes(p)}
-                                                        onChange={() => toggleFilter("publisher", p)}
+                                                        checked={activeFilters[FILTER_KEYS.PUBLISHER].includes(p)}
+                                                        onChange={() => toggleFilter(FILTER_KEYS.PUBLISHER, p)}
                                                     />
                                                     <span className="filter-label">{p}</span>
                                                 </label>
@@ -190,8 +183,8 @@ const ControlsBar: React.FC<ControlsBarProps> = ({
                                             <label key={y} className="filter-option">
                                                 <input
                                                     type="checkbox"
-                                                    checked={activeFilters.year.includes(y)}
-                                                    onChange={() => toggleFilter("year", y)}
+                                                    checked={activeFilters[FILTER_KEYS.YEAR].includes(y)}
+                                                    onChange={() => toggleFilter(FILTER_KEYS.YEAR, y)}
                                                 />
                                                 <span className="filter-label">{y}</span>
                                             </label>
@@ -203,7 +196,11 @@ const ControlsBar: React.FC<ControlsBarProps> = ({
                                     <button
                                         className="filter-clear-all"
                                         onClick={() =>
-                                            setActiveFilters({ publisher: [], year: [], language: [] })
+                                            setActiveFilters({
+                                                [FILTER_KEYS.PUBLISHER]: [],
+                                                [FILTER_KEYS.YEAR]: [],
+                                                [FILTER_KEYS.LANGUAGE]: [],
+                                            })
                                         }
                                     >
                                         Limpar Todos
@@ -215,8 +212,8 @@ const ControlsBar: React.FC<ControlsBarProps> = ({
 
                     <div className="view-toggle">
                         <button
-                            className={`toggle-button ${viewMode === "grid" ? "active" : ""}`}
-                            onClick={() => onViewModeChange("grid")}
+                            className={`toggle-button ${viewMode === VIEW_MODES.GRID ? "active" : ""}`}
+                            onClick={() => onViewModeChange(VIEW_MODES.GRID)}
                             data-tooltip="Grade"
                             aria-label="Grade"
                             onPointerEnter={handlePointerEnter}
@@ -233,8 +230,8 @@ const ControlsBar: React.FC<ControlsBarProps> = ({
                             </svg>
                         </button>
                         <button
-                            className={`toggle-button ${viewMode === "list" ? "active" : ""}`}
-                            onClick={() => onViewModeChange("list")}
+                            className={`toggle-button ${viewMode === VIEW_MODES.LIST ? "active" : ""}`}
+                            onClick={() => onViewModeChange(VIEW_MODES.LIST)}
                             data-tooltip="Lista"
                             aria-label="Lista"
                             onPointerEnter={handlePointerEnter}

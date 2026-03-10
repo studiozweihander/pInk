@@ -1,12 +1,13 @@
 import React, { useState, useEffect, useMemo, useRef } from "react";
-import { useParams, useOutletContext, useNavigate, useLocation } from "react-router-dom";
+import { useParams, useOutletContext, useNavigate } from "react-router-dom";
 import { api, Comic as ComicType, Issue } from "../api";
 import IssueCard from "../components/IssueCard";
 import ControlsBar from "../components/ControlsBar";
 import StatusMessage from "../components/StatusMessage";
 import Modal from "../components/Modal";
 import { updateMetaTags } from "../utils/seoUtils";
-import { getDynamicOGImage } from "../constants";
+import { ActiveFilters, FILTER_KEYS, getDynamicOGImage, VIEW_MODES, ViewMode } from "../constants";
+import { useScrollVisibility } from "../hooks/useScrollVisibility";
 
 interface ComicContext {
     searchTerm: string;
@@ -17,26 +18,22 @@ const ComicPage: React.FC = () => {
     const { slug } = useParams<{ slug: string }>();
     const { searchTerm, setHeaderComic } = useOutletContext<ComicContext>();
     const navigate = useNavigate();
-    const location = useLocation();
 
     const [currentComic, setCurrentComic] = useState<ComicType | null>(null);
     const [currentIssues, setCurrentIssues] = useState<Issue[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [selectedIssueId, setSelectedIssueId] = useState<number | null>(null);
-    const [activeFilters, setActiveFilters] = useState<{
-        publisher: string[];
-        year: string[];
-        language: string[];
-    }>({
-        publisher: [],
-        year: [],
-        language: [],
+    const [activeFilters, setActiveFilters] = useState<ActiveFilters>({
+        [FILTER_KEYS.PUBLISHER]: [],
+        [FILTER_KEYS.YEAR]: [],
+        [FILTER_KEYS.LANGUAGE]: [],
     });
-    const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-    const [isControlsHidden, setIsControlsHidden] = useState(false);
-    const lastScrollTop = useRef(0);
+    const [viewMode, setViewMode] = useState<ViewMode>(VIEW_MODES.GRID);
     const scrollableContentRef = useRef<HTMLDivElement>(null);
+    const isControlsHidden = useScrollVisibility(scrollableContentRef, {
+        hideThreshold: 50,
+    });
 
     useEffect(() => {
         const loadData = async () => {
@@ -48,6 +45,9 @@ const ComicPage: React.FC = () => {
                     api.getComicById(slug),
                     api.getComicIssues(slug),
                 ]);
+                if (!comicRes.data || !issuesRes.data) {
+                    throw new Error("Resposta inválida da API");
+                }
                 setCurrentComic(comicRes.data);
                 setHeaderComic(comicRes.data);
                 setCurrentIssues(issuesRes.data);
@@ -68,32 +68,14 @@ const ComicPage: React.FC = () => {
             item.title.toLowerCase().includes(searchTerm.toLowerCase())
         );
 
-        if (activeFilters.year.length > 0) {
+        if (activeFilters[FILTER_KEYS.YEAR].length > 0) {
             filtered = filtered.filter((item) =>
-                activeFilters.year.includes(item.year?.toString())
+                activeFilters[FILTER_KEYS.YEAR].includes(item.year?.toString())
             );
         }
 
         return filtered;
     }, [currentIssues, searchTerm, activeFilters]);
-
-    useEffect(() => {
-        const scrollElement = scrollableContentRef.current;
-        if (!scrollElement) return;
-
-        const handleScroll = () => {
-            const scrollTop = scrollElement.scrollTop;
-            if (scrollTop > lastScrollTop.current && scrollTop > 50) {
-                setIsControlsHidden(true);
-            } else if (scrollTop < lastScrollTop.current) {
-                setIsControlsHidden(false);
-            }
-            lastScrollTop.current = scrollTop;
-        };
-
-        scrollElement.addEventListener("scroll", handleScroll);
-        return () => scrollElement.removeEventListener("scroll", handleScroll);
-    }, [isLoading]);
 
     useEffect(() => {
         if (currentComic) {
@@ -139,7 +121,7 @@ const ComicPage: React.FC = () => {
                             onRetry={() => navigate(0)}
                         />
                     ) : filteredItems.length > 0 ? (
-                        <div className={`cards has-content ${viewMode === "list" ? "list-view" : ""}`}>
+                        <div className={`cards has-content ${viewMode === VIEW_MODES.LIST ? "list-view" : ""}`}>
                             {filteredItems.map((item) => (
                                 <IssueCard
                                     key={item.id}
@@ -150,7 +132,7 @@ const ComicPage: React.FC = () => {
                         </div>
                     ) : (
                         <StatusMessage
-                            type={searchTerm || activeFilters.year.length > 0 ? "empty_search" : "empty_content"}
+                            type={searchTerm || activeFilters[FILTER_KEYS.YEAR].length > 0 ? "empty_search" : "empty_content"}
                             message={currentComic?.total_issues === 0 ? "Quadrinho sem edições" : undefined}
                             description={currentComic?.total_issues === 0 ? `O quadrinho "${currentComic?.title}" ainda não tem edições disponíveis.` : undefined}
                         />
