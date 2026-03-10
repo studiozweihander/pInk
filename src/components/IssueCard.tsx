@@ -22,8 +22,8 @@ const IssueCard: React.FC<IssueCardProps> = ({ issue, onClick }) => {
                     src={issue.cover || PLACEHOLDER_IMAGE}
                     alt={`Capa do quadrinho ${issue.title} de ${issue.year}`}
                     referrerPolicy="no-referrer"
-                    onError={(e: any) => {
-                        e.target.src = PLACEHOLDER_IMAGE;
+                    onError={(event: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                        event.currentTarget.src = PLACEHOLDER_IMAGE;
                     }}
                 />
             </div>

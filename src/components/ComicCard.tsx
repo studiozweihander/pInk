@@ -25,8 +25,8 @@ const ComicCard: React.FC<ComicCardProps> = ({ comic }) => {
                     src={comic.cover || PLACEHOLDER_IMAGE}
                     alt={`Capa do quadrinho ${comic.title} de ${comic.year}`}
                     referrerPolicy="no-referrer"
-                    onError={(e: any) => {
-                        e.target.src = PLACEHOLDER_IMAGE;
+                    onError={(event: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                        event.currentTarget.src = PLACEHOLDER_IMAGE;
                     }}
                 />
             </div>
