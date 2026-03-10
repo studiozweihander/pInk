@@ -1,0 +1,6 @@
+name = "pink-api"
+compatibility_date = "2026-03-09"
+
+# Frontend deployment target (Cloudflare Pages)
+pages_build_output_dir = "dist"
+

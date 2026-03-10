@@ -5,6 +5,8 @@ import ComicCard from "../components/ComicCard";
 import ControlsBar from "../components/ControlsBar";
 import StatusMessage from "../components/StatusMessage";
 import { updateMetaTags } from "../utils/seoUtils";
+import { useScrollVisibility } from "../hooks/useScrollVisibility";
+import { ActiveFilters, FILTER_KEYS, VIEW_MODES, ViewMode } from "../constants";
 
 interface HomeContext {
     searchTerm: string;
@@ -16,19 +18,16 @@ const Home: React.FC = () => {
     const [allComics, setAllComics] = useState<Comic[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
-    const [activeFilters, setActiveFilters] = useState<{
-        publisher: string[];
-        year: string[];
-        language: string[];
-    }>({
-        publisher: [],
-        year: [],
-        language: [],
+    const [activeFilters, setActiveFilters] = useState<ActiveFilters>({
+        [FILTER_KEYS.PUBLISHER]: [],
+        [FILTER_KEYS.YEAR]: [],
+        [FILTER_KEYS.LANGUAGE]: [],
     });
-    const [viewMode, setViewMode] = useState<"grid" | "list">("grid");
-    const [isControlsHidden, setIsControlsHidden] = useState(false);
-    const lastScrollTop = useRef(0);
+    const [viewMode, setViewMode] = useState<ViewMode>(VIEW_MODES.GRID);
     const scrollableContentRef = useRef<HTMLDivElement>(null);
+    const isControlsHidden = useScrollVisibility(scrollableContentRef, {
+        hideThreshold: 50,
+    });
 
     useEffect(() => {
         const loadComics = async () => {
@@ -36,6 +35,9 @@ const Home: React.FC = () => {
             setError(null);
             try {
                 const response = await api.getAllComics();
+                if (!response.data) {
+                    throw new Error("Resposta inválida da API");
+                }
                 setAllComics(response.data);
             } catch (error) {
                 console.error(error);
@@ -52,41 +54,23 @@ const Home: React.FC = () => {
             item.title.toLowerCase().includes(searchTerm.toLowerCase())
         );
 
-        if (activeFilters.year.length > 0) {
+        if (activeFilters[FILTER_KEYS.YEAR].length > 0) {
             filtered = filtered.filter((item) =>
-                activeFilters.year.includes(item.year?.toString())
+                activeFilters[FILTER_KEYS.YEAR].includes(item.year?.toString())
             );
         }
-        if (activeFilters.publisher.length > 0) {
-            filtered = filtered.filter((c) =>
-                activeFilters.publisher.includes(c.publisher)
+        if (activeFilters[FILTER_KEYS.PUBLISHER].length > 0) {
+            filtered = filtered.filter((comic) =>
+                activeFilters[FILTER_KEYS.PUBLISHER].includes(comic.publisher)
             );
         }
-        if (activeFilters.language.length > 0) {
-            filtered = filtered.filter((c) =>
-                activeFilters.language.includes(c.language)
+        if (activeFilters[FILTER_KEYS.LANGUAGE].length > 0) {
+            filtered = filtered.filter((comic) =>
+                activeFilters[FILTER_KEYS.LANGUAGE].includes(comic.language)
             );
         }
         return filtered;
     }, [allComics, searchTerm, activeFilters]);
-
-    useEffect(() => {
-        const scrollElement = scrollableContentRef.current;
-        if (!scrollElement) return;
-
-        const handleScroll = () => {
-            const scrollTop = scrollElement.scrollTop;
-            if (scrollTop > lastScrollTop.current && scrollTop > 50) {
-                setIsControlsHidden(true);
-            } else if (scrollTop < lastScrollTop.current) {
-                setIsControlsHidden(false);
-            }
-            lastScrollTop.current = scrollTop;
-        };
-
-        scrollElement.addEventListener("scroll", handleScroll);
-        return () => scrollElement.removeEventListener("scroll", handleScroll);
-    }, [isLoading]);
 
     useEffect(() => {
         updateMetaTags({
@@ -122,7 +106,7 @@ const Home: React.FC = () => {
                             onRetry={() => window.location.reload()}
                         />
                     ) : filteredItems.length > 0 ? (
-                        <div className={`cards has-content ${viewMode === "list" ? "list-view" : ""}`}>
+                        <div className={`cards has-content ${viewMode === VIEW_MODES.LIST ? "list-view" : ""}`}>
                             {filteredItems.map((item) => (
                                 <ComicCard
                                     key={item.id}
@@ -132,7 +116,7 @@ const Home: React.FC = () => {
                         </div>
                     ) : (
                         <StatusMessage
-                            type={searchTerm || activeFilters.year.length > 0 || activeFilters.publisher.length > 0 || activeFilters.language.length > 0 ? "empty_search" : "empty_content"}
+                            type={searchTerm || activeFilters[FILTER_KEYS.YEAR].length > 0 || activeFilters[FILTER_KEYS.PUBLISHER].length > 0 || activeFilters[FILTER_KEYS.LANGUAGE].length > 0 ? "empty_search" : "empty_content"}
                         />
                     )}
                 </div>

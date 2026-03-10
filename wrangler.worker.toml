@@ -1,0 +1,13 @@
+name = "pink-api"
+compatibility_date = "2026-03-09"
+main = "src/worker/index.ts"
+workers_dev = true
+
+[vars]
+APP_ENV = "production"
+NODE_ENV = "production"
+
+routes = [
+	{ pattern = "pink.zwei-han-der.com/api/*", zone_name = "zwei-han-der.com" },
+	{ pattern = "pink.zwei-han-der.com/health", zone_name = "zwei-han-der.com" }
+]

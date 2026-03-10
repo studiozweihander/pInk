@@ -3,6 +3,35 @@ export interface Idiom {
   name: string;
 }
 
+export interface PaginationMeta {
+  limit: number;
+  offset: number;
+  has_more: boolean;
+}
+
+export interface ApiMeta {
+  count?: number;
+  total?: number;
+  pagination?: PaginationMeta;
+  comic_id?: number;
+}
+
+export interface ApiSuccessResponse<T> {
+  success: true;
+  data: T;
+  meta?: ApiMeta;
+  count?: number;
+  total?: number;
+  pagination?: PaginationMeta;
+  comic_id?: number;
+}
+
+export interface ApiErrorResponse {
+  success: false;
+  error: string;
+  code: string;
+}
+
 export interface Publisher {
   id: number;
   name: string;

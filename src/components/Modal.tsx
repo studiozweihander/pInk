@@ -16,6 +16,9 @@ const Modal: React.FC<ModalProps> = ({ issueId, onClose }) => {
             setIsLoading(true);
             try {
                 const res = await api.getIssueById(issueId);
+                if (!res.data) {
+                    throw new Error("Resposta inválida da API");
+                }
                 setIssue(res.data);
             } catch (error) {
                 console.error(error);
@@ -41,8 +44,8 @@ const Modal: React.FC<ModalProps> = ({ issueId, onClose }) => {
                             src={issue?.cover || PLACEHOLDER_IMAGE}
                             alt={`Capa do quadrinho ${issue?.title} de ${issue?.year}`}
                             referrerPolicy="no-referrer"
-                            onError={(e: any) => {
-                                e.target.src = PLACEHOLDER_IMAGE;
+                            onError={(event: React.SyntheticEvent<HTMLImageElement, Event>) => {
+                                event.currentTarget.src = PLACEHOLDER_IMAGE;
                             }}
                         />
 

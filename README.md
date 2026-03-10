@@ -5,12 +5,13 @@
 - **Catálogo**: Interface limpa e intuitiva para buscar seu quadrinho favorito.
 - **Filtros**: Filtrar por editora, idioma e ano com resultados instantâneos.
 - **Modal**: Visualização detalhada de cada revista, incluindo sinopses, metadados e links de download direto.
-- **Performance**: Desenvolvido com Bun e ElysiaJS para alta performance.
+- **Performance**: Frontend em Vite + API na borda com Cloudflare Workers.
 
 ## 🛠️ Tecnologias
 
 - **Frontend**: React + Vite
-- **Backend**: Bun + ElysiaJS
+- **Backend (produção)**: Hono + Cloudflare Workers
+- **Backend (local/compat)**: Express
 - **Database**: Supabase (PostgreSQL)
 - **Typing**: TypeScript
 
@@ -28,7 +29,7 @@
 3.  **Iniciar o ambiente de desenvolvimento**:
 
     ```bash
-    # Iniciar o backend (com hot-reload)
+    # Iniciar o backend local (Express com hot-reload)
     bun run server
 
     # Iniciar o frontend

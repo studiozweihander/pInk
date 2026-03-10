@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { CONTACT_EMAIL, SOCIAL_LINKS } from "../constants";
 
 const Footer: React.FC = () => {
+    const currentYear = new Date().getFullYear();
     const [requestTitle, setRequestTitle] = React.useState("");
     const [notification, setNotification] = React.useState<{ message: string; type: "success" | "error" | null }>({
         message: "",
@@ -143,7 +144,7 @@ const Footer: React.FC = () => {
                         <span className="footer-logo">pInk</span>
                     </div>
                     <div className="footer-copyright">
-                        <span>© 2025. Todos os direitos reservados</span>
+                        <span>© {currentYear}. Todos os direitos reservados</span>
                     </div>
                 </div>
             </div>
