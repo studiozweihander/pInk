@@ -1,18 +1,12 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "../../../utils/supabaseClient";
+import { createRowId, parseValuesSimple } from "../../../utils/seederShared";
 import { SeederConfig, SeederRow, Toast } from "../types";
 
 const STORAGE_KEY = "pinkSeederData";
 const DEFAULT_TEMPLATE = `INSERT INTO "Issue" (title, "issueNumber", year, size, series, genres, link, cover, synopsis, "comicId", "idiomId")
 VALUES ('{title}', {number}, {year}, '{size}', '{series}', ARRAY{genres}, '{link}', '{cover}', '{synopsis}', {comicId}, {idiomId});`;
 const DEFAULT_COVER_PATTERN = "{nome-da-serie}-{number:3}.webp";
-
-const createRowId = () => {
-    if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-        return crypto.randomUUID();
-    }
-    return `row-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-};
 
 const createRow = (data?: Partial<SeederRow>, fallbackNumber = 1): SeederRow => ({
     id: data?.id || createRowId(),
@@ -22,61 +16,6 @@ const createRow = (data?: Partial<SeederRow>, fallbackNumber = 1): SeederRow => 
     link: data?.link ?? "",
     synopsis: data?.synopsis ?? "",
 });
-
-const parseValuesSimple = (valueStr: string) => {
-    const values: string[] = [];
-    let current = "";
-    let inString = false;
-    let stringChar: string | null = null;
-    let depth = 0;
-
-    for (let i = 0; i < valueStr.length; i += 1) {
-        const char = valueStr[i];
-        const prevChar = i > 0 ? valueStr[i - 1] : "";
-
-        if ((char === "'" || char === '"') && prevChar !== "\\") {
-            if (!inString) {
-                inString = true;
-                stringChar = char;
-                current += char;
-            } else if (char === stringChar) {
-                if (valueStr[i + 1] === stringChar) {
-                    current += char;
-                    i += 1;
-                    current += valueStr[i];
-                } else {
-                    inString = false;
-                    stringChar = null;
-                    current += char;
-                }
-            } else {
-                current += char;
-            }
-            continue;
-        }
-
-        if (!inString) {
-            if (char === "(" || char === "[") {
-                depth += 1;
-            } else if (char === ")" || char === "]") {
-                depth -= 1;
-            }
-        }
-
-        if (char === "," && !inString && depth === 0) {
-            values.push(current.trim());
-            current = "";
-        } else {
-            current += char;
-        }
-    }
-
-    if (current.trim()) {
-        values.push(current.trim());
-    }
-
-    return values;
-};
 
 const parseGenresInput = (value: string) => {
     const trimmed = value.trim();

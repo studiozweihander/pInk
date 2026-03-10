@@ -1,17 +1,11 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { supabase } from "../../../utils/supabaseClient";
+import { createRowId, parseValuesSimple } from "../../../utils/seederShared";
 import { ComicSeederRow, Toast } from "../types";
 
 const STORAGE_KEY = "pinkComicSeederData";
 const DEFAULT_TEMPLATE = `INSERT INTO "Comic" (title, issues, year, link, cover, "idiomId", "publisherId")
 VALUES ('{title}', {issues}, {year}, '{link}', '{cover}', {idiomId}, {publisherId});`;
-
-const createRowId = () => {
-    if (typeof crypto !== "undefined" && "randomUUID" in crypto) {
-        return crypto.randomUUID();
-    }
-    return `row-${Date.now()}-${Math.random().toString(16).slice(2)}`;
-};
 
 const createRow = (data?: Partial<ComicSeederRow>): ComicSeederRow => ({
     id: data?.id || createRowId(),
@@ -23,61 +17,6 @@ const createRow = (data?: Partial<ComicSeederRow>): ComicSeederRow => ({
     idiomId: data?.idiomId ?? "",
     publisherId: data?.publisherId ?? "",
 });
-
-const parseValuesSimple = (valueStr: string) => {
-    const values: string[] = [];
-    let current = "";
-    let inString = false;
-    let stringChar: string | null = null;
-    let depth = 0;
-
-    for (let i = 0; i < valueStr.length; i += 1) {
-        const char = valueStr[i];
-        const prevChar = i > 0 ? valueStr[i - 1] : "";
-
-        if ((char === "'" || char === '"') && prevChar !== "\\") {
-            if (!inString) {
-                inString = true;
-                stringChar = char;
-                current += char;
-            } else if (char === stringChar) {
-                if (valueStr[i + 1] === stringChar) {
-                    current += char;
-                    i += 1;
-                    current += valueStr[i];
-                } else {
-                    inString = false;
-                    stringChar = null;
-                    current += char;
-                }
-            } else {
-                current += char;
-            }
-            continue;
-        }
-
-        if (!inString) {
-            if (char === "(" || char === "[") {
-                depth += 1;
-            } else if (char === ")" || char === "]") {
-                depth -= 1;
-            }
-        }
-
-        if (char === "," && !inString && depth === 0) {
-            values.push(current.trim());
-            current = "";
-        } else {
-            current += char;
-        }
-    }
-
-    if (current.trim()) {
-        values.push(current.trim());
-    }
-
-    return values;
-};
 
 export const useComicSeederState = () => {
     const [rows, setRows] = useState<ComicSeederRow[]>([]);
