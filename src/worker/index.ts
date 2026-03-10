@@ -12,9 +12,18 @@ import {
   createSupabaseClient,
   readRuntimeEnv,
 } from "../server/services/supabaseClient";
-import { ApiNotFoundError, toErrorMessage } from "../server/services/errors";
+import { ApiNotFoundError, AppError, toErrorMessage } from "../server/services/errors";
 
 type Bindings = RuntimeEnv;
+type WorkerErrorStatus = 400 | 404 | 500 | 502;
+
+function toWorkerErrorStatus(statusCode: number): WorkerErrorStatus {
+  if (statusCode === 400 || statusCode === 404 || statusCode === 500 || statusCode === 502) {
+    return statusCode;
+  }
+
+  return 500;
+}
 
 const app = new Hono<{ Bindings: Bindings }>();
 
@@ -81,11 +90,25 @@ app.get("/api/issues/:id", async (c) => {
 app.onError((error, c) => {
   const message = toErrorMessage(error);
 
+  if (error instanceof AppError) {
+    const status = toWorkerErrorStatus(error.statusCode);
+
+    return c.json(
+      {
+        success: false,
+        error: message,
+        code: error.code,
+      },
+      status,
+    );
+  }
+
   if (error instanceof ApiNotFoundError) {
     return c.json(
       {
         success: false,
-        message,
+        error: message,
+        code: "NOT_FOUND",
       },
       404,
     );
@@ -94,7 +117,8 @@ app.onError((error, c) => {
   return c.json(
     {
       success: false,
-      message,
+      error: message,
+      code: "INTERNAL_ERROR",
     },
     500,
   );

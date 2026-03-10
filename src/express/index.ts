@@ -8,7 +8,7 @@ import {
 } from "../server/services/comicsService";
 import { getAllIssues, getIssueById } from "../server/services/issuesService";
 import { createSupabaseClient } from "../server/services/supabaseClient";
-import { ApiNotFoundError, toErrorMessage } from "../server/services/errors";
+import { ApiNotFoundError, AppError, toErrorMessage } from "../server/services/errors";
 
 export function createExpressApp() {
   const app = express();
@@ -97,17 +97,28 @@ export function createExpressApp() {
   app.use((error: unknown, _req: express.Request, res: express.Response, _next: express.NextFunction) => {
     const message = toErrorMessage(error);
 
+    if (error instanceof AppError) {
+      res.status(error.statusCode).json({
+        success: false,
+        error: message,
+        code: error.code,
+      });
+      return;
+    }
+
     if (error instanceof ApiNotFoundError) {
       res.status(404).json({
         success: false,
-        message,
+        error: message,
+        code: "NOT_FOUND",
       });
       return;
     }
 
     res.status(500).json({
       success: false,
-      message,
+      error: message,
+      code: "INTERNAL_ERROR",
     });
   });
 
