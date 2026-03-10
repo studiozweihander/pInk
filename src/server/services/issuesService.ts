@@ -1,4 +1,4 @@
-import { ApiNotFoundError } from "./errors";
+import { ApiNotFoundError, ValidationError } from "./errors";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { ApiSuccessResponse, PaginationMeta } from "../types";
 
@@ -175,6 +175,19 @@ export async function getAllIssues(
 }>>> {
   const limit = Number.parseInt(query.limit || "50", 10);
   const offset = Number.parseInt(query.offset || "0", 10);
+
+  if (Number.isNaN(limit) || Number.isNaN(offset)) {
+    throw new ValidationError("Invalid pagination params: limit and offset must be numbers");
+  }
+
+  if (limit <= 0 || limit > 200) {
+    throw new ValidationError("Invalid limit: expected a value between 1 and 200");
+  }
+
+  if (offset < 0) {
+    throw new ValidationError("Invalid offset: expected a value greater than or equal to 0");
+  }
+
   const search = query.search;
 
   let supabaseQuery = supabase

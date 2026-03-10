@@ -12,7 +12,7 @@ import {
   createSupabaseClient,
   readRuntimeEnv,
 } from "../server/services/supabaseClient";
-import { ApiNotFoundError, AppError, toErrorMessage } from "../server/services/errors";
+import { AppError, toErrorMessage } from "../server/services/errors";
 
 type Bindings = RuntimeEnv;
 type WorkerErrorStatus = 400 | 404 | 500 | 502;
@@ -100,17 +100,6 @@ app.onError((error, c) => {
         code: error.code,
       },
       status,
-    );
-  }
-
-  if (error instanceof ApiNotFoundError) {
-    return c.json(
-      {
-        success: false,
-        error: message,
-        code: "NOT_FOUND",
-      },
-      404,
     );
   }
 
