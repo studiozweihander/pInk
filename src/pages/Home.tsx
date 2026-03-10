@@ -7,6 +7,7 @@ import StatusMessage from "../components/StatusMessage";
 import { updateMetaTags } from "../utils/seoUtils";
 import { useScrollVisibility } from "../hooks/useScrollVisibility";
 import { ActiveFilters, FILTER_KEYS, VIEW_MODES, ViewMode } from "../constants";
+import { filterItemsBySearchAndFilters } from "../utils/filterUtils";
 
 interface HomeContext {
     searchTerm: string;
@@ -50,26 +51,10 @@ const Home: React.FC = () => {
     }, []);
 
     const filteredItems = useMemo(() => {
-        let filtered = allComics.filter((item) =>
-            item.title.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-
-        if (activeFilters[FILTER_KEYS.YEAR].length > 0) {
-            filtered = filtered.filter((item) =>
-                activeFilters[FILTER_KEYS.YEAR].includes(item.year?.toString())
-            );
-        }
-        if (activeFilters[FILTER_KEYS.PUBLISHER].length > 0) {
-            filtered = filtered.filter((comic) =>
-                activeFilters[FILTER_KEYS.PUBLISHER].includes(comic.publisher)
-            );
-        }
-        if (activeFilters[FILTER_KEYS.LANGUAGE].length > 0) {
-            filtered = filtered.filter((comic) =>
-                activeFilters[FILTER_KEYS.LANGUAGE].includes(comic.language)
-            );
-        }
-        return filtered;
+        return filterItemsBySearchAndFilters(allComics, searchTerm, activeFilters, {
+            includePublisher: true,
+            includeLanguage: true,
+        });
     }, [allComics, searchTerm, activeFilters]);
 
     useEffect(() => {

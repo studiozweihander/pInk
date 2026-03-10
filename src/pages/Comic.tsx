@@ -8,6 +8,7 @@ import Modal from "../components/Modal";
 import { updateMetaTags } from "../utils/seoUtils";
 import { ActiveFilters, FILTER_KEYS, getDynamicOGImage, VIEW_MODES, ViewMode } from "../constants";
 import { useScrollVisibility } from "../hooks/useScrollVisibility";
+import { filterItemsBySearchAndFilters } from "../utils/filterUtils";
 
 interface ComicContext {
     searchTerm: string;
@@ -65,17 +66,10 @@ const ComicPage: React.FC = () => {
     }, [slug, setHeaderComic]);
 
     const filteredItems = useMemo(() => {
-        let filtered = currentIssues.filter((item) =>
-            item.title.toLowerCase().includes(searchTerm.toLowerCase())
-        );
-
-        if (activeFilters[FILTER_KEYS.YEAR].length > 0) {
-            filtered = filtered.filter((item) =>
-                activeFilters[FILTER_KEYS.YEAR].includes(item.year?.toString())
-            );
-        }
-
-        return filtered;
+        return filterItemsBySearchAndFilters(currentIssues, searchTerm, activeFilters, {
+            includePublisher: false,
+            includeLanguage: false,
+        });
     }, [currentIssues, searchTerm, activeFilters]);
 
     useEffect(() => {

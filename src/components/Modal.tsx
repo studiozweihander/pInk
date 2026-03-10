@@ -10,10 +10,12 @@ interface ModalProps {
 const Modal: React.FC<ModalProps> = ({ issueId, onClose }) => {
     const [issue, setIssue] = useState<Issue | null>(null);
     const [isLoading, setIsLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
 
     useEffect(() => {
         const loadIssue = async () => {
             setIsLoading(true);
+            setError(null);
             try {
                 const res = await api.getIssueById(issueId);
                 if (!res.data) {
@@ -22,6 +24,7 @@ const Modal: React.FC<ModalProps> = ({ issueId, onClose }) => {
                 setIssue(res.data);
             } catch (error) {
                 console.error(error);
+                setError("Nao foi possivel carregar os detalhes da edicao.");
             } finally {
                 setIsLoading(false);
             }
@@ -29,7 +32,7 @@ const Modal: React.FC<ModalProps> = ({ issueId, onClose }) => {
         loadIssue();
     }, [issueId]);
 
-    if (!issue && !isLoading) return null;
+    if (!issue && !isLoading && !error) return null;
 
     return (
         <div className="modal open">
@@ -71,7 +74,9 @@ const Modal: React.FC<ModalProps> = ({ issueId, onClose }) => {
 
                         <div className="modal-section">
                             <h3>Sinopse</h3>
-                            <p id="modal-synopsis">{issue?.synopsis || "Sem sinopse disponível."}</p>
+                            <p id="modal-synopsis">
+                                {error ? error : issue?.synopsis || "Sem sinopse disponivel."}
+                            </p>
                         </div>
 
                         <div className="modal-section">

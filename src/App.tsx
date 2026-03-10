@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 import { Routes, Route, Outlet, useLocation, useNavigate } from "react-router-dom";
+import { Comic } from "./api";
 import Header from "./components/Header";
 import Footer from "./components/Footer";
 import ASCIIArt from "./components/ASCIIArt";
@@ -11,7 +12,7 @@ import "./styles/main.css";
 
 const Layout: React.FC = () => {
     const [searchTerm, setSearchTerm] = useState("");
-    const [headerComic, setHeaderComic] = useState<any | null>(null);
+    const [headerComic, setHeaderComic] = useState<Comic | null>(null);
     const [headerAction, setHeaderAction] = useState<React.ReactNode | null>(null);
     const location = useLocation();
     const navigate = useNavigate();
