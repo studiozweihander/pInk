@@ -17,8 +17,9 @@
   "keywords": [
     "comics",
     "catalog",
+    "cloudflare",
+    "hono",
     "bun",
-    "elysia",
     "react",
     "typescript"
   ],
