@@ -24,7 +24,7 @@ const Modal: React.FC<ModalProps> = ({ issueId, onClose }) => {
                 setIssue(res.data);
             } catch (error) {
                 console.error(error);
-                setError("Nao foi possivel carregar os detalhes da edicao.");
+                setError("Nao foi possivel carregar os detalhes da edição.");
             } finally {
                 setIsLoading(false);
             }
