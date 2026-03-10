@@ -1,4 +1,4 @@
-export const APP_VERSION = "2.4.1";
+export const APP_VERSION = "2.5.0";
 export const CONTACT_EMAIL = "comics.pink@gmail.com";
 export const PLACEHOLDER_IMAGE =
   "https://placehold.co/300x450/242424/e78fde?text=Imagem+Não+Disponível&font=source-sans-pro";
