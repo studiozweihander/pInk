@@ -69,7 +69,7 @@ async function parseApiResponse<T>(response: Response): Promise<ApiResponse<T>> 
   try {
     payload = (await response.json()) as ApiResponse<T>;
   } catch {
-    payload = null;
+    throw new Error(`Resposta invalida da API (nao-JSON) - HTTP ${response.status}`);
   }
 
   if (!response.ok) {
@@ -78,7 +78,7 @@ async function parseApiResponse<T>(response: Response): Promise<ApiResponse<T>> 
   }
 
   if (!payload || !payload.success || payload.data === undefined) {
-    throw new Error(payload?.error || "Resposta invalida da API");
+    throw new Error(payload?.error || `Resposta invalida da API - HTTP ${response.status}`);
   }
 
   return payload;

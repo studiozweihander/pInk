@@ -1,6 +1,6 @@
 import { createExpressApp } from "../express/index";
 
-const PORT = Number(process.env.PORT || 3000);
+const PORT = Number(process.env.PORT || 3105);
 
 const app = createExpressApp();
 
